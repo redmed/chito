@@ -1,7 +1,7 @@
 module.exports = {
     entry: {
-        'animator': './src/main',
-        'animator.spec': './spec/animator.spec'
+        'animater': './src/main',
+        'animater.spec': './spec/animater.spec'
     },
 
     output: {

@@ -1,7 +1,8 @@
 {
-  "name": "animator",
+  "name": "animater",
   "version": "0.1.0",
   "description": "",
+  "main": "dist/animater.js",
   "scripts": {
     "dev": "webpack-dev-server --inline --port 8082 --host 0.0.0.0 --config webpack.dev.config.js",
     "release": "webpack --config webpack.release.config.js",

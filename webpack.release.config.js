@@ -2,14 +2,14 @@ var path = require('path');
 
 module.exports = {
     entry: {
-        'animator': './src/main',
+        'animater': './src/main',
     },
 
     output: {
         filename: '[name].js',
         // publicPath: path.normalize('./dist'),
         path: path.resolve(__dirname, './dist/'),
-        library: 'Animator',
+        library: 'Animater',
         libraryTarget: 'umd',
         umdNamedDefine: true,
     },
