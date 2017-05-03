@@ -213,6 +213,10 @@ class Animation extends EventEmitter {
 
     }
 
+    /**
+     * 获得 Clips
+     * @returns {Array.<Clip>}
+     */
     getClips() {
         return this._aliveClips;
     }

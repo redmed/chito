@@ -124,7 +124,7 @@ class ShaderClip extends Clip {
      * 设置属性状态及时间控制点
      * @param {Object} attr
      * @param {number} time 单位ms
-     * @returns {Shader}
+     * @returns {ShaderClip}
      */
     when(attr/*, time*/) {
         // TODO: 如果需要支持指定time上的变化，需要实现关于时间的插值计算，比较复杂，后面再考虑实现
@@ -156,6 +156,7 @@ class ShaderClip extends Clip {
     }
 
     update(time) {
+
         if (this._isPlaying && time && time < this._startTime) {
             return true;
         }
@@ -216,6 +217,7 @@ class ShaderClip extends Clip {
         }
 
         return true;
+
     }
 }
 

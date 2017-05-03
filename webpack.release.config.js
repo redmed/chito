@@ -7,8 +7,7 @@ module.exports = {
 
     output: {
         filename: '[name].js',
-        // publicPath: path.normalize('./dist'),
-        path: path.resolve(__dirname, './dist/'),
+        path: path.resolve(__dirname, './'),
         library: 'Animater',
         libraryTarget: 'umd',
         umdNamedDefine: true,
