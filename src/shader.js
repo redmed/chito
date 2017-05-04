@@ -1,7 +1,6 @@
 /**
- * @file
+ * @file ShaderClip 动画片段，由 Animation 统一调度, 提供数值和颜色的变化
  * @author redmed
- * @date 2017/3/13
  */
 
 import Clip from './clip.js';
@@ -206,6 +205,8 @@ class ShaderClip extends Clip {
                 if (this._yoyo) {
                     this._reversed = !this._reversed;
                 }
+
+                this.emit(this.Event.REPEAT_COMPLETE);
 
                 return true;
             }

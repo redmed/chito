@@ -1,7 +1,6 @@
 /**
- * @file 子动画片段, 由 Animation 统一调度, 只控制时间的变化量
+ * @file 动画片段, 由 Animation 统一调度, 只控制时间的变化量
  * @author redmed
- *
  */
 
 // Include a performance.now polyfill
@@ -33,6 +32,7 @@ import EasingFunc from './lib/easing.js';
 const Event = {
     UPDATE: 'update',
     START: 'start',
+    REPEAT_COMPLETE: 'repeatComplete',
     COMPLETE: 'complete',
     STOP: 'stop'
 };
@@ -280,6 +280,8 @@ class Clip extends EventEmitter {
                 if (this._yoyo) {
                     this._reversed = !this._reversed;
                 }
+
+                this.emit(Event.REPEAT_COMPLETE);
 
                 return true;
             }

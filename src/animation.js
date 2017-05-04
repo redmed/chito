@@ -8,8 +8,10 @@ import utils from './lib/util.js';
 import { requestAnimationFrame, cancelAnimationFrame } from './lib/animationframe.js';
 
 let Event = {
-    UPDATE: 'frameUpdate',
-    UPDATE_AFTER: 'frameUpdateAfter',
+    START: 'start',
+    STOP: 'stop',
+    UPDATE: 'update',
+    AFTER_UPDATE: 'afterUpdate',
     COMPLETE: 'complete'
 };
 
@@ -109,7 +111,7 @@ class Animation extends EventEmitter {
 
             this._aliveClips = alive;
 
-            this.emit(Event.UPDATE_AFTER, timestamp);
+            this.emit(Event.AFTER_UPDATE, timestamp);
 
             if (this._aliveClips.length === 0) {
                 this.stop();
@@ -133,6 +135,8 @@ class Animation extends EventEmitter {
         //     clip.start();
         // });
 
+        this.emit(Event.START);
+
         requestAnimationFrame(this._animation);
         this._status = 1;
 
@@ -151,6 +155,8 @@ class Animation extends EventEmitter {
             // this._aliveClips.forEach(clip => {
             //     clip.stop();
             // });
+
+            this.emit(Event.STOP);
 
             this._status = 2;
         }

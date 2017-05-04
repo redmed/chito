@@ -48,6 +48,40 @@
 
 析构函数，清空内部状态。
 
+
+### Animation 事件
+
+#### 1. on(eventName, handler)
+
+添加事件
+
+参数:
+
+* eventName: `string` 事件名称
+* handler: `function` 事件回调函数
+
+其中`eventName`支持类型: 
+
+* `'start' | Animation.Event.START` Animation 启动
+* `'stop' | Animation.Event.STOP`  Animation 停止
+* `'update' | Animation.Event.UPDATE`  Animation 每次更新调用时，此时未触发 Clip
+* `'afterUpdate' | Animation.Event.AFTER_UPDATE`  Animation 每次更新 Clip 后触发
+* `'complete' | Animation.Event.COMPLETE`  Animation 动画全部(Clip)结束触发
+
+`handler` 提供一个参数:
+
+* timestamp: `number` 当前时间戳
+
+#### 2.off(eventName, handler)
+
+移除事件
+
+参数:
+
+* eventName: `string=` 事件名称，默认移除全部函数
+* handler: `function=` 事件回调函数，默认移除`eventName`下的全部事件
+
+
 ---
 
 ## ShaderClip
@@ -159,3 +193,52 @@ keyframe = {
 * `value`: `Array.<number|color>` 数组中指定了数据变化的关键帧，变化过程会按照缓动函数进行。   
 其中数据格式支持 `number` 和 `CSS` 的 `color` 类型 - 颜色名称, #RRGGBB, #RGB, rgb(R,G,B), rgba(R,G,B,A)   
 其中，`Array` 的长度必须 >1，否则 `value` 不会变化。
+
+### ShaderClip 事件
+
+#### 1. on(eventName, handler)
+
+添加事件
+
+参数:
+
+* eventName: `string` 事件名称
+* handler: `function` 事件回调函数
+
+其中`eventName`支持类型: 
+
+* `'start' | Clip.Event.START`  clip 启动
+* `'update' | Clip.Event.UPDATE`  clip 每次更新动画帧
+* `'repeatComplete' | Clip.Event.REPEAT_COMPLETE`  clip 每个周期(repeat)结束后
+* `'complete' | Clip.Event.COMPLETE`  clip  动画结束(repeat运行全部结束)
+* `'stop' | Clip.Event.STOP`  clip 动画停止
+
+`handler` 提供两个参数:
+
+* progress: `number=[0, 1]` 缓动进度
+* keyframe: `Object` 关键帧在当前进度下的值
+
+例如: 
+
+```js
+let clip = new Clip({
+	duration: 2000,
+	repeat: 10
+}, {
+	x: [0, 10]
+})
+
+clip.on(Clip.Event.UPDATE, (progress, keyframe) => {
+	console.log(progress) // output: 0 .. 0.5 .. 1 
+	console.log(keyframe) // output: {x: 0} .. {x: 5} .. {x: 10}
+})
+```
+
+#### 2.off(eventName, handler)
+
+移除事件
+
+参数:
+
+* eventName: `string=` 事件名称，默认移除全部函数
+* handler: `function=` 事件回调函数，默认移除`eventName`下的全部事件
