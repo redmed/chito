@@ -13,7 +13,7 @@
 
 ##### 参数:  
 
-clip `Clip|Array.<Clip>`  添加的`Clip`实例
+* clip `Clip|Array.<Clip>`  添加的`Clip`实例
 
 #### 2. removeClip(clip)
 
@@ -21,7 +21,7 @@ clip `Clip|Array.<Clip>`  添加的`Clip`实例
 
 ##### 参数:  
 
-clip `Clip=` 	`可选` 移除的`Clip`实例，默认移除全部。
+* clip `Clip=` 	`可选` 移除的`Clip`实例，默认移除全部。
 
 #### 3. start()
 
@@ -60,9 +60,9 @@ clip `Clip=` 	`可选` 移除的`Clip`实例，默认移除全部。
 
 ##### 参数: 
 
-options `options` 动画配置项
+* options `options` 动画配置项
 
-keyframe `options` 关键帧属性配置
+* keyframe `options` 关键帧属性配置
 
 具体配置请参考下面文档: 
 
@@ -80,9 +80,9 @@ options = {
 }
 ```
 
-#### duration: `number=0` 
+#### duration: `number` 
 
-每次动画播放总时长，单位毫秒，默认值 0
+每次动画播放总时长，单位毫秒
 
 #### repeat: `number=0`
 
@@ -109,12 +109,14 @@ options = {
 
 #### easing: `string|function` (optional)
 
-时间缓动函数，默认为线性函数 'Linear'。
+* 时间缓动函数名称，默认为线性函数 'Linear'。
 
 可选参数有: Linear, QuadraticIn, QuadraticOut, QuadraticInOut, CubicIn, CubicOut, CubicInOut, QuarticIn, QuarticOut, QuarticInOut, QuinticIn, QuinticOut, QuinticInOut, SinusoidalIn, SinusoidalOut, SinusoidalInOut, ExponentialIn, ExponentialOut, ExponentialInOut, CircularIn, CircularOut, CircularInOut, ElasticIn, ElasticOut, ElasticInOut, BackIn, 
 BackOut, BackInOut, BounceIn, BounceOut, BounceInOut.
 
-也可以使用自定义缓动函数。
+<!-- 缓动函数效果，请参考[DEMO]() -->
+
+* 也可以使用自定义缓动函数。
 
 只要保证以下两点:  
 1. 自定义函数接受一个缓动进度 `k`, 范围为 [0, 1]  
@@ -131,14 +133,29 @@ function tenStepEasing(k) {
 各个参数关系请参考下图:
 
 ```text
-                                         |            yoyo            |            |  yoyo  |
-start()          | startAt               |          repeat            |   repeat   |        |
- |----------|-----------------|----------|-----------------|----------|------- ... |---- ...|
+               startAt                   |           yoyo             |            |   yoyo   |
+start()          |                       |          repeat            |   repeat   |  repeat  |
+ |----------|-----------------|----------|-----------------|----------|------- ... |------ ...|
     delay        duration       interval      duration       interval
 
 ```
 
-<!-- 缓动函数效果，请参考[DEMO]() -->
-
 
 #### 2. keyframe 关键帧配置
+
+`Object - Key.<string>: Value.<Array>`  
+
+```js
+keyframe = {
+	x: [ 0, 10, 20 ], // x 从 0 -> 10 -> 20 变化
+	y: [ 10, 0, -10 ],
+	color: [ '#f00', '#0f0', '#00f' ], // color 从 #f00 -> #0f0 -> #00f 变化
+	borderColor: [ 'red', 'blue' ],
+	backgroundColor: [ 'rgba(255, 0, 0, 0.3)', 'rgba(0, 0, 255, 0.9)' ]
+}
+```
+
+* `key`: `string` 属性名称
+* `value`: `Array.<number|color>` 数组中指定了数据变化的关键帧，变化过程会按照缓动函数进行。   
+其中数据格式支持 `number` 和 `CSS` 的 `color` 类型 - 颜色名称, #RRGGBB, #RGB, rgb(R,G,B), rgba(R,G,B,A)   
+其中，`Array` 的长度必须 >1，否则 `value` 不会变化。

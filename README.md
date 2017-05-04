@@ -18,7 +18,7 @@ npm i animater --save
 
 ### 2. 模块引入
 
-`Animater`采用 `UMD` 的模块引用方式，因此可是考虑一下方式引用。
+`Animater`采用 `UMD` 的模块引用方式，因此可以考虑一下方式引用。
 
 
 By ES6
