@@ -281,7 +281,7 @@ class Clip extends EventEmitter {
                     this._reversed = !this._reversed;
                 }
 
-                this.emit(Event.REPEAT_COMPLETE);
+                this.emit(Event.REPEAT_COMPLETE, this._repeat);
 
                 return true;
             }

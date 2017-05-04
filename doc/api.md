@@ -68,7 +68,7 @@
 * `'afterUpdate' | Animation.Event.AFTER_UPDATE`  Animation 每次更新 Clip 后触发
 * `'complete' | Animation.Event.COMPLETE`  Animation 动画全部(Clip)结束触发
 
-`handler` 提供一个参数:
+`update`handler 提供一个参数:
 
 * timestamp: `number` 当前时间戳
 
@@ -207,13 +207,14 @@ keyframe = {
 
 其中`eventName`支持类型: 
 
-* `'start' | Clip.Event.START`  clip 启动
-* `'update' | Clip.Event.UPDATE`  clip 每次更新动画帧
-* `'repeatComplete' | Clip.Event.REPEAT_COMPLETE`  clip 每个周期(repeat)结束后
-* `'complete' | Clip.Event.COMPLETE`  clip  动画结束(repeat运行全部结束)
-* `'stop' | Clip.Event.STOP`  clip 动画停止
+* `'start' | ShaderClip.Event.START`  clip 启动
+* `'update' | ShaderClip.Event.UPDATE`  clip 每次更新动画帧
+* `'complete' | ShaderClip.Event.COMPLETE`  clip  动画结束(repeat运行全部结束)
+* `'stop' | ShaderClip.Event.STOP`  clip 动画停止
 
-`handler` 提供两个参数:
+<!-- * `'repeatComplete' | ShaderClip.Event.REPEAT_COMPLETE`  clip 每个周期(repeat)结束后 -->
+
+`update`handler 提供两个参数:
 
 * progress: `number=[0, 1]` 缓动进度
 * keyframe: `Object` 关键帧在当前进度下的值
@@ -221,14 +222,14 @@ keyframe = {
 例如: 
 
 ```js
-let clip = new Clip({
+let clip = new ShaderClip({
 	duration: 2000,
 	repeat: 10
 }, {
 	x: [0, 10]
 })
 
-clip.on(Clip.Event.UPDATE, (progress, keyframe) => {
+clip.on(ShaderClip.Event.UPDATE, (progress, keyframe) => {
 	console.log(progress) // output: 0 .. 0.5 .. 1 
 	console.log(keyframe) // output: {x: 0} .. {x: 5} .. {x: 10}
 })

@@ -4,7 +4,7 @@
  * @date 16/7/30
  */
 
-import { Animation, Clip } from '../src/main';
+import { Animation, Clip, ShaderClip } from '../src/main';
 
 describe('Clip test', () => {
 
@@ -79,10 +79,29 @@ describe('Clip test', () => {
 
         clip.update(window.performance.now() + 5000);
     });
+
+    it('Clip on(Event.REPEAT_COMPLETE)/emit(Event.REPEAT_COMPLETE) test ...ok', (done) => {
+        animationOptions = {
+            [Clip.Attr.DURATION]: 1000,
+            [Clip.Attr.REPEAT]: 2
+        };
+
+        let clip = new Clip(animationOptions);
+
+        clip.on(Clip.Event.REPEAT_COMPLETE, (repeat) => {
+            expect(typeof repeat == 'number' && repeat > 0).toBe(true);
+            done();
+        });
+        clip.start();
+
+        clip.update(window.performance.now() + 1500);
+    });
 });
+
 
 describe('Animation test', () => {
     let ani;
+
     it('Animation constructor test ...ok', () => {
         let a = new Animation();
         expect(a._status).toBe(0);
@@ -105,7 +124,7 @@ describe('Animation test', () => {
             expect(typeof timestamp == 'number').toBe(true);
         });
 
-        ani.on(Animation.Event.UPDATE_AFTER, (timestamp) => {
+        ani.on(Animation.Event.AFTER_UPDATE, (timestamp) => {
             t1 = window.performance.now();
             expect(typeof timestamp == 'number').toBe(true);
             expect(t1 > t).toBe(true);

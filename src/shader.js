@@ -206,7 +206,7 @@ class ShaderClip extends Clip {
                     this._reversed = !this._reversed;
                 }
 
-                this.emit(this.Event.REPEAT_COMPLETE);
+                this.emit(this.Event.REPEAT_COMPLETE, this._repeat);
 
                 return true;
             }
