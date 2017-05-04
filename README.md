@@ -79,6 +79,21 @@ ani.start()
 
 <!-- [DEMO](./demo) -->
 
+### 5. 代码修改及本地调试
+
+源码使用`ES6`语法开发，具体语法规则请参考[babelrc](./.babelrc)文件
+
+```sh
+# 1. 安装依赖
+npm i
+
+# 2. 运行本地开发环境
+npm run dev
+
+# 3. 打开浏览器调试 (或者自行打开浏览器，使用以下url)
+open http://localhost:8082
+
+```
 
 ### 许可
 本软件 (Animater) 实施 BSD 许可协议
