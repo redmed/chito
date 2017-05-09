@@ -4,6 +4,8 @@ module.exports = {
         'animater.spec': './spec/animater.spec',
         'ee.spec': './spec/ee.spec',
         'animater.benchmark': './benchmark/animater',
+        'color.benchmark': './benchmark/color',
+        'compute.benchmark': './benchmark/compute',
     },
 
     output: {
