@@ -190,7 +190,7 @@ class ShaderClip extends Clip {
             }
         }
 
-        this.emit(this.Event.UPDATE, percent, keyframe);
+        this.emit(this.Event.UPDATE, percent, keyframe, this.getOpt());
 
         // 一个周期结束
         if (elapsed == 1) {
@@ -206,12 +206,12 @@ class ShaderClip extends Clip {
                     this._reversed = !this._reversed;
                 }
 
-                this.emit(this.Event.REPEAT_COMPLETE, this._repeat);
+                this.emit(this.Event.REPEAT_COMPLETE, this._repeat, this.getOpt());
 
                 return true;
             }
             else {
-                this.emit(this.Event.COMPLETE);
+                this.emit(this.Event.COMPLETE, this.getOpt());
 
                 return false;
             }

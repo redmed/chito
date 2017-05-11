@@ -100,6 +100,13 @@ class Clip extends EventEmitter {
     _options = {};
 
     /**
+     * 变换属性
+     * @type {Object}
+     * @private
+     */
+    _attr = {};
+
+    /**
      * 运行时长
      * @type {number}
      */
@@ -179,13 +186,13 @@ class Clip extends EventEmitter {
 
     /**
      * 初始化函数
-     * @param {Object=} from 起始帧
-     * @param {Object=} to 结束帧
      * @param {Object=} options 配置项
+     * @param {Object=} attr 变换属性
      */
     initialize(options = {}, attr) {
 
         this._options = this._initOption(options);
+        this._attr = attr;
 
     }
 
@@ -213,6 +220,13 @@ class Clip extends EventEmitter {
 
     }
 
+    getOpt() {
+        return {
+            options: this._options,
+            attr: this._attr
+        }
+    }
+
     /**
      * 启动动画
      * @param {Boolean=} forceStart 强制重新计时
@@ -226,7 +240,7 @@ class Clip extends EventEmitter {
         this._isPlaying = true;
         this._startTime = window.performance.now() + this._delay;
 
-        this.emit(Event.START);
+        this.emit(Event.START, this.getOpt());
 
         return this;
 
@@ -243,7 +257,7 @@ class Clip extends EventEmitter {
 
         this._isPlaying = false;
 
-        this.emit(Event.STOP);
+        this.emit(Event.STOP, this.getOpt());
 
         return this;
 
@@ -265,7 +279,7 @@ class Clip extends EventEmitter {
         elapsed = Math.min(elapsed, 1);
 
         let percent = this._easing(this._reversed ? 1 - elapsed : elapsed);
-        this.emit(Event.UPDATE, percent);
+        this.emit(Event.UPDATE, percent, this.getOpt());
 
         // 一个周期结束
         if (elapsed == 1) {
@@ -281,12 +295,12 @@ class Clip extends EventEmitter {
                     this._reversed = !this._reversed;
                 }
 
-                this.emit(Event.REPEAT_COMPLETE, this._repeat);
+                this.emit(Event.REPEAT_COMPLETE, this._repeat, this.getOpt());
 
                 return true;
             }
             else {
-                this.emit(Event.COMPLETE);
+                this.emit(Event.COMPLETE, this.getOpt());
 
                 return false;
             }

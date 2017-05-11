@@ -96,8 +96,74 @@ describe('Clip test', () => {
 
         clip.update(window.performance.now() + 1500);
     });
+
+    it('Clip Complete Event arguments test ...ok', (done) => {
+        animationOptions = {
+            [Clip.Attr.DURATION]: 1000,
+            [Clip.Attr.REPEAT]: 1
+        };
+
+        let clip = new Clip(animationOptions);
+
+        clip.on(Clip.Event.COMPLETE, (args) => {
+            expect(typeof args.options == 'object'
+                && args.options[ Clip.Attr.DURATION ] === animationOptions[ Clip.Attr.DURATION ])
+                .toBe(true);
+            expect(typeof args.options == 'object'
+                && args.options[ Clip.Attr.REPEAT ] === animationOptions[ Clip.Attr.REPEAT ])
+                .toBe(true);
+
+            done();
+        });
+        clip.start();
+
+        clip.update(window.performance.now() + 1500);
+    });
 });
 
+describe('ShaderClip test', () => {
+    let animationOptions = {
+        [ShaderClip.Attr.DURATION]: 1000,
+        [ShaderClip.Attr.REPEAT]: 1,
+        [ShaderClip.Attr.DELAY]: 0,
+        [ShaderClip.Attr.EASING]: 'Linear'
+    };
+
+    let attr = {
+        x: [ 0, 100 ],
+        y: [ 200, 400 ],
+        color: [ '#f00', '#00f' ]
+    };
+
+    it('ShaderClip update() test ...ok', () => {
+        let clip = new ShaderClip(animationOptions, attr);
+        clip.start();
+
+        let res = clip.update(window.performance.now() + 500);
+        expect(res).toBe(true);
+        res = clip.update(window.performance.now() + 1500);
+        expect(res).toBe(false);
+    });
+
+    it('ShaderClip on(Event.UPDATE)/emit(Event.UPDATE) test ...ok', (done) => {
+        let clip = new ShaderClip(animationOptions, attr);
+
+        clip.on(ShaderClip.Event.UPDATE, (progress, keyframe, args) => {
+            expect(typeof progress == 'number' && progress <= 1).toBe(true);
+            expect(typeof keyframe == 'object'
+                && typeof keyframe.x == 'number'
+                && keyframe.x < 100).toBe(true);
+            expect(typeof args.options == 'object'
+                && args.options[ ShaderClip.Attr.DURATION ] === animationOptions[ ShaderClip.Attr.DURATION ]).toBe(true);
+
+            done();
+        });
+        clip.start();
+
+        clip.update(window.performance.now() + 500);
+    });
+
+});
 
 describe('Animation test', () => {
     let ani;
