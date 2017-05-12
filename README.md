@@ -2,6 +2,7 @@
 
 ![version](https://img.shields.io/npm/v/animater.svg) 
 ![](https://img.shields.io/npm/dt/animater.svg)
+![](https://api.travis-ci.org/redmed/animater.svg?branch=develop)
 
 
 一个支持计算颜色变化的动画库。
