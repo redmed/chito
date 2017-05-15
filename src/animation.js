@@ -33,7 +33,7 @@ class Animation extends EventEmitter {
 
     /**
      * 动画进程标记
-     * @type {*}
+     * @type {number|null}
      * @private
      */
     _timer;

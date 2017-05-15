@@ -175,15 +175,97 @@ describe('ShaderClip test', function () {
 });
 
 describe('Animation test', function () {
-    var ani;
 
-    it('Animation Event.UPDATE/UPDATE_AFTER test ...ok', function (done) {
-        ani = new Animation();
+    var clipOpt = {
+        duration: 5000,
+        repeat: 10
+    };
+
+    var ani = new Animation();
+
+    var clip1 = new Clip(clipOpt);
+    var clips2 = [];
+
+    for (var i = 0, len = 10; i < len; i++) {
+        clips2.push(new Clip(clipOpt));
+    }
+
+    it('Animation addClip() test ...ok', function () {
+        ani.addClip(clip1);
+        expect(ani._clips.length).toBe(1);
+
+        ani.addClip(clips2);
+        expect(ani._clips.length).toBe(clips2.length + 1);
+    });
+
+    it('Animation  test ...ok', function () {
+        ani.removeClip(clip1);
+        expect(ani._clips.length).toBe(clips2.length);
+
+        ani.removeClip();
+        expect(ani._clips.length).toBe(0);
+    });
+
+    it('Animation getClips() test ...ok', function () {
+        var ani = new Animation();
+        ani.addClip(clip1);
+
+        expect(ani.getClips()[ 0 ]).toBe(clip1);
+    });
+
+    it('Animation start()/on(Event.START) test ...ok', function (done) {
+        var ani = new Animation();
+        ani.addClip(clip1);
+
+        ani.on(Animation.Event.START, () => {
+            expect(1).toBe(1);
+            done();
+        });
+
+        ani.start();
+    });
+
+    it('Animation start(true) test ...ok', function (done) {
+        var ani = new Animation();
+        ani.addClip(new Clip(clipOpt));
+
+        ani.on(Animation.Event.START, () => {
+
+            var clips = ani.getClips();
+            for (var i = 0, len = clips.length; i < len; i++) {
+                let c = clips[i];
+
+                expect(c._isPlaying).toBe(true);
+            }
+
+            done();
+        });
+
+        ani.start(true);
+    });
+
+    it('Animation stop()/on(Event.STOP) test ...ok', function (done) {
+        var ani = new Animation();
+        ani.addClip(clip1);
+
+        ani.on(Animation.Event.STOP, function () {
+            expect(ani._timer).toBe(null);
+            done();
+        });
+
+        ani.start();
+        setTimeout(function () {
+            ani.stop()
+        }, 500);
+    });
+
+    it('Animation on(Event.UPDATE/UPDATE_AFTER) test ...ok', function (done) {
         var clip = new Clip({
             duration: 500,
             repeat: 1
         });
 
+        var ani = new Animation();
         clip.start();
         ani.addClip(clip);
 
