@@ -177,11 +177,6 @@ describe('ShaderClip test', function () {
 describe('Animation test', function () {
     var ani;
 
-    it('Animation constructor test ...ok', function () {
-        var a = new Animation();
-        expect(a._status).toBe(0);
-    });
-
     it('Animation Event.UPDATE/UPDATE_AFTER test ...ok', function (done) {
         ani = new Animation();
         var clip = new Clip({
