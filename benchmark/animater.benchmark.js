@@ -1,13 +1,15 @@
-import { Clip, ShaderClip as Shader } from '../src/main';
+var Animation = Animater.Animation,
+    Clip = Animater.Clip,
+    ShaderClip = Animater.ShaderClip;
 
-suite('Clip benchmark test', () => {
-    let clips = [],
+suite('Clip.update() benchmark test', () => {
+    var clips = [],
         shaders = [];
 
-    let i = 0, m = 5000;
+    var i = 0, m = 5000;
     while (i++ < m) {
         // Clip
-        let clip = new Clip({
+        var clip = new Clip({
             duration: 9999999999,
             repeat: 9999999999
         });
@@ -16,7 +18,7 @@ suite('Clip benchmark test', () => {
         clip.start();
 
         // Shader
-        let shader = new Shader({
+        var shader = new ShaderClip({
             duration: 9999999999,
             repeat: 9999999999
         }, {
@@ -30,17 +32,17 @@ suite('Clip benchmark test', () => {
     }
 
     bench('ShaderClip update ', () => {
-        let j = 0;
+        var j = 0;
         while (j < m) {
-            let shader = shaders[ j++ ];
+            var shader = shaders[ j++ ];
             shader.update(Date.now());
         }
     });
 
     bench('Clip update ', () => {
-        let j = 0;
+        var j = 0;
         while (j < m) {
-            let clip = clips[ j++ ];
+            var clip = clips[ j++ ];
             clip.update(Date.now());
         }
     });
@@ -49,22 +51,52 @@ suite('Clip benchmark test', () => {
 
 suite('create Class', () => {
 
-    let opt = {
+    var opt = {
         duration: 1000,
         repeat: 1
     };
 
-    let keyframe = {
+    var keyframe = {
         x: [ 0, 100 ],
         color: [ 'red', 'blue', '#0fe' ]
     };
 
     bench('new ShaderClip', () => {
-        new Shader(opt, keyframe);
+        new ShaderClip(opt, keyframe);
     });
 
     bench('new Clip', () => {
         new Clip(opt);
+    });
+
+});
+
+suite('Animation._update()', () => {
+
+    var ani = new Animation();
+    var ani2 = new Animation();
+
+    var clips = [];
+
+    var i = 0, m = 5000;
+
+    while (i++ < m) {
+        // Clip
+        var clip = new Clip({
+            duration: 999999,
+            repeat: 99999
+        });
+
+        clips.push(clip);
+        clip.start();
+
+    }
+
+    ani.addClip(clips);
+    ani2.addClip(clips);
+
+    bench('Animation._update()', () => {
+        ani._update(Date.now());
     });
 
 });
