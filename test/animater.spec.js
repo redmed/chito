@@ -249,7 +249,7 @@ describe('Animation test', function () {
 
             var clips = ani.getClips();
             for (var i = 0, len = clips.length; i < len; i++) {
-                let c = clips[ i ];
+                var c = clips[ i ];
 
                 expect(c._isPlaying).toBe(true);
             }
