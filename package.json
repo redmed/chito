@@ -1,7 +1,7 @@
 {
   "name": "animater",
-  "version": "0.1.4",
-  "description": "",
+  "version": "0.1.5",
+  "description": "一个支持计算颜色变化的动画库。",
   "main": "animater.js",
   "scripts": {
     "dev": "webpack-dev-server --inline --port 8082 --host 0.0.0.0 --config webpack.config.js",

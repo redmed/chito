@@ -2,7 +2,7 @@ var Animation = Animater.Animation,
     Clip = Animater.Clip,
     ShaderClip = Animater.ShaderClip;
 
-suite('Clip.update() benchmark test', () => {
+suite('Clip.update() benchmark test', function () {
     var clips = [],
         shaders = [];
 
@@ -23,7 +23,7 @@ suite('Clip.update() benchmark test', () => {
             repeat: 9999999999
         }, {
             x: [ 0, 100 ],
-            color: [ 'red', 'blue', '#0fe' ]
+            color: [ 'red', 'blue', '#00ffee' ]
         });
 
         shaders.push(shader);
@@ -31,19 +31,19 @@ suite('Clip.update() benchmark test', () => {
 
     }
 
-    bench('ShaderClip update ', () => {
-        var j = 0;
-        while (j < m) {
-            var shader = shaders[ j++ ];
-            shader.update(Date.now());
-        }
-    });
-
-    bench('Clip update ', () => {
+    bench('Clip update ', function () {
         var j = 0;
         while (j < m) {
             var clip = clips[ j++ ];
             clip.update(Date.now());
+        }
+    });
+
+    bench('ShaderClip update ', function () {
+        var j = 0;
+        while (j < m) {
+            var shader = shaders[ j++ ];
+            shader.update(Date.now());
         }
     });
 

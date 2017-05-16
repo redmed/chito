@@ -24,6 +24,14 @@ describe('Clip test', function () {
         'easing': 'Linear'
     };
 
+    it('Static attributies test ...ok', function () {
+        expect(Clip.Event.UPDATE).toBe('update');
+        expect(Clip.Event.START).toBe('start');
+        expect(Clip.Event.STOP).toBe('stop');
+        expect(Clip.Event.COMPLETE).toBe('complete');
+        expect(Clip.Event.REPEAT_COMPLETE).toBe('repeatComplete');
+    });
+
     it('Clip start() test ...ok', function () {
         var clip = new Clip(animationOptions);
         clip.start();
@@ -144,6 +152,14 @@ describe('ShaderClip test', function () {
         color: [ '#f00', '#00f' ]
     };
 
+    it('Static attributies test ...ok', function () {
+        expect(ShaderClip.Event.UPDATE).toBe('update');
+        expect(ShaderClip.Event.START).toBe('start');
+        expect(ShaderClip.Event.STOP).toBe('stop');
+        expect(ShaderClip.Event.COMPLETE).toBe('complete');
+        expect(ShaderClip.Event.REPEAT_COMPLETE).toBe('repeatComplete');
+    });
+
     it('ShaderClip update() test ...ok', function () {
         var clip = new ShaderClip(animationOptions, attr);
         clip.start();
@@ -198,7 +214,7 @@ describe('Animation test', function () {
         expect(ani._clips.length).toBe(clips2.length + 1);
     });
 
-    it('Animation  test ...ok', function () {
+    it('Animation removeClip() test ...ok', function () {
         ani.removeClip(clip1);
         expect(ani._clips.length).toBe(clips2.length);
 
@@ -217,7 +233,7 @@ describe('Animation test', function () {
         var ani = new Animation();
         ani.addClip(clip1);
 
-        ani.on(Animation.Event.START, () => {
+        ani.on(Animation.Event.START, function () {
             expect(1).toBe(1);
             done();
         });
@@ -229,11 +245,11 @@ describe('Animation test', function () {
         var ani = new Animation();
         ani.addClip(new Clip(clipOpt));
 
-        ani.on(Animation.Event.START, () => {
+        ani.on(Animation.Event.START, function () {
 
             var clips = ani.getClips();
             for (var i = 0, len = clips.length; i < len; i++) {
-                let c = clips[i];
+                let c = clips[ i ];
 
                 expect(c._isPlaying).toBe(true);
             }

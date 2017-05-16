@@ -7,7 +7,7 @@ import EventEmitter from './lib/eventemitter.js';
 import utils from './lib/util.js';
 import { requestAnimationFrame, cancelAnimationFrame } from './lib/animationframe.js';
 
-let Ev = {
+const Ev = {
     START: 'start',
     STOP: 'stop',
     UPDATE: 'update',

@@ -23,19 +23,19 @@
 
 * clip `Clip=` 	`可选` 移除的`Clip`实例，默认移除全部。
 
-#### 3. start()
+#### 3. start(startClip=false)
 
-启动动画，会同时启动内部的 `Clip`。如果已启动，则不会重复启动。
+启动动画，startClip 控制是否启动内部的 `Clip`。如果已启动，则不会重复启动。
+
+##### 参数:
+
+* startClip `boolean=false` 是否启动全部 Clip，默认不启动，需要开发者调用 Clip.start()
 
 #### 4. stop()
 
 停止动画
 
-#### 5. restart()
-
-重启动画
-
-#### 6. getClips()
+#### 5. getClips()
 
 获取正在进行的`Clip`
 
@@ -44,7 +44,7 @@
 `Array.<Clip>` 
 
 
-#### 7. destory()
+#### 6. destory()
 
 析构函数，清空内部状态。
 
@@ -210,11 +210,12 @@ keyframe = {
 * `'start' | ShaderClip.Event.START`  clip 启动
 * `'update' | ShaderClip.Event.UPDATE`  clip 每次更新动画帧
 * `'complete' | ShaderClip.Event.COMPLETE`  clip  动画结束(repeat运行全部结束)
+* `'repeatComplete' | ShaderClip.Event.REPEAT_COMPLETE`  clip repeat结束后(单词repeat执行结束后)  
 * `'stop' | ShaderClip.Event.STOP`  clip 动画停止
 
 <!-- * `'repeatComplete' | ShaderClip.Event.REPEAT_COMPLETE`  clip 每个周期(repeat)结束后 -->
 
-`update`handler 提供两个参数:
+`update` handler 提供两个参数:
 
 * progress: `number=[0, 1]` 缓动进度
 * keyframe: `Object` 关键帧在当前进度下的值

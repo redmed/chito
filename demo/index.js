@@ -6,20 +6,21 @@ var clip = new ShaderClip({
     duration: 5000,
     repeat: 10
 }, {
-    x: [ 0, 300 ],
-    y: [ 0, 400 ],
-    color: [ '#22e1ee', '#e1ee22' ]
+    x: [0, 300],
+    y: [0, 400],
+    color: ['rgba(22, 220, 233, 0.1)', 'rgba(220, 22, 23, 0.7)']
 });
 
 var $p1 = document.getElementById('p1');
 
-clip.on(ShaderClip.Event.UPDATE, function(p, keyframe) {
+clip.on(ShaderClip.Event.UPDATE, function (p, keyframe) {
     $p1.style.left = keyframe.x + 'px';
     $p1.style.top = keyframe.y + 'px';
     $p1.style.backgroundColor = keyframe.color;
 });
+clip.start();
 
 var ani = new Animation();
 ani.addClip(clip);
 
-ani.start(true);
+ani.start();

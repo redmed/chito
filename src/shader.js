@@ -6,60 +6,7 @@
 import Clip from './clip.js';
 import Interpolation from './lib/Interpolation.js';
 import ColorHelper from './lib/colorhelper.js';
-
-const SUPPORT_COLORS = {
-    color: 1,
-    backgroundColor: 1,
-    borderColor: 1,
-    lineColor: 1,
-    shadowColor: 1
-};
-
-function isColorName(name) {
-    // TODO: 修改, 根据特性判断。自己构造内部使用的数据类型
-    return name in SUPPORT_COLORS;
-}
-
-/**
- * 计算属性在某个时间上的具体数值
- * @param {Object} keyframe 属性
- * @param {number} progress 进度
- * @param {Function} interpolation 插值算法
- * @returns {Object}
- */
-function loopKeyframe(keyframe, progress, interpolation = Interpolation.Linear) {
-
-    let _keyframe = {};
-
-    for (let key in keyframe) {
-        if (keyframe.hasOwnProperty(key)) {
-
-            let val = keyframe[ key ];
-
-            if (typeof val != 'undefined') {
-                // if (_.isPlainObject(val)) {
-                //     val = loopKeyframe(val, progress, interpolation);
-                // }
-                // else {
-                if (Array.isArray(val)) {
-                    if (isColorName(key) && Array.isArray(val[ 0 ])) {
-                        // 颜色渐变
-                        val = ColorHelper.linearGradient(val, progress);
-                        val = ColorHelper.toRGBA(val);
-                    }
-                    else {
-                        val = interpolation(val, progress);
-                    }
-                }
-                // }
-
-                _keyframe[ key ] = val;
-            }
-        }
-    }
-
-    return _keyframe;
-}
+import { Ev } from './lib/define.js';
 
 /**
  * 转换数据格式
@@ -77,6 +24,7 @@ function transform(attr) {
 
             if (ColorHelper.isColor(val)) {
                 val = ColorHelper.toNormalArray(val);
+                val.__color__ = true;
             }
 
             _attr[ key ] = val;
@@ -105,16 +53,14 @@ class ShaderClip extends Clip {
      */
     _interpolation = Interpolation.Linear;
 
-    constructor(...args) {
+    /**
+     * 构造函数
+     * @param {Object=} options 配置项
+     * @param {Object=} attr 变换属性
+     */
+    constructor(options, attr) {
 
-        super();
-        this.initialize(...args);
-
-    }
-
-    initialize(options, attr) {
-
-        super.initialize(options);
+        super(options, attr);
         this._tracks = transform(attr);
 
     }
@@ -125,35 +71,40 @@ class ShaderClip extends Clip {
      * @param {number} time 单位ms
      * @returns {ShaderClip}
      */
-    when(attr/*, time*/) {
-        // TODO: 如果需要支持指定time上的变化，需要实现关于时间的插值计算，比较复杂，后面再考虑实现
-        let tracks = this._tracks;
-        for (let key in attr) {
-            if (attr.hasOwnProperty(key)) {
-                let value = attr[ key ];
+    // when(attr/*, time*/) {
+    //     // TODO: 如果需要支持指定time上的变化，需要实现关于时间的插值计算，比较复杂，后面再考虑实现
+    //     let tracks = this._tracks;
+    //     for (let key in attr) {
+    //         if (attr.hasOwnProperty(key)) {
+    //             let value = attr[ key ];
+    //
+    //             if (!tracks[ key ]) {
+    //                 tracks[ key ] = [];
+    //
+    //                 // if (time != 0) {
+    //                 //     tracks[ key ].push({
+    //                 //         value,
+    //                 //         time: 0
+    //                 //     });
+    //                 // }
+    //             }
+    //
+    //             // tracks[ key ].push({
+    //             //     value,
+    //             //     time
+    //             // });
+    //             tracks[ key ].push(value);
+    //         }
+    //     }
+    //
+    //     return this;
+    // }
 
-                if (!tracks[ key ]) {
-                    tracks[ key ] = [];
-
-                    // if (time != 0) {
-                    //     tracks[ key ].push({
-                    //         value,
-                    //         time: 0
-                    //     });
-                    // }
-                }
-
-                // tracks[ key ].push({
-                //     value,
-                //     time
-                // });
-                tracks[ key ].push(value);
-            }
-        }
-
-        return this;
-    }
-
+    /**
+     * 更新动画, 触发 UPDATE 事件
+     * @param {number} time
+     * @returns {boolean} true: 还没结束. false: 运行结束
+     */
     update(time) {
 
         if (this._isPlaying && time && time < this._startTime) {
@@ -174,23 +125,20 @@ class ShaderClip extends Clip {
 
                 let val = tracks[ key ];
 
-                if (Array.isArray(val)) {
-                    if (isColorName(key) && Array.isArray(val[ 0 ])) {
-                        // 颜色渐变
-                        val = ColorHelper.linearGradient(val, percent);
-                        val = ColorHelper.toRGBA(val);
-                    }
-                    else {
-                        val = this._interpolation(val, percent);
-                    }
-
+                if (val.__color__) {
+                    // 颜色渐变
+                    val = ColorHelper.linearGradient(val, percent);
+                    val = ColorHelper.toRGBA(val);
+                }
+                else {
+                    val = this._interpolation(val, percent);
                 }
 
                 keyframe[ key ] = val;
             }
         }
 
-        this.emit(this.Event.UPDATE, percent, keyframe, this.getOpt());
+        this.emit(Ev.UPDATE, percent, keyframe, this.getOpt());
 
         // 一个周期结束
         if (elapsed == 1) {
@@ -206,12 +154,12 @@ class ShaderClip extends Clip {
                     this._reversed = !this._reversed;
                 }
 
-                this.emit(this.Event.REPEAT_COMPLETE, this._repeat, this.getOpt());
+                this.emit(Ev.REPEAT_COMPLETE, this._repeat, this.getOpt());
 
                 return true;
             }
             else {
-                this.emit(this.Event.COMPLETE, this.getOpt());
+                this.emit(Ev.COMPLETE, this.getOpt());
 
                 return false;
             }

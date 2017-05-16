@@ -61,13 +61,15 @@ let clip = new ShaderClip({
 })
 
 // 增加 Clip 的 Update 事件
-clip.on(Clip.Event.UPDATE, (frame) => {
+clip.on(Clip.Event.UPDATE, (progress, frame) => {
 	// frame 中包含了当前时刻下的数据
 	// frame.x
 	// frame.y
 	// frame.color
 	// 根据数据绘制 UI
 })
+
+clip.start()
 
 // 将 clip 添加至动画主进程
 ani.addClip(clip)

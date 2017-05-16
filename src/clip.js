@@ -28,74 +28,14 @@
 
 import EventEmitter from './lib/eventemitter.js';
 import EasingFunc from './lib/easing.js';
-
-const Event = {
-    UPDATE: 'update',
-    START: 'start',
-    REPEAT_COMPLETE: 'repeatComplete',
-    COMPLETE: 'complete',
-    STOP: 'stop'
-};
-
-const Attr = {
-    DURATION: 'duration',
-    REPEAT: 'repeat',
-    DELAY: 'delay',
-    EASING: 'easing',
-    INTERVAL: 'interval',
-    YOYO: 'yoyo',
-    START: 'startAt'
-};
-
-const Easing = {
-    LINEAR: 'Linear',
-
-    QUADRATIC_IN: 'QuadraticIn',
-    QUADRATIC_OUT: 'QuadraticOut',
-    QUADRATIC_IN_OUT: 'QuadraticInOut',
-
-    CUBIC_IN: 'CubicIn',
-    CUBIC_OUT: 'CubicOut',
-    CUBIC_IN_OUT: 'CubicInOut',
-
-    QUARTIC_IN: 'QuarticIn',
-    QUARTIC_OUT: 'QuarticOut',
-    QUARTIC_IN_OUT: 'QuarticInOut',
-
-    QUINTIC_IN: 'QuinticIn',
-    QUINTIC_OUT: 'QuinticOut',
-    QUINTIC_IN_OUT: 'QuinticInOut',
-
-    SINUSOIDAL_IN: 'SinusoidalIn',
-    SINUSOIDAL_OUT: 'SinusoidalOut',
-    SINUSOIDAL_IN_OUT: 'SinusoidalInOut',
-
-    EXPONENTIAL_IN: 'ExponentialIn',
-    EXPONENTIAL_OUT: 'ExponentialOut',
-    EXPONENTIAL_IN_OUT: 'ExponentialInOut',
-
-    CIRCULAR_IN: 'CircularIn',
-    CIRCULAR_OUT: 'CircularOut',
-    CIRCULAR_IN_OUT: 'CircularInOut',
-
-    ELASTIC_IN: 'ElasticIn',
-    ELASTIC_OUT: 'ElasticOut',
-    ELASTIC_IN_OUT: 'ElasticInOut',
-
-    BACK_IN: 'BackIn',
-    BACK_OUT: 'BackOut',
-    BACK_IN_OUT: 'BackInOut',
-
-    BOUNCE_IN: 'BounceIn',
-    BOUNCE_OUT: 'BounceOut',
-    BOUNCE_IN_OUT: 'BounceInOut'
-};
+import { Ev, Attr, Easing } from './lib/define.js';
 
 class Clip extends EventEmitter {
 
     /**
      * 配置项
      * @type {Object}
+     * @private
      */
     _options = {};
 
@@ -125,7 +65,7 @@ class Clip extends EventEmitter {
     _interval;
 
     /**
-     * 重复数量
+     * 动画重复次数
      * @type {number}
      */
     _repeat;
@@ -155,19 +95,18 @@ class Clip extends EventEmitter {
     _isPlaying = false;
 
     /**
-     * 起始时间
+     * 每次动画起始时间
+     * @type {number}
      */
     _startTime;
 
     /**
-     * yoyo翻转状态
+     * yoyo 翻转状态
      * @type {boolean}
      */
     _reversed = false;
 
-    Event = Event;
-
-    static Event = Event;
+    static Event = Ev;
 
     static Attr = Attr;
 
@@ -176,23 +115,16 @@ class Clip extends EventEmitter {
     /**
      * 构造函数
      * @param {Object=} options 配置项
-     */
-    constructor(options = {}) {
-
-        super();
-        this.initialize(options);
-
-    }
-
-    /**
-     * 初始化函数
-     * @param {Object=} options 配置项
      * @param {Object=} attr 变换属性
      */
-    initialize(options = {}, attr) {
+    constructor(options = {}, attr) {
 
-        this._options = this._initOption(options);
+        super();
+
+        this._options = options;
         this._attr = attr;
+
+        this._initOption(options);
 
     }
 
@@ -210,13 +142,12 @@ class Clip extends EventEmitter {
         let easing = options[ Attr.EASING ] || Easing.LINEAR;
         this._easing = EasingFunc[ easing ] ? EasingFunc[ easing ] : easing;
         this._delay = options[ Attr.DELAY ] || 0;
-        this._duration = options[ Attr.DURATION ] || 1000;
-        this._repeat = options[ Attr.REPEAT ] || 0;
+        let dur = options[ Attr.DURATION ];
+        this._duration = typeof dur == 'undefined' ? 1000 : dur;
+        this._repeat = options[ Attr.REPEAT ] || 1;
         this._interval = options[ Attr.INTERVAL ] || 0;
         this._yoyo = options[ Attr.YOYO ] || false;
         this._startAt = options[ Attr.START ] || 0;
-
-        return options;
 
     }
 
@@ -229,7 +160,7 @@ class Clip extends EventEmitter {
 
     /**
      * 启动动画
-     * @param {Boolean=} forceStart 强制重新计时
+     * @param {boolean=} forceStart 强制重新计时
      */
     start(forceStart) {
 
@@ -240,7 +171,7 @@ class Clip extends EventEmitter {
         this._isPlaying = true;
         this._startTime = window.performance.now() + this._delay;
 
-        this.emit(Event.START, this.getOpt());
+        this.emit(Ev.START, this.getOpt());
 
         return this;
 
@@ -257,7 +188,7 @@ class Clip extends EventEmitter {
 
         this._isPlaying = false;
 
-        this.emit(Event.STOP, this.getOpt());
+        this.emit(Ev.STOP, this.getOpt());
 
         return this;
 
@@ -266,7 +197,7 @@ class Clip extends EventEmitter {
     /**
      * 更新动画, 触发 UPDATE 事件
      * @param {number} time
-     * @returns {Boolean} true: 还没结束. false: 运行结束
+     * @returns {boolean} true: 还没结束. false: 运行结束
      */
     update(time) {
 
@@ -279,7 +210,7 @@ class Clip extends EventEmitter {
         elapsed = Math.min(elapsed, 1);
 
         let percent = this._easing(this._reversed ? 1 - elapsed : elapsed);
-        this.emit(Event.UPDATE, percent, this.getOpt());
+        this.emit(Ev.UPDATE, percent, this.getOpt());
 
         // 一个周期结束
         if (elapsed == 1) {
@@ -295,12 +226,12 @@ class Clip extends EventEmitter {
                     this._reversed = !this._reversed;
                 }
 
-                this.emit(Event.REPEAT_COMPLETE, this._repeat, this.getOpt());
+                this.emit(Ev.REPEAT_COMPLETE, this._repeat, this.getOpt());
 
                 return true;
             }
             else {
-                this.emit(Event.COMPLETE, this.getOpt());
+                this.emit(Ev.COMPLETE, this.getOpt());
 
                 return false;
             }

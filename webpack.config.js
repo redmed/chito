@@ -16,7 +16,6 @@ module.exports = {
 
     module: {
         rules: [
-            // Babel 转换 ES6
             {
                 test: /(\.es6|\.js)$/,
                 exclude: /(node_modules|bower_components)/,
