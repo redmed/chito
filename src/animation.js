@@ -68,10 +68,9 @@ class Animation extends EventEmitter {
 
         this.emit(Ev.UPDATE, timestamp, clips);
 
-        let i = 0,
-            len = clips.length;
+        let i = 0;
 
-        while (i < len) {
+        while (i < clips.length) {
             let clip = clips[ i ];
 
             let running = clip.update(timestamp);
