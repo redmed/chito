@@ -2,6 +2,7 @@ const Ev = {
     UPDATE: 'update',
     START: 'start',
     REPEAT_COMPLETE: 'repeatComplete',
+    AFTER_UPDATE: 'afterUpdate',
     COMPLETE: 'complete',
     STOP: 'stop'
 };

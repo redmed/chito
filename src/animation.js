@@ -6,14 +6,7 @@
 import EventEmitter from './lib/eventemitter.js';
 import utils from './lib/util.js';
 import { requestAnimationFrame, cancelAnimationFrame } from './lib/animationframe.js';
-
-const Ev = {
-    START: 'start',
-    STOP: 'stop',
-    UPDATE: 'update',
-    AFTER_UPDATE: 'afterUpdate',
-    COMPLETE: 'complete'
-};
+import { Ev } from './lib/define.js';
 
 class Animation extends EventEmitter {
 
@@ -75,9 +68,10 @@ class Animation extends EventEmitter {
 
         this.emit(Ev.UPDATE, timestamp, clips);
 
-        let i = 0;
+        let i = 0,
+            len = clips.length;
 
-        while (i < clips.length) {
+        while (i < len) {
             let clip = clips[ i ];
 
             let running = clip.update(timestamp);
@@ -109,15 +103,18 @@ class Animation extends EventEmitter {
      */
     start(startClip = false) {
 
-        let clips = this._clips;
-        if (this._timer || clips.length === 0) {
+        let clips = this._clips,
+            len = clips.length;
+        if (this._timer || len === 0) {
             return;
         }
 
         if (startClip) {
-            clips.forEach(clip => {
+            let i = 0;
+            while (i < len) {
+                let clip = clips[ i++ ];
                 clip.start();
-            });
+            }
         }
 
         this.emit(Ev.START);
@@ -138,9 +135,13 @@ class Animation extends EventEmitter {
             this._timer = null;
 
             if (stopClip) {
-                this._clips.forEach(clip => {
+                let i = 0,
+                    clips = this._clips,
+                    len = clips.length;
+                while (i < len) {
+                    let clip = clips[ i++ ];
                     clip.stop();
-                });
+                }
             }
 
             this.emit(Ev.STOP);

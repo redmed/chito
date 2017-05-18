@@ -64,25 +64,31 @@ class EventEmitter {
     off(type = null, listener = null) {
         let events = this.__events__;
 
-        if (type == null) {
+        if (!type) {
             this.__events__ = {};
 
             return this;
         }
 
-        if (listener == null) {
+        if (!listener) {
             delete events[ type ];
 
             return this;
         }
 
-        events[ type ].some((cb, index, listeners) => {
-            if (cb === listener || cb === cb.listener) {
-                listeners.splice(index, 1);
+        let listeners = events[ type ];
+        if (listeners) {
 
-                return true;
+            let i = listeners.length - 1;
+            while (i >= 0) {
+                let cb = listeners[ i ];
+                if (cb === listener || cb == cb.listener) {
+                    listeners.splice(i, 1);
+                }
+
+                i--;
             }
-        });
+        }
 
         return this;
     }

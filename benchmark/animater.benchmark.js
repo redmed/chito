@@ -62,13 +62,13 @@ suite('Clip.update() benchmark test', function () {
         }
     });
 
-    bench('Clip update ', function () {
-        var j = 0;
-        while (j < m) {
-            var clip = clips[ j++ ];
-            clip.update(Date.now());
-        }
-    });
+    // bench('Clip update ', function () {
+    //     var j = 0;
+    //     while (j < m) {
+    //         var clip = clips[ j++ ];
+    //         clip.update(Date.now());
+    //     }
+    // });
 
     bench('ShaderClip update (color not support) ', function () {
         var j = 0;
@@ -78,27 +78,11 @@ suite('Clip.update() benchmark test', function () {
         }
     });
 
-    bench('ShaderClip update2 (color not support) ', function () {
-        var j = 0;
-        while (j < m) {
-            var shader = shaders2[ j++ ];
-            shader.update2(Date.now());
-        }
-    });
-
     bench('ShaderClip update (color support) ', function () {
         var j = 0;
         while (j < m) {
             var shader = shaders[ j++ ];
             shader.update(Date.now());
-        }
-    });
-
-    bench('ShaderClip update2 (color support) ', function () {
-        var j = 0;
-        while (j < m) {
-            var shader = shaders[ j++ ];
-            shader.update2(Date.now());
         }
     });
 });
@@ -121,9 +105,9 @@ suite('create Class', function () {
             .to({ x: 100 });
     });
 
-    bench('new Clip', function () {
-        new Clip(opt);
-    });
+    // bench('new Clip', function () {
+    //     new Clip(opt);
+    // });
 
     bench('new ShaderClip (color not support) ', function () {
         new ShaderClip({

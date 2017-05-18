@@ -3,7 +3,7 @@ var webpack = require('webpack');
 
 module.exports = {
     entry: {
-        'animater': './src/main',
+        'animater': './src/main'
     },
 
     output: {

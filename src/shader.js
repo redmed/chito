@@ -41,7 +41,6 @@ function transform(attr, colorSupport) {
     let _attrList = [];
 
     for (let key in _attr) {
-
         let val = _attr[ key ];
         _attrList.push({
             key,
@@ -52,32 +51,6 @@ function transform(attr, colorSupport) {
     return _attrList;
 }
 
-function transform2(attr, colorSupport) {
-
-    let _attr = {};
-
-    for (let key in attr) {
-        if (attr.hasOwnProperty(key)) {
-
-            let val = attr[ key ];
-
-            if (ColorHelper.isColor(val)) {
-                if (colorSupport) {
-                    val = ColorHelper.toNormalArray(val);
-                    val.__color__ = 1;
-                }
-                else {
-                    val.__color__ = 2;
-                }
-            }
-
-            _attr[ key ] = val;
-        }
-    }
-
-    return _attr;
-}
-
 /**
  * 渲染器
  */
@@ -85,6 +58,7 @@ class ShaderClip extends Clip {
 
     /**
      * 存储属性
+     * @param {Array}
      * @private
      */
     _tracks;
@@ -107,7 +81,6 @@ class ShaderClip extends Clip {
         let cs = options[ Attr.COLOR_SUPPORT ];
         cs = typeof cs == 'undefined' ? true : cs;
         this._tracks = transform(attr, cs);
-        this._tracks2 = transform2(attr, cs);
 
     }
 
@@ -186,116 +159,6 @@ class ShaderClip extends Clip {
             }
 
             keyframe[ key ] = val;
-        }
-
-        // for (let key in tracks) {
-        //     if (tracks.hasOwnProperty(key)) {
-        //
-        //         let val = tracks[ key ];
-        //         let color = val.__color__;
-        //
-        //         if (color) {
-        //             if (color == 1) {
-        //                 // 颜色渐变
-        //                 val = ColorHelper.linearGradient(val, percent);
-        //                 val = ColorHelper.toRGBA(val);
-        //             }
-        //         }
-        //         else {
-        //             val = this._interpolation(val, percent);
-        //         }
-        //
-        //         keyframe[ key ] = val;
-        //     }
-        // }
-
-        this.emit(Ev.UPDATE, percent, keyframe, this.getOpt());
-
-        // 一个周期结束
-        if (elapsed == 1) {
-            if (this._repeat > 1) {
-                if (isFinite(this._repeat)) {
-                    this._repeat--;
-                }
-
-                this._startTime = time + this._interval;
-                this._startAt = 0;
-
-                if (this._yoyo) {
-                    this._reversed = !this._reversed;
-                }
-
-                this.emit(Ev.REPEAT_COMPLETE, this._repeat, this.getOpt());
-
-                return true;
-            }
-            else {
-                this.emit(Ev.COMPLETE, this.getOpt());
-
-                return false;
-            }
-        }
-
-        return true;
-
-    }
-
-    update2(time) {
-
-        if (this._isPlaying && time && time < this._startTime) {
-            return true;
-        }
-
-        let elapsed = (time - this._startTime) / this._duration;
-        elapsed += this._startAt;
-        elapsed = Math.min(elapsed, 1);
-
-        let percent = this._easing(this._reversed ? 1 - elapsed : elapsed);
-
-        let tracks = this._tracks2;
-        let keyframe = {};
-
-        // let i = 0,
-        //     len = tracks.length;
-        //
-        // while (i < len) {
-        //     let item = tracks[ i++ ];
-        //     let { key, val } = item;
-        //
-        //     let color = val.__color__;
-        //     if (color) {
-        //         if (color == 1) {
-        //             // 颜色渐变
-        //             val = ColorHelper.linearGradient(val, percent);
-        //             val = ColorHelper.toRGBA(val);
-        //         }
-        //     }
-        //     else {
-        //         val = this._interpolation(val, percent);
-        //     }
-        //
-        //     keyframe[ key ] = val;
-        // }
-
-        for (let key in tracks) {
-            if (tracks.hasOwnProperty(key)) {
-
-                let val = tracks[ key ];
-                let color = val.__color__;
-
-                if (color) {
-                    if (color == 1) {
-                        // 颜色渐变
-                        val = ColorHelper.linearGradient(val, percent);
-                        val = ColorHelper.toRGBA(val);
-                    }
-                }
-                else {
-                    val = this._interpolation(val, percent);
-                }
-
-                keyframe[ key ] = val;
-            }
         }
 
         this.emit(Ev.UPDATE, percent, keyframe, this.getOpt());

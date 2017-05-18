@@ -1,6 +1,6 @@
 {
   "name": "animater",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "一个支持计算颜色变化的动画库。",
   "main": "animater.js",
   "scripts": {
