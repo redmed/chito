@@ -6,14 +6,15 @@
 import Clip from './clip.js';
 import Interpolation from './lib/Interpolation.js';
 import ColorHelper from './lib/colorhelper.js';
-import { Ev } from './lib/define.js';
+import { Ev, Attr } from './lib/define.js';
 
 /**
  * 转换数据格式
  * @param {Object} attr
+ * @param {boolean} colorSupport
  * @returns {Object}
  */
-function transform(attr) {
+function transform(attr, colorSupport) {
 
     let _attr = {};
 
@@ -23,13 +24,25 @@ function transform(attr) {
             let val = attr[ key ];
 
             if (ColorHelper.isColor(val)) {
-                val = ColorHelper.toNormalArray(val);
-                val.__color__ = true;
+                if (colorSupport) {
+                    val = ColorHelper.toNormalArray(val);
+                    val.__color__ = 1;
+                }
+                else {
+                    val.__color__ = 2;
+                }
             }
 
             _attr[ key ] = val;
         }
     }
+
+    // 转换成数组，可以提高 loop 速度
+    // let _attrList = [];
+    //
+    // for (let key in _attr) {
+    //     _attrList.push([ key, _attr[ key ] ]);
+    // }
 
     return _attr;
 }
@@ -61,7 +74,9 @@ class ShaderClip extends Clip {
     constructor(options, attr) {
 
         super(options, attr);
-        this._tracks = transform(attr);
+        let cs = options[ Attr.COLOR_SUPPORT ];
+        cs = typeof cs == 'undefined' ? true : cs;
+        this._tracks = transform(attr, cs);
 
     }
 
@@ -124,11 +139,14 @@ class ShaderClip extends Clip {
             if (tracks.hasOwnProperty(key)) {
 
                 let val = tracks[ key ];
+                let color = val.__color__;
 
-                if (val.__color__) {
-                    // 颜色渐变
-                    val = ColorHelper.linearGradient(val, percent);
-                    val = ColorHelper.toRGBA(val);
+                if (color) {
+                    if (color == 1) {
+                        // 颜色渐变
+                        val = ColorHelper.linearGradient(val, percent);
+                        val = ColorHelper.toRGBA(val);
+                    }
                 }
                 else {
                     val = this._interpolation(val, percent);

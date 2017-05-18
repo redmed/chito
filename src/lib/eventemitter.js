@@ -1,10 +1,10 @@
 /**
  * @file 事件封装类
  * @author redmed
- * 
  */
 
 class EventEmitter {
+
     /**
      * 事件池
      * @type {Object}
@@ -57,7 +57,7 @@ class EventEmitter {
 
     /**
      * 事件解绑
-     * @param {string=} type
+     * @param {string|null=} type
      * @param {Function=} listener
      * @returns {EventEmitter}
      */
@@ -97,9 +97,13 @@ class EventEmitter {
         let listeners = this.__events__[ type ];
 
         if (listeners) {
-            listeners.forEach((cb) => {
+            let i = 0,
+                len = listeners.length;
+
+            while (i < len) {
+                let cb = listeners[ i++ ];
                 cb.apply(this, args);
-            });
+            }
         }
 
         return this;
