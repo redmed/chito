@@ -78,6 +78,14 @@ suite('Clip.update() benchmark test', function () {
         }
     });
 
+    bench('ShaderClip update2 (color not support) ', function () {
+        var j = 0;
+        while (j < m) {
+            var shader = shaders2[ j++ ];
+            shader.update2(Date.now());
+        }
+    });
+
     bench('ShaderClip update (color support) ', function () {
         var j = 0;
         while (j < m) {
@@ -86,6 +94,13 @@ suite('Clip.update() benchmark test', function () {
         }
     });
 
+    bench('ShaderClip update2 (color support) ', function () {
+        var j = 0;
+        while (j < m) {
+            var shader = shaders[ j++ ];
+            shader.update2(Date.now());
+        }
+    });
 });
 
 suite('create Class', function () {
@@ -165,14 +180,17 @@ suite('Animation._update()', function () {
 
     while (i++ < m) {
         hash[ i ] = i;
-        list.push(i);
+        list.push({
+            name: i,
+            value: i
+        });
     }
 
     bench('for...in loop', function () {
         for (var key in hash) {
             let v = hash[ key ];
 
-            let x = v * v;
+            // let x = v * v;
         }
     });
 
@@ -181,9 +199,9 @@ suite('Animation._update()', function () {
         let i = 0, len = list.length;
 
         while (i < len) {
-            let v = list[ i++ ];
+            let v = list[ i++ ].name;
 
-            let x = v * v;
+            // let x = v * v;
         }
     });
 
