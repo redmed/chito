@@ -68,30 +68,24 @@ class Animation extends EventEmitter {
 
         this.emit(Ev.UPDATE, timestamp, clips);
 
-        let i = 0;
+        let i = -1,
+            len = clips.length;
+        let over = true;
 
-        while (i < clips.length) {
+        while (++i < len) {
             let clip = clips[ i ];
 
-            let running = clip.update(timestamp);
-
-            // 未结束的动画保存下来, 以便下次继续执行
-            if (!running) {
-                clips.splice(i, 1);
+            if (clip._isPlaying && !clip._isFinish) {
+                over = false;
+                clip.update(timestamp);
             }
-            else {
-                i++;
-            }
-
         }
-
-        this._clips = clips;
 
         this.emit(Ev.AFTER_UPDATE, timestamp, clips);
 
-        if (clips.length === 0) {
+        if (over) {
             this.stop();
-            this.emit(Ev.COMPLETE);
+            this.emit(Ev.COMPLETE, timestamp);
         }
 
     }
@@ -158,7 +152,26 @@ class Animation extends EventEmitter {
             clips = [ clips ];
         }
 
-        this._clips = this._clips.concat(clips);
+        let _addClip = (clips) => {
+            if (clips && clips.length > 0) {
+                let i = -1, len = clips.length;
+
+                while (++i < len) {
+                    let clip = clips[ i ];
+
+                    if (!clip.__chained__) {
+                        this._clips.push(clip);
+
+                        clip.__chained__ = true;
+
+                        _addClip(clip._chainClips);
+
+                    }
+                }
+            }
+        };
+
+        _addClip(clips);
 
         return this;
 
@@ -170,12 +183,25 @@ class Animation extends EventEmitter {
      */
     removeClip(clip) {
 
+        let clips = this._clips;
+
         if (clip) {
-            utils.remove(this._clips, c => {
-                return c === clip;
+            utils.remove(clips, c => {
+                if (c === clip) {
+                    c.__chained__ = false;
+                    return true;
+                }
             });
         }
         else {
+            let i = -1,
+                len = clips.length;
+
+            while (++i < len) {
+                let c = clips[ i ];
+                c.__chained__ = false;
+            }
+
             this._clips = [];
         }
 
@@ -197,7 +223,7 @@ class Animation extends EventEmitter {
     destroy() {
 
         this.stop();
-        this._clips = [];
+        this.removeClip();
 
         this.off();
 

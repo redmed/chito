@@ -131,7 +131,7 @@ suite('Animation._update()', function () {
     var ani = new Animation();
     var ani2 = new Animation();
 
-    var clips = [];
+    var clips = [], clips2 = [];
 
     var i = 0, m = 5000;
 
@@ -145,13 +145,25 @@ suite('Animation._update()', function () {
         clips.push(clip);
         clip.start();
 
+        var clip2 = new Clip({
+            duration: 999999,
+            repeat: 99999
+        });
+
+        clips2.push(clip2);
+        clip2.start();
+
     }
 
     ani.addClip(clips);
-    ani2.addClip(clips);
+    ani2.addClip(clips2);
 
     bench('Animation._update()', function () {
         ani._update(Date.now());
+    });
+
+    bench('Animation._update2()', function () {
+        ani2._update2(Date.now());
     });
 
 });

@@ -35,76 +35,100 @@ class Clip extends EventEmitter {
     /**
      * 配置项
      * @type {Object}
-     * @private
+     * @protected
      */
     _options = {};
 
     /**
      * 变换属性
      * @type {Object}
-     * @private
+     * @protected
      */
     _attr = {};
 
     /**
      * 运行时长
      * @type {number}
+     * @protected
      */
     _duration;
 
     /**
      * 延迟运行
      * @type {number} ms
+     * @protected
      */
     _delay;
 
     /**
      * 每次动画间隔
      * @type {number} ms
+     * @protected
      */
     _interval;
 
     /**
      * 动画重复次数
      * @type {number}
+     * @protected
      */
     _repeat;
 
     /**
      * Ease 动画名
      * @type {Function}
+     * @protected
      */
     _easing;
 
     /**
      * 是否按原轨迹返回(类似溜溜球)
      * @type {boolean}
+     * @protected
      */
     _yoyo;
 
     /**
      * progress起始位置加成, 可以控制progress不从0开始启动
      * @type {number}
+     * @protected
      */
     _startAt = 0;
 
     /**
      * 播放状态
      * @type {boolean}
+     * @protected
      */
     _isPlaying = false;
 
     /**
+     * 动画是否结束
+     * @type {boolean}
+     * @protected
+     */
+    _isFinish = false;
+
+    /**
      * 每次动画起始时间
      * @type {number}
+     * @protected
      */
     _startTime;
 
     /**
      * yoyo 翻转状态
      * @type {boolean}
+     * @protected
      */
     _reversed = false;
+
+    /**
+     * 被当前 Clip 链式调用的 Clip
+     * @type {Array}
+     * @protected
+     */
+    _chainClips = [];
 
     static Event = Ev;
 
@@ -151,7 +175,10 @@ class Clip extends EventEmitter {
 
     }
 
-    getOpt() {
+    /**
+     * @protected
+     */
+    _getOption() {
         return {
             options: this._options,
             attr: this._attr
@@ -161,17 +188,19 @@ class Clip extends EventEmitter {
     /**
      * 启动动画
      * @param {boolean=} forceStart 强制重新计时
+     * @returns {Clip}
      */
     start(forceStart) {
 
         if (!forceStart && this._isPlaying) {
-            return;
+            return this;
         }
 
         this._isPlaying = true;
+        this._isFinish = false;
         this._startTime = window.performance.now() + this._delay;
 
-        this.emit(Ev.START, this.getOpt());
+        this.emit(Ev.START, this._getOption());
 
         return this;
 
@@ -179,16 +208,34 @@ class Clip extends EventEmitter {
 
     /**
      * 停止动画
+     * @returns {Clip}
      */
     stop() {
 
         if (!this._isPlaying) {
-            return;
+            return this;
         }
 
         this._isPlaying = false;
 
-        this.emit(Ev.STOP, this.getOpt());
+        this.emit(Ev.STOP, this._getOption());
+
+        this.stopChain();
+
+        return this;
+
+    }
+
+    stopChain() {
+
+        let i = -1,
+            clips = this._chainClips,
+            len = clips.length;
+
+        while (++i < len) {
+            let clip = clips[ i ];
+            clip.stop();
+        }
 
         return this;
 
@@ -205,12 +252,31 @@ class Clip extends EventEmitter {
             return true;
         }
 
+        let { percent, elapsed } = this._getProgress(time);
+
+        this.emit(Ev.UPDATE, percent, this._getOption());
+
+        // 一个周期结束
+        return this._afterUpdate(time, elapsed);
+
+    }
+
+    _getProgress(time) {
+
         let elapsed = (time - this._startTime) / this._duration;
         elapsed += this._startAt;
         elapsed = Math.min(elapsed, 1);
 
         let percent = this._easing(this._reversed ? 1 - elapsed : elapsed);
-        this.emit(Ev.UPDATE, percent, this.getOpt());
+
+        return {
+            percent,
+            elapsed
+        }
+
+    }
+
+    _afterUpdate(time, elapsed) {
 
         // 一个周期结束
         if (elapsed == 1) {
@@ -226,12 +292,22 @@ class Clip extends EventEmitter {
                     this._reversed = !this._reversed;
                 }
 
-                this.emit(Ev.REPEAT_COMPLETE, this._repeat, this.getOpt());
+                this.emit(Ev.REPEAT_COMPLETE, this._repeat, this._getOption());
 
                 return true;
             }
             else {
-                this.emit(Ev.COMPLETE, this.getOpt());
+
+                this.emit(Ev.COMPLETE, this._getOption());
+
+                let i = -1,
+                    len = this._chainClips.length;
+                while (++i < len) {
+                    let clip = this._chainClips[ i ];
+                    clip.start(true);
+                }
+
+                this._isFinish = true;
 
                 return false;
             }
@@ -242,10 +318,23 @@ class Clip extends EventEmitter {
     }
 
     /**
+     * 链接新 Clip
+     * @param {*} args
+     * @returns {Clip}
+     */
+    chain(...args) {
+
+        this._chainClips = args;
+
+        return this;
+    }
+
+    /**
      * 析构函数
      */
     destroy() {
 
+        this.stop();
         this._isPlaying = false;
         this.off();
 

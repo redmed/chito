@@ -1,6 +1,6 @@
 import Animation from './animation.js';
 import Clip from './clip.js';
-import ShaderClip from './shader.js';
+import ShaderClip from './shaderclip.js';
 
 export {
     Animation,

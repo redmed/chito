@@ -49,6 +49,10 @@ describe('Clip test', function () {
         expect(res).toBe(false);
     });
 
+    // it('Clip chain() test ...ok', function() {
+    //
+    // });
+
     it('Clip on(Event.START)/emit(Event.START) test ...ok', function (done) {
         var clip = new Clip(animationOptions);
 
@@ -223,6 +227,7 @@ describe('Animation test', function () {
     });
 
     it('Animation getClips() test ...ok', function () {
+        var clip1 = new Clip(clipOpt);
         var ani = new Animation();
         ani.addClip(clip1);
 
@@ -230,6 +235,7 @@ describe('Animation test', function () {
     });
 
     it('Animation start()/on(Event.START) test ...ok', function (done) {
+        var clip1 = new Clip(clipOpt);
         var ani = new Animation();
         ani.addClip(clip1);
 
@@ -261,6 +267,7 @@ describe('Animation test', function () {
     });
 
     it('Animation stop()/on(Event.STOP) test ...ok', function (done) {
+        var clip1 = new Clip(clipOpt);
         var ani = new Animation();
         ani.addClip(clip1);
 
