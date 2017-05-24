@@ -4,6 +4,7 @@ const Ev = {
     REPEAT_COMPLETE: 'repeatComplete',
     AFTER_UPDATE: 'afterUpdate',
     COMPLETE: 'complete',
+    PAUSE: 'pause',
     STOP: 'stop'
 };
 

@@ -1,26 +1,103 @@
-var Animation = Animater.Animation,
-    Clip = Animater.Clip,
-    ShaderClip = Animater.ShaderClip;
+import Animater from '../src/main';
 
-var clip = new ShaderClip({
-    duration: 5000,
-    repeat: 10
-}, {
-    x: [0, 300],
-    y: [0, 400],
-    color: ['rgba(22, 220, 233, 0.1)', 'rgba(220, 22, 23, 0.7)']
-});
-
+var $p3Num = document.getElementById('p3-num');
+var $p3 = document.getElementById('p3');
+var $p2Num = document.getElementById('p2-num');
+var $p2 = document.getElementById('p2');
+var $p1Num = document.getElementById('p1-num');
 var $p1 = document.getElementById('p1');
 
-clip.on(ShaderClip.Event.UPDATE, function (p, keyframe) {
-    $p1.style.left = keyframe.x + 'px';
-    $p1.style.top = keyframe.y + 'px';
-    $p1.style.backgroundColor = keyframe.color;
+var Animation = Animater.Animation,
+    ShaderClip = Animater.ShaderClip;
+
+var clip1 = new ShaderClip({
+    duration: 2000,
+    repeat: 1
+}, {
+    x: [ 0, 300 ],
+    fill: [ '#22e1ee', '#eb5e17' ]
 });
-clip.start();
 
-var ani = new Animation();
-ani.addClip(clip);
+clip1.on('update', function (progress, keyframe) {
+    $p1Num.innerText = ((progress * 100) >> 0) + '%';
+    $p1.style.left = keyframe.x + 'px';
+    // $p1.style.top = keyframe.y + 'px';
+    // $p1.style.width = keyframe.width + 'px';
+    // $p1.style.height = keyframe.height + 'px';
+    $p1.style.backgroundColor = keyframe.fill;
+});
 
-ani.start();
+var clip2 = new ShaderClip({
+    duration: 2000,
+    repeat: 1
+}, {
+    x: [ 0, 300 ],
+    fill: [ '#22e1ee', '#eb5e17' ]
+});
+
+clip2.on('update', function (progress, keyframe) {
+    $p2Num.innerText = ((progress * 100) >> 0) + '%';
+    $p2.style.left = keyframe.x + 'px';
+    // $p2.style.top = keyframe.y + 'px';
+    $p2.style.backgroundColor = keyframe.fill;
+});
+
+var clip3 = new ShaderClip({
+    duration: 2000,
+    repeat: 1
+}, {
+    x: [ 0, 300 ],
+    fill: [ '#22e1ee', '#eb5e17' ]
+});
+
+clip3.on('update', function (progress, keyframe) {
+    $p3Num.innerText = ((progress * 100) >> 0) + '%';
+    $p3.style.left = keyframe.x + 'px';
+    // $p1.style.top = keyframe.y + 'px';
+    // $p1.style.width = keyframe.width + 'px';
+    // $p1.style.height = keyframe.height + 'px';
+    $p3.style.backgroundColor = keyframe.fill;
+});
+
+clip1.chain(clip2);
+// clip2.chain(clip1);
+
+var animation = new Animation();
+
+animation
+    .on('start', function () {
+        console.log('animation start')
+    })
+    .on('stop', function() {
+        console.log('animation stop')
+    })
+    .on('pause', function() {
+        console.log('animation pause')
+    })
+    .on('update', function() {
+        console.log('animation update')
+    })
+    .on('complete', function() {
+        console.log('animation complete')
+    });
+
+animation.addClip(clip1);
+animation.start();
+
+var $startBtn = document.getElementById('start');
+var $stopBtn = document.getElementById('stop');
+var $pauseBtn = document.getElementById('pause');
+
+$startBtn.onclick = function () {
+    animation.start();
+};
+
+$stopBtn.onclick = function () {
+    // clip1.stop();
+    // clip2.stop();
+    animation.stop();
+};
+
+$pauseBtn.onclick = function () {
+    animation.pause()
+};

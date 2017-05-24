@@ -68,23 +68,29 @@ class Animation extends EventEmitter {
 
         this.emit(Ev.UPDATE, timestamp, clips);
 
-        let i = -1,
-            len = clips.length;
-        let over = true;
+        let i = 0;
 
-        while (++i < len) {
+        while (i < clips.length) {
             let clip = clips[ i ];
 
-            if (clip._isPlaying && !clip._isFinish) {
-                over = false;
-                clip.update(timestamp);
+            let running = clip.update(timestamp);
+
+            // 未结束的动画保存下来, 以便下次继续执行
+            if (!running) {
+                clip._animation = null;
+                clips.splice(i, 1);
+            }
+            else {
+                i++;
             }
         }
 
+        this._clips = clips;
+
         this.emit(Ev.AFTER_UPDATE, timestamp, clips);
 
-        if (over) {
-            this.stop();
+        if (clips.length === 0) {
+            this._cancelTimer();
             this.emit(Ev.COMPLETE, timestamp);
         }
 
@@ -92,9 +98,9 @@ class Animation extends EventEmitter {
 
     /**
      * 启动动画进程
-     * @param {boolean=false} startClip 是否同时启动内部 Clip
+     * @param {boolean=false} force 是否同时启动内部 Clip
      */
-    start(startClip = false) {
+    start(force = true) {
 
         let clips = this._clips,
             len = clips.length;
@@ -102,7 +108,7 @@ class Animation extends EventEmitter {
             return;
         }
 
-        if (startClip) {
+        if (force) {
             let i = 0;
             while (i < len) {
                 let clip = clips[ i++ ];
@@ -117,9 +123,43 @@ class Animation extends EventEmitter {
 
     /**
      * 停止动画进程
-     * @param {boolean=false} stopClip 是否同时停止内部 Clip
+     * @param {boolean=false} force 是否同时停止内部 Clip
      */
-    stop(stopClip = false) {
+    stop(force = true) {
+
+        this._stop(force);
+
+    }
+
+    pause(force = true) {
+
+        this._stop(force, true);
+
+    }
+
+    _stop(force = true, pause = false) {
+
+        this._cancelTimer(() => {
+            let clips = this._clips,
+                len = clips.length;
+
+            if (len) {
+                if (force) {
+                    let i = -1;
+                    while (++i < len) {
+                        let clip = clips[ i ];
+                        pause ? clip.pause() : clip.stop();
+                    }
+
+                }
+
+                this.emit(pause ? Ev.PAUSE : Ev.STOP);
+            }
+        });
+
+    }
+
+    _cancelTimer(callback) {
 
         let timer = this._timer;
 
@@ -127,17 +167,7 @@ class Animation extends EventEmitter {
             cancelAnimationFrame(timer);
             this._timer = null;
 
-            if (stopClip) {
-                let i = 0,
-                    clips = this._clips,
-                    len = clips.length;
-                while (i < len) {
-                    let clip = clips[ i++ ];
-                    clip.stop();
-                }
-            }
-
-            this.emit(Ev.STOP);
+            callback && callback();
         }
 
     }
@@ -152,26 +182,15 @@ class Animation extends EventEmitter {
             clips = [ clips ];
         }
 
-        let _addClip = (clips) => {
-            if (clips && clips.length > 0) {
-                let i = -1, len = clips.length;
+        let i = -1,
+            len = clips.length;
 
-                while (++i < len) {
-                    let clip = clips[ i ];
+        while (++i < len) {
+            let clip = clips[ i ];
+            clip._animation = this;
 
-                    if (!clip.__chained__) {
-                        this._clips.push(clip);
-
-                        clip.__chained__ = true;
-
-                        _addClip(clip._chainClips);
-
-                    }
-                }
-            }
-        };
-
-        _addClip(clips);
+            this._clips.push(clip);
+        }
 
         return this;
 
@@ -186,9 +205,14 @@ class Animation extends EventEmitter {
         let clips = this._clips;
 
         if (clip) {
+            // let idx = clips.indexOf(clip);
+            // if (idx != -1) {
+            //     clip._animation = null;
+            //     clips.splice(idx, 1);
+            // }
             utils.remove(clips, c => {
                 if (c === clip) {
-                    c.__chained__ = false;
+                    c._animation = null;
                     return true;
                 }
             });
@@ -199,7 +223,7 @@ class Animation extends EventEmitter {
 
             while (++i < len) {
                 let c = clips[ i ];
-                c.__chained__ = false;
+                c._animation = null;
             }
 
             this._clips = [];

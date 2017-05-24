@@ -1,0 +1,42 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-size: 12px;
+}
+
+.container {
+    margin: 0 40px;
+}
+
+.header {
+    font-size: 1.8rem;
+}
+
+.ctrl-btns {
+    margin: 30px 0;
+}
+
+.status-info {
+    font-size: 1.2rem;
+    margin: 10px 0;
+}
+
+.ani-wrapper {
+    margin-top: 20px;
+}
+
+.shape-wrapper {
+    display: block;
+    position: relative;
+    height: 320px;
+}
+
+.shape-wrapper .point {
+    width: 50px;
+    height: 50px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: #22e1ee;
+    opacity: 0.8;
+}

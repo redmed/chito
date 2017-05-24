@@ -103,13 +103,6 @@ class Clip extends EventEmitter {
     _isPlaying = false;
 
     /**
-     * 动画是否结束
-     * @type {boolean}
-     * @protected
-     */
-    _isFinish = false;
-
-    /**
      * 每次动画起始时间
      * @type {number}
      * @protected
@@ -129,6 +122,12 @@ class Clip extends EventEmitter {
      * @protected
      */
     _chainClips = [];
+
+    /**
+     * @type {Animation}
+     * @protected
+     */
+    _animation;
 
     static Event = Ev;
 
@@ -197,8 +196,10 @@ class Clip extends EventEmitter {
         }
 
         this._isPlaying = true;
-        this._isFinish = false;
         this._startTime = window.performance.now() + this._delay;
+
+        // let ani = this._animation;
+        // ani && ani.addClip(this);
 
         this.emit(Ev.START, this._getOption());
 
@@ -218,11 +219,18 @@ class Clip extends EventEmitter {
 
         this._isPlaying = false;
 
+        // let ani = this._animation;
+        // ani && ani.removeClip(this);
+
         this.emit(Ev.STOP, this._getOption());
 
         this.stopChain();
 
         return this;
+
+    }
+
+    pause() {
 
     }
 
@@ -301,13 +309,18 @@ class Clip extends EventEmitter {
                 this.emit(Ev.COMPLETE, this._getOption());
 
                 let i = -1,
-                    len = this._chainClips.length;
+                    chains = this._chainClips,
+                    len = chains.length;
                 while (++i < len) {
-                    let clip = this._chainClips[ i ];
-                    clip.start(true);
+                    let clip = chains[ i ];
+
+                    let ani = this._animation;
+                    ani && ani.addClip(clip);
+
+                    clip.start();
                 }
 
-                this._isFinish = true;
+                this._isPlaying = false;
 
                 return false;
             }
