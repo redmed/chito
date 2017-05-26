@@ -11,8 +11,8 @@ var Animation = Animater.Animation,
     ShaderClip = Animater.ShaderClip;
 
 var clip1 = new ShaderClip({
-    duration: 2000,
-    repeat: 1
+    duration: 4000,
+    repeat: 2
 }, {
     x: [ 0, 300 ],
     fill: [ '#22e1ee', '#eb5e17' ]
@@ -28,7 +28,7 @@ clip1.on('update', function (progress, keyframe) {
 });
 
 var clip2 = new ShaderClip({
-    duration: 2000,
+    duration: 8000,
     repeat: 1
 }, {
     x: [ 0, 300 ],
@@ -43,8 +43,8 @@ clip2.on('update', function (progress, keyframe) {
 });
 
 var clip3 = new ShaderClip({
-    duration: 2000,
-    repeat: 1
+    duration: 3000,
+    repeat: 2
 }, {
     x: [ 0, 300 ],
     fill: [ '#22e1ee', '#eb5e17' ]
@@ -82,11 +82,16 @@ animation
     });
 
 animation.addClip(clip1);
+animation.addClip(clip3);
 animation.start();
+
+let startStatus = true;
 
 var $startBtn = document.getElementById('start');
 var $stopBtn = document.getElementById('stop');
 var $pauseBtn = document.getElementById('pause');
+var $resumeBtn = document.getElementById('resume');
+var $resetBtn = document.getElementById('reset');
 
 $startBtn.onclick = function () {
     animation.start();
@@ -99,5 +104,16 @@ $stopBtn.onclick = function () {
 };
 
 $pauseBtn.onclick = function () {
-    animation.pause()
+    // clip1.pause();
+    animation.pause();
+};
+
+$resumeBtn.onclick = function () {
+    // clip1.start()
+    // animation.start();
+};
+
+$resetBtn.onclick = function () {
+    // clip1.start()
+    animation.reset();
 };

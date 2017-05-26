@@ -5,7 +5,7 @@
 
 import EventEmitter from './lib/eventemitter.js';
 import utils from './lib/util.js';
-import { requestAnimationFrame, cancelAnimationFrame } from './lib/animationframe.js';
+import { requestAnimationFrame as rAF, cancelAnimationFrame as cAF } from './lib/animationframe.js';
 import { Ev } from './lib/define.js';
 
 class Animation extends EventEmitter {
@@ -37,9 +37,11 @@ class Animation extends EventEmitter {
      * 构造函数
      * @param {Object=} options 配置项
      */
-    constructor(options = {}) {
+    constructor(options) {
+
         super();
-        this._options = options;
+        this._options = options || {};
+
     }
 
     /**
@@ -48,12 +50,27 @@ class Animation extends EventEmitter {
      */
     _startAni() {
 
-        let update = (timestamp) => {
-            this._timer = requestAnimationFrame(update);
+        let update = timestamp => {
+            this._timer = rAF(update);
             this._update(timestamp);
         };
 
-        this._timer = requestAnimationFrame(update);
+        this._timer = rAF(update);
+
+    }
+
+    _stopAni() {
+
+        let timer = this._timer;
+
+        if (timer) {
+            cAF(timer);
+            this._timer = null;
+
+            return true;
+        }
+
+        return false;
 
     }
 
@@ -66,16 +83,14 @@ class Animation extends EventEmitter {
 
         let clips = this._clips;
 
-        this.emit(Ev.UPDATE, timestamp, clips);
+        this.emit(Ev.UPDATE, clips);
 
         let i = 0;
-
         while (i < clips.length) {
             let clip = clips[ i ];
 
             let running = clip.update(timestamp);
 
-            // 未结束的动画保存下来, 以便下次继续执行
             if (!running) {
                 clip._animation = null;
                 clips.splice(i, 1);
@@ -87,33 +102,31 @@ class Animation extends EventEmitter {
 
         this._clips = clips;
 
-        this.emit(Ev.AFTER_UPDATE, timestamp, clips);
+        this.emit(Ev.AFTER_UPDATE, clips);
 
-        if (clips.length === 0) {
-            this._cancelTimer();
-            this.emit(Ev.COMPLETE, timestamp);
+        if (clips.length == 0) {
+            this._stopAni();
+            this.emit(Ev.COMPLETE);
         }
 
     }
 
     /**
      * 启动动画进程
-     * @param {boolean=false} force 是否同时启动内部 Clip
      */
-    start(force = true) {
+    start() {
 
         let clips = this._clips,
             len = clips.length;
-        if (this._timer || len === 0) {
+
+        if (this._timer || len == 0) {
             return;
         }
 
-        if (force) {
-            let i = 0;
-            while (i < len) {
-                let clip = clips[ i++ ];
-                clip.start();
-            }
+        let i = -1;
+        while (++i < len) {
+            let clip = clips[ i ];
+            clip.start();
         }
 
         this.emit(Ev.START);
@@ -123,51 +136,49 @@ class Animation extends EventEmitter {
 
     /**
      * 停止动画进程
-     * @param {boolean=false} force 是否同时停止内部 Clip
      */
-    stop(force = true) {
+    stop() {
 
-        this._stop(force);
-
-    }
-
-    pause(force = true) {
-
-        this._stop(force, true);
+        this._stop(false);
 
     }
 
-    _stop(force = true, pause = false) {
+    /**
+     * 暂停动画进程
+     */
+    pause() {
 
-        this._cancelTimer(() => {
+        this._stop(true);
+
+    }
+
+    /**
+     * 重置动画
+     * 会重置内部 Clip 已经执行的的 repeat 次数
+     */
+    reset() {
+
+        this._stop(false, true);
+
+    }
+
+    _stop(pause, reset) {
+
+        let stopped = this._stopAni();
+
+        if (stopped) {
             let clips = this._clips,
                 len = clips.length;
 
             if (len) {
-                if (force) {
-                    let i = -1;
-                    while (++i < len) {
-                        let clip = clips[ i ];
-                        pause ? clip.pause() : clip.stop();
-                    }
-
+                let i = -1;
+                while (++i < len) {
+                    let clip = clips[ i ];
+                    pause ? clip.pause() : clip.stop(reset);
                 }
 
                 this.emit(pause ? Ev.PAUSE : Ev.STOP);
             }
-        });
-
-    }
-
-    _cancelTimer(callback) {
-
-        let timer = this._timer;
-
-        if (timer) {
-            cancelAnimationFrame(timer);
-            this._timer = null;
-
-            callback && callback();
         }
 
     }
@@ -238,7 +249,9 @@ class Animation extends EventEmitter {
      * @returns {Array.<Clip>}
      */
     getClips() {
+
         return this._clips;
+
     }
 
     /**
@@ -246,7 +259,7 @@ class Animation extends EventEmitter {
      */
     destroy() {
 
-        this.stop();
+        this._stopAni();
         this.removeClip();
 
         this.off();
