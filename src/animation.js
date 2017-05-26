@@ -164,21 +164,19 @@ class Animation extends EventEmitter {
 
     _stop(pause, reset) {
 
-        let stopped = this._stopAni();
+        this._stopAni();
 
-        if (stopped) {
-            let clips = this._clips,
-                len = clips.length;
+        let clips = this._clips,
+            len = clips.length;
 
-            if (len) {
-                let i = -1;
-                while (++i < len) {
-                    let clip = clips[ i ];
-                    pause ? clip.pause() : clip.stop(reset);
-                }
-
-                this.emit(pause ? Ev.PAUSE : Ev.STOP);
+        if (len) {
+            let i = -1;
+            while (++i < len) {
+                let clip = clips[ i ];
+                pause ? clip.pause() : clip.stop(reset);
             }
+
+            this.emit(pause ? Ev.PAUSE : Ev.STOP);
         }
 
     }

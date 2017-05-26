@@ -98,13 +98,10 @@ $startBtn.onclick = function () {
 };
 
 $stopBtn.onclick = function () {
-    // clip1.stop();
-    // clip2.stop();
     animation.stop();
 };
 
 $pauseBtn.onclick = function () {
-    // clip1.pause();
     animation.pause();
 };
 
@@ -114,6 +111,36 @@ $resumeBtn.onclick = function () {
 };
 
 $resetBtn.onclick = function () {
+    animation.reset();
+};
+
+var $startBtn2 = document.getElementById('start2');
+var $stopBtn2 = document.getElementById('stop2');
+var $pauseBtn2 = document.getElementById('pause2');
+var $resumeBtn2 = document.getElementById('resume2');
+var $resetBtn2 = document.getElementById('reset2');
+
+$startBtn2.onclick = function () {
+    animation.start();
+};
+
+$stopBtn2.onclick = function () {
+    // clip1.stop();
+    // clip2.stop();
+    animation.stop();
+};
+
+$pauseBtn2.onclick = function () {
+    // clip1.pause();
+    animation.pause();
+};
+
+$resumeBtn2.onclick = function () {
+    // clip1.start()
+    // animation.start();
+};
+
+$resetBtn2.onclick = function () {
     // clip1.start()
     animation.reset();
 };
