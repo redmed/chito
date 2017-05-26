@@ -36,7 +36,7 @@ describe('Clip test', function () {
         var clip = new Clip(animationOptions);
         clip.start();
 
-        expect(clip._playing).toBe(true);
+        expect(clip._stopped).toBe(true);
     });
 
     it('Clip update() test ...ok', function () {

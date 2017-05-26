@@ -126,7 +126,7 @@ class ShaderClip extends Clip {
      */
     update(time) {
 
-        if (!this._playing) {
+        if (!this._stopped) {
             return false;
         }
 

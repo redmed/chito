@@ -103,11 +103,11 @@ class Clip extends EventEmitter {
     _startAt = 0;
 
     /**
-     * 播放状态
+     * 停止状态
      * @type {boolean}
      * @protected
      */
-    _playing = false;
+    _stopped = true;
 
     /**
      * 暂停状态
@@ -116,12 +116,14 @@ class Clip extends EventEmitter {
      */
     _paused = false;
 
+    _startTime = 0;
+
     /**
      * 每次暂停动画起始时间
      * @type {number}
      * @protected
      */
-    _startTime = 0;
+    _pauseStart = 0;
 
     /**
      * 暂停时长
@@ -207,10 +209,10 @@ class Clip extends EventEmitter {
 
     /**
      * 启动动画
-     * @param {boolean=} forceStart 强制重新计时
+     * @param {boolean=} force 强制重新计时
      * @returns {Clip}
      */
-    start(forceStart) {
+    start(force) {
 
         if (this._paused) {
             this._pauseTime += window.performance.now() - this._pauseStart;
@@ -219,11 +221,11 @@ class Clip extends EventEmitter {
             return this;
         }
 
-        if (!forceStart && this._playing) {
+        if (!force && !this._stopped) {
             return this;
         }
 
-        this._playing = true;
+        this._stopped = false;
         this._startTime = window.performance.now() + this._delay;
 
         this.emit(Ev.START, this._getOption());
@@ -238,11 +240,11 @@ class Clip extends EventEmitter {
      */
     stop(reset) {
 
-        if (!this._playing) {
+        if (this._stopped) {
             return this;
         }
 
-        this._playing = false;
+        this._stopped = true;
         this._paused = false;
         this._pauseTime = 0;
 
@@ -260,7 +262,7 @@ class Clip extends EventEmitter {
 
     pause() {
 
-        if (!this._playing || this._paused) {
+        if (this._stopped || this._paused) {
             return this;
         }
 
@@ -293,7 +295,7 @@ class Clip extends EventEmitter {
      */
     update(time) {
 
-        if (!this._playing) {
+        if (this._stopped) {
             return false;
         }
 
@@ -361,7 +363,7 @@ class Clip extends EventEmitter {
                     clip.start();
                 }
 
-                this._playing = false;
+                this._stopped = true;
 
                 return false;
             }
@@ -389,7 +391,7 @@ class Clip extends EventEmitter {
     destroy() {
 
         this.stop();
-        this._playing = false;
+        this._stopped = true;
         this.off();
 
     }

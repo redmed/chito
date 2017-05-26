@@ -121,26 +121,26 @@ var $resumeBtn2 = document.getElementById('resume2');
 var $resetBtn2 = document.getElementById('reset2');
 
 $startBtn2.onclick = function () {
-    animation.start();
+    clip1.start();
 };
 
 $stopBtn2.onclick = function () {
-    // clip1.stop();
+    clip1.stop();
     // clip2.stop();
-    animation.stop();
+    // animation.stop();
 };
 
 $pauseBtn2.onclick = function () {
-    // clip1.pause();
-    animation.pause();
+    clip1.pause();
+    // animation.pause();
 };
 
 $resumeBtn2.onclick = function () {
-    // clip1.start()
+    clip1.start()
     // animation.start();
 };
 
 $resetBtn2.onclick = function () {
-    // clip1.start()
-    animation.reset();
+    clip1.reset()
+    // animation.reset();
 };
