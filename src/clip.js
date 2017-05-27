@@ -116,6 +116,11 @@ class Clip extends EventEmitter {
      */
     _paused = false;
 
+    /**
+     * 动画起始时间
+     * @type {number}
+     * @protected
+     */
     _startTime = 0;
 
     /**
@@ -209,7 +214,7 @@ class Clip extends EventEmitter {
 
     /**
      * 启动动画
-     * @param {boolean=} force 强制重新计时
+     * @param {boolean=false} force 强制重新计时
      * @returns {Clip}
      */
     start(force) {
@@ -217,16 +222,15 @@ class Clip extends EventEmitter {
         if (this._paused) {
             this._pauseTime += window.performance.now() - this._pauseStart;
             this._paused = false;
-
-            return this;
         }
+        else {
+            if (!force && !this._stopped) {
+                return this;
+            }
 
-        if (!force && !this._stopped) {
-            return this;
+            this._stopped = false;
+            this._startTime = window.performance.now() + this._delay;
         }
-
-        this._stopped = false;
-        this._startTime = window.performance.now() + this._delay;
 
         this.emit(Ev.START, this._getOption());
 
@@ -236,25 +240,25 @@ class Clip extends EventEmitter {
 
     /**
      * 停止动画
+     * @param {boolean=false} reset 是否重置 repeat 次数
      * @returns {Clip}
      */
     stop(reset) {
 
-        if (this._stopped) {
-            return this;
-        }
+        if (!this._stopped) {
+            this._stopped = true;
+            this._paused = false;
+            this._pauseTime = 0;
+            this._pauseStart = 0;
 
-        this._stopped = true;
-        this._paused = false;
-        this._pauseTime = 0;
+            this.emit(Ev.STOP, this._getOption());
+
+            this.stopChain();
+        }
 
         if (reset) {
             this._repeat = this._repeat_0;
         }
-
-        this.emit(Ev.STOP, this._getOption());
-
-        this.stopChain();
 
         return this;
 
@@ -303,12 +307,14 @@ class Clip extends EventEmitter {
             return true;
         }
 
-        let { percent, elapsed } = this._getProgress(time - this._pauseTime);
+        let t = time - this._pauseTime;
+
+        let { percent, elapsed } = this._getProgress(t);
 
         this.emit(Ev.UPDATE, percent, this._getOption());
 
         // 一个周期结束
-        return this._afterUpdate(time - this._pauseTime, elapsed);
+        return this._afterUpdate(t, elapsed);
 
     }
 
@@ -364,6 +370,8 @@ class Clip extends EventEmitter {
                 }
 
                 this._stopped = true;
+                this._pauseTime = 0;
+                this._pauseStart = 0;
 
                 return false;
             }
@@ -390,8 +398,17 @@ class Clip extends EventEmitter {
      */
     destroy() {
 
-        this.stop();
         this._stopped = true;
+        this._paused = false;
+        this._startTime = 0;
+        this._pauseTime = 0;
+        this._pauseStart = 0;
+        this._chainClips = [];
+
+        let ani = this._animation;
+        ani && ani.removeClip(this);
+        this._animation = null;
+
         this.off();
 
     }

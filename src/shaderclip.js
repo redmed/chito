@@ -126,7 +126,7 @@ class ShaderClip extends Clip {
      */
     update(time) {
 
-        if (!this._stopped) {
+        if (this._stopped) {
             return false;
         }
 
@@ -134,7 +134,9 @@ class ShaderClip extends Clip {
             return true;
         }
 
-        let { percent, elapsed } = this._getProgress(time - this._pauseTime);
+        let t = time - this._pauseTime;
+
+        let { percent, elapsed } = this._getProgress(t);
 
         let tracks = this._tracks;
         let keyframe = {};
@@ -164,7 +166,7 @@ class ShaderClip extends Clip {
         this.emit(Ev.UPDATE, percent, keyframe, this._getOption());
 
         // 一个周期结束
-        return this._afterUpdate(time - this._pauseTime, elapsed);
+        return this._afterUpdate(t, elapsed);
 
     }
 }
