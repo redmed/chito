@@ -17,6 +17,8 @@ class Animation extends EventEmitter {
      */
     _options = {};
 
+    _savedClips = [];
+
     /**
      * 子动画片段
      * @type {Array.<Clip>}
@@ -120,7 +122,7 @@ class Animation extends EventEmitter {
             len = clips.length;
 
         if (this._timer || len == 0) {
-            return;
+            return this;
         }
 
         let i = -1;
@@ -132,6 +134,8 @@ class Animation extends EventEmitter {
         this.emit(Ev.START);
         this._startAni();
 
+        return this;
+
     }
 
     /**
@@ -140,6 +144,8 @@ class Animation extends EventEmitter {
     stop() {
 
         this._stop(false);
+
+        return this;
 
     }
 
@@ -150,6 +156,8 @@ class Animation extends EventEmitter {
 
         this._stop(true);
 
+        return this;
+
     }
 
     /**
@@ -158,7 +166,20 @@ class Animation extends EventEmitter {
      */
     reset() {
 
-        this._stop(false, true);
+        let i = -1,
+            saved = this._savedClips,
+            len = saved.length;
+
+        while (++i < len) {
+            let c = saved[ i ];
+            c.stop(true);
+        }
+
+        this._clips = saved.slice();
+
+        this.emit(Ev.RESET);
+
+        return this;
 
     }
 
@@ -199,6 +220,7 @@ class Animation extends EventEmitter {
             clip._animation = this;
 
             this._clips.push(clip);
+            this._savedClips.push(clip);
         }
 
         return this;
@@ -212,6 +234,7 @@ class Animation extends EventEmitter {
     removeClip(clip) {
 
         let clips = this._clips;
+        let saved = this._savedClips;
 
         if (clip) {
             // let idx = clips.indexOf(clip);
@@ -220,22 +243,25 @@ class Animation extends EventEmitter {
             //     clips.splice(idx, 1);
             // }
             utils.remove(clips, c => {
-                if (c === clip) {
-                    c._animation = null;
-                    return true;
-                }
+                return c === clip;
             });
+            utils.remove(saved, c => {
+                return c === clip;
+            });
+
+            clip._animation = null;
         }
         else {
             let i = -1,
-                len = clips.length;
+                len = saved.length;
 
             while (++i < len) {
-                let c = clips[ i ];
+                let c = saved[ i ];
                 c._animation = null;
             }
 
             this._clips = [];
+            this._savedClips = [];
         }
 
         return this;

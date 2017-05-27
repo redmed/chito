@@ -5,7 +5,8 @@ const Ev = {
     AFTER_UPDATE: 'afterUpdate',
     COMPLETE: 'complete',
     PAUSE: 'pause',
-    STOP: 'stop'
+    STOP: 'stop',
+    RESET: 'reset'
 };
 
 const Attr = {

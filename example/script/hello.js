@@ -14,7 +14,7 @@ var Animation = Animater.Animation,
 
 var clip1 = new ShaderClip({
     duration: 5000,
-    repeat: 10
+    repeat: 1
 }, {
     x: [ 0, 200 ],
     y: [ 0, 200 ],
@@ -34,7 +34,7 @@ clip1.on('update', function (progress, keyframe) {
 
 var clip2 = new ShaderClip({
     duration: 5000,
-    repeat: 10
+    repeat: 1
 }, {
     x: [ 0, 200, 200, 0, 0 ],
     y: [ 0, 0, 200, 200, 0 ],
@@ -53,6 +53,10 @@ var animation = new Animation();
 animation
     .on('start', function () {
         $st.value += '\n Start... \n';
+        goBottom()
+    })
+    .on('reset', function () {
+        $st.value += '\n Reset... \n';
         goBottom()
     })
     .on('update', function () {

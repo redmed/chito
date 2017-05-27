@@ -4,8 +4,6 @@ var webpack = require('webpack');
 module.exports = {
     entry: {
         'animater': './src/main',
-        'example.basic': './example/script/basic',
-        'demo.index': './demo/index'
     },
 
     output: {
