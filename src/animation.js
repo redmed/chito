@@ -5,7 +5,7 @@
 
 import EventEmitter from './lib/eventemitter.js';
 import utils from './lib/util.js';
-import { requestAnimationFrame, cancelAnimationFrame } from './lib/animationframe.js';
+import { requestAnimationFrame as rAF, cancelAnimationFrame as cAF } from './lib/animationframe.js';
 import { Ev } from './lib/define.js';
 
 class Animation extends EventEmitter {
@@ -16,6 +16,8 @@ class Animation extends EventEmitter {
      * @private
      */
     _options = {};
+
+    _savedClips = [];
 
     /**
      * 子动画片段
@@ -37,9 +39,11 @@ class Animation extends EventEmitter {
      * 构造函数
      * @param {Object=} options 配置项
      */
-    constructor(options = {}) {
+    constructor(options) {
+
         super();
-        this._options = options;
+        this._options = options || {};
+
     }
 
     /**
@@ -48,12 +52,27 @@ class Animation extends EventEmitter {
      */
     _startAni() {
 
-        let update = (timestamp) => {
-            this._timer = requestAnimationFrame(update);
+        let update = timestamp => {
+            this._timer = rAF(update);
             this._update(timestamp);
         };
 
-        this._timer = requestAnimationFrame(update);
+        this._timer = rAF(update);
+
+    }
+
+    _stopAni() {
+
+        let timer = this._timer;
+
+        if (timer) {
+            cAF(timer);
+            this._timer = null;
+
+            return true;
+        }
+
+        return false;
 
     }
 
@@ -66,31 +85,29 @@ class Animation extends EventEmitter {
 
         let clips = this._clips;
 
-        this.emit(Ev.UPDATE, timestamp, clips);
+        this.emit(Ev.UPDATE, clips);
 
         let i = 0;
-
         while (i < clips.length) {
             let clip = clips[ i ];
 
             let running = clip.update(timestamp);
 
-            // 未结束的动画保存下来, 以便下次继续执行
             if (!running) {
+                clip._animation = null;
                 clips.splice(i, 1);
             }
             else {
                 i++;
             }
-
         }
 
         this._clips = clips;
 
-        this.emit(Ev.AFTER_UPDATE, timestamp, clips);
+        this.emit(Ev.AFTER_UPDATE, clips);
 
-        if (clips.length === 0) {
-            this.stop();
+        if (clips.length == 0) {
+            this._stopAni();
             this.emit(Ev.COMPLETE);
         }
 
@@ -98,52 +115,89 @@ class Animation extends EventEmitter {
 
     /**
      * 启动动画进程
-     * @param {boolean=false} startClip 是否同时启动内部 Clip
      */
-    start(startClip = false) {
+    start() {
 
         let clips = this._clips,
             len = clips.length;
-        if (this._timer || len === 0) {
-            return;
+
+        if (this._timer || len == 0) {
+            return this;
         }
 
-        if (startClip) {
-            let i = 0;
-            while (i < len) {
-                let clip = clips[ i++ ];
-                clip.start();
-            }
+        let i = -1;
+        while (++i < len) {
+            let clip = clips[ i ];
+            clip.start();
         }
 
         this.emit(Ev.START);
         this._startAni();
 
+        return this;
+
     }
 
     /**
      * 停止动画进程
-     * @param {boolean=false} stopClip 是否同时停止内部 Clip
      */
-    stop(stopClip = false) {
+    stop() {
 
-        let timer = this._timer;
+        this._stop(false);
 
-        if (timer) {
-            cancelAnimationFrame(timer);
-            this._timer = null;
+        return this;
 
-            if (stopClip) {
-                let i = 0,
-                    clips = this._clips,
-                    len = clips.length;
-                while (i < len) {
-                    let clip = clips[ i++ ];
-                    clip.stop();
-                }
+    }
+
+    /**
+     * 暂停动画进程
+     */
+    pause() {
+
+        this._stop(true);
+
+        return this;
+
+    }
+
+    /**
+     * 重置动画
+     * 会重置内部 Clip 已经执行的的 repeat 次数
+     */
+    reset() {
+
+        let i = -1,
+            saved = this._savedClips,
+            len = saved.length;
+
+        while (++i < len) {
+            let c = saved[ i ];
+            c.stop(true);
+        }
+
+        this._clips = saved.slice();
+
+        this.emit(Ev.RESET);
+
+        return this;
+
+    }
+
+    _stop(pause, reset) {
+
+        this._stopAni();
+
+        let clips = this._clips,
+            len = clips.length;
+
+        if (len) {
+            let i = -1;
+            while (++i < len) {
+                let clip = clips[ i ];
+                pause ? clip.pause() : clip.stop(reset);
             }
 
-            this.emit(Ev.STOP);
+            this.emit(pause ? Ev.PAUSE : Ev.STOP);
         }
 
     }
@@ -158,7 +212,16 @@ class Animation extends EventEmitter {
             clips = [ clips ];
         }
 
-        this._clips = this._clips.concat(clips);
+        let i = -1,
+            len = clips.length;
+
+        while (++i < len) {
+            let clip = clips[ i ];
+            clip._animation = this;
+
+            this._clips.push(clip);
+            this._savedClips.push(clip);
+        }
 
         return this;
 
@@ -170,13 +233,35 @@ class Animation extends EventEmitter {
      */
     removeClip(clip) {
 
+        let clips = this._clips;
+        let saved = this._savedClips;
+
         if (clip) {
-            utils.remove(this._clips, c => {
+            // let idx = clips.indexOf(clip);
+            // if (idx != -1) {
+            //     clip._animation = null;
+            //     clips.splice(idx, 1);
+            // }
+            utils.remove(clips, c => {
                 return c === clip;
             });
+            utils.remove(saved, c => {
+                return c === clip;
+            });
+
+            clip._animation = null;
         }
         else {
+            let i = -1,
+                len = saved.length;
+
+            while (++i < len) {
+                let c = saved[ i ];
+                c._animation = null;
+            }
+
             this._clips = [];
+            this._savedClips = [];
         }
 
         return this;
@@ -188,7 +273,9 @@ class Animation extends EventEmitter {
      * @returns {Array.<Clip>}
      */
     getClips() {
+
         return this._clips;
+
     }
 
     /**
@@ -196,8 +283,8 @@ class Animation extends EventEmitter {
      */
     destroy() {
 
-        this.stop();
-        this._clips = [];
+        this._stopAni();
+        this.removeClip();
 
         this.off();
 

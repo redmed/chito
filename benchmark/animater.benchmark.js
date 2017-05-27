@@ -48,7 +48,7 @@ suite('Clip.update() benchmark test', function () {
         // Tween
         var from = { x: 0, y: 100 };
         var tween = new TWEEN.Tween(from)
-            .to({ x: 100, y: 0 })
+            .to({ x: 100, y: 0 }, 99999999)
             .start();
 
         tweens.push(tween);
@@ -131,7 +131,7 @@ suite('Animation._update()', function () {
     var ani = new Animation();
     var ani2 = new Animation();
 
-    var clips = [];
+    var clips = [], clips2 = [];
 
     var i = 0, m = 5000;
 
@@ -145,10 +145,18 @@ suite('Animation._update()', function () {
         clips.push(clip);
         clip.start();
 
+        var clip2 = new Clip({
+            duration: 999999,
+            repeat: 99999
+        });
+
+        clips2.push(clip2);
+        clip2.start();
+
     }
 
     ani.addClip(clips);
-    ani2.addClip(clips);
+    ani2.addClip(clips2);
 
     bench('Animation._update()', function () {
         ani._update(Date.now());

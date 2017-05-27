@@ -15,6 +15,8 @@ var options = {
 var consoleReporter = new ConsoleReporter(options); // initialize ConsoleReporter
 jasmine.getEnv().addReporter(consoleReporter);
 
+jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
+
 describe('Clip test', function () {
 
     var animationOptions = {
@@ -24,7 +26,7 @@ describe('Clip test', function () {
         'easing': 'Linear'
     };
 
-    it('Static attributies test ...ok', function () {
+    it('Static attributes test ...ok', function () {
         expect(Clip.Event.UPDATE).toBe('update');
         expect(Clip.Event.START).toBe('start');
         expect(Clip.Event.STOP).toBe('stop');
@@ -32,14 +34,14 @@ describe('Clip test', function () {
         expect(Clip.Event.REPEAT_COMPLETE).toBe('repeatComplete');
     });
 
-    it('Clip start() test ...ok', function () {
+    it('.start() test ...ok', function () {
         var clip = new Clip(animationOptions);
         clip.start();
 
-        expect(clip._isPlaying).toBe(true);
+        expect(clip._stopped).toBe(false);
     });
 
-    it('Clip update() test ...ok', function () {
+    it('.update() test ...ok', function () {
         var clip = new Clip(animationOptions);
         clip.start();
 
@@ -49,7 +51,17 @@ describe('Clip test', function () {
         expect(res).toBe(false);
     });
 
-    it('Clip on(Event.START)/emit(Event.START) test ...ok', function (done) {
+    it('.chain() test ...ok', function () {
+        var clipA = new Clip(animationOptions);
+        var clipB = new Clip(animationOptions);
+
+        clipA.chain(clipB);
+
+        expect(clipA._chainClips.length).toBe(1);
+        expect(clipA._chainClips[ 0 ]).toBe(clipB);
+    });
+
+    it('.on(Event.START)/emit(Event.START) test ...ok', function (done) {
         var clip = new Clip(animationOptions);
 
         clip.on(Clip.Event.START, function () {
@@ -60,7 +72,7 @@ describe('Clip test', function () {
         clip.start();
     });
 
-    it('Clip on(Event.STOP)/emit(Event.STOP) test ...ok', function (done) {
+    it('.on(Event.STOP)/emit(Event.STOP) test ...ok', function (done) {
         var clip = new Clip(animationOptions);
 
         clip.on(Clip.Event.STOP, function () {
@@ -73,7 +85,7 @@ describe('Clip test', function () {
         clip.stop();
     });
 
-    it('Clip on(Event.UPDATE)/emit(Event.UPDATE) test ...ok', function (done) {
+    it('.on(Event.UPDATE)/emit(Event.UPDATE) test ...ok', function (done) {
         var clip = new Clip(animationOptions);
 
         clip.on(Clip.Event.UPDATE, function (progress) {
@@ -85,7 +97,7 @@ describe('Clip test', function () {
         clip.update(window.performance.now() + 500);
     });
 
-    it('Clip on(Event.COMPLETE)/emit(Event.COMPLETE) test ...ok', function (done) {
+    it('.on(Event.COMPLETE)/emit(Event.COMPLETE) test ...ok', function (done) {
         var clip = new Clip(animationOptions);
 
         clip.on(Clip.Event.COMPLETE, function () {
@@ -97,7 +109,7 @@ describe('Clip test', function () {
         clip.update(window.performance.now() + 5000);
     });
 
-    it('Clip on(Event.REPEAT_COMPLETE)/emit(Event.REPEAT_COMPLETE) test ...ok', function (done) {
+    it('.on(Event.REPEAT_COMPLETE)/emit(Event.REPEAT_COMPLETE) test ...ok', function (done) {
         animationOptions = {
             'duration': 1000,
             'repeat': 2
@@ -152,7 +164,7 @@ describe('ShaderClip test', function () {
         color: [ '#f00', '#00f' ]
     };
 
-    it('Static attributies test ...ok', function () {
+    it('Static attributes test ...ok', function () {
         expect(ShaderClip.Event.UPDATE).toBe('update');
         expect(ShaderClip.Event.START).toBe('start');
         expect(ShaderClip.Event.STOP).toBe('stop');
@@ -160,7 +172,7 @@ describe('ShaderClip test', function () {
         expect(ShaderClip.Event.REPEAT_COMPLETE).toBe('repeatComplete');
     });
 
-    it('ShaderClip update() test ...ok', function () {
+    it('.update() test ...ok', function () {
         var clip = new ShaderClip(animationOptions, attr);
         clip.start();
 
@@ -170,7 +182,7 @@ describe('ShaderClip test', function () {
         expect(res).toBe(false);
     });
 
-    it('ShaderClip on(Event.UPDATE)/emit(Event.UPDATE) test ...ok', function (done) {
+    it('.on(Event.UPDATE)/emit(Event.UPDATE) test ...ok', function (done) {
         var clip = new ShaderClip(animationOptions, attr);
 
         clip.on(ShaderClip.Event.UPDATE, function (progress, keyframe, args) {
@@ -206,7 +218,7 @@ describe('Animation test', function () {
         clips2.push(new Clip(clipOpt));
     }
 
-    it('Animation addClip() test ...ok', function () {
+    it('.addClip() test ...ok', function () {
         ani.addClip(clip1);
         expect(ani._clips.length).toBe(1);
 
@@ -214,7 +226,7 @@ describe('Animation test', function () {
         expect(ani._clips.length).toBe(clips2.length + 1);
     });
 
-    it('Animation removeClip() test ...ok', function () {
+    it('.removeClip() test ...ok', function () {
         ani.removeClip(clip1);
         expect(ani._clips.length).toBe(clips2.length);
 
@@ -222,14 +234,16 @@ describe('Animation test', function () {
         expect(ani._clips.length).toBe(0);
     });
 
-    it('Animation getClips() test ...ok', function () {
+    it('.getClips() test ...ok', function () {
+        var clip1 = new Clip(clipOpt);
         var ani = new Animation();
         ani.addClip(clip1);
 
         expect(ani.getClips()[ 0 ]).toBe(clip1);
     });
 
-    it('Animation start()/on(Event.START) test ...ok', function (done) {
+    it('.start()/on(Event.START) test ...ok', function (done) {
+        var clip1 = new Clip(clipOpt);
         var ani = new Animation();
         ani.addClip(clip1);
 
@@ -241,7 +255,7 @@ describe('Animation test', function () {
         ani.start();
     });
 
-    it('Animation start(true) test ...ok', function (done) {
+    it('.start(true) test ...ok', function (done) {
         var ani = new Animation();
         ani.addClip(new Clip(clipOpt));
 
@@ -251,7 +265,7 @@ describe('Animation test', function () {
             for (var i = 0, len = clips.length; i < len; i++) {
                 var c = clips[ i ];
 
-                expect(c._isPlaying).toBe(true);
+                expect(c._stopped).toBe(false);
             }
 
             done();
@@ -260,7 +274,8 @@ describe('Animation test', function () {
         ani.start(true);
     });
 
-    it('Animation stop()/on(Event.STOP) test ...ok', function (done) {
+    it('.stop()/on(Event.STOP) test ...ok', function (done) {
+        var clip1 = new Clip(clipOpt);
         var ani = new Animation();
         ani.addClip(clip1);
 
@@ -275,7 +290,7 @@ describe('Animation test', function () {
         }, 500);
     });
 
-    it('Animation on(Event.UPDATE/UPDATE_AFTER) test ...ok', function (done) {
+    it('.on(Event.UPDATE/UPDATE_AFTER) test ...ok', function (done) {
         var clip = new Clip({
             duration: 500,
             repeat: 1
@@ -286,20 +301,112 @@ describe('Animation test', function () {
         ani.addClip(clip);
 
         var t, t1;
-        ani.on(Animation.Event.UPDATE, function (timestamp) {
-            ani.stop();
-            t = window.performance.now();
-            expect(typeof timestamp == 'number').toBe(true);
-        });
-
-        ani.on(Animation.Event.AFTER_UPDATE, function (timestamp) {
-            t1 = window.performance.now();
-            expect(typeof timestamp == 'number').toBe(true);
-            expect(t1 > t).toBe(true);
-            done();
-        });
+        ani
+            .on(Animation.Event.UPDATE, function () {
+                ani.stop();
+                t = window.performance.now();
+            })
+            .on(Animation.Event.AFTER_UPDATE, function () {
+                t1 = window.performance.now();
+                expect(t1 > t).toBe(true);
+                done();
+            });
 
         ani.start();
     });
 
+});
+
+describe('Running test', function () {
+    var aniOpt = {
+        duration: 1000,
+        repeat: 2,
+    };
+
+    var attr = {
+        x: [ 0, 10 ],
+        fill: [ '#fff', '#000' ]
+    };
+
+    it('start -> update -> stop -> start -> update -> complete', function (done) {
+        var clip1 = new ShaderClip(aniOpt, attr);
+        var clip2 = new ShaderClip({ duration: 1000, repeat: 2 }, attr);
+        var ani = new Animation();
+
+        var t0, t1, t2,
+            ct0, ct1, ct2,
+            repeat = 0, stop = 0,
+            at0, at1, at2,
+            at00, t11;
+
+        clip1
+            .on('start', function () {
+                t0 = window.performance.now();
+            })
+            .on('update', function (p, k) {
+                t1 = window.performance.now();
+                if (!t11) {
+                    t11 = t1;
+                }
+
+                expect(p <= 1 && p >= 0).toBe(true);
+                expect(k.x <= 10 && k.x >= 0).toBe(true);
+                expect(!!k.fill.match(/rgba\(\d+,\d+,\d+,.+\)/ig)).toBe(true);
+
+                expect(t0 < t1).toBe(true);
+            })
+            .on('stop', function () {
+                stop++;
+            })
+            .on('repeatComplete', function () {
+                repeat++;
+            })
+            .on('complete', function () {
+                t2 = window.performance.now();
+
+                expect(t1 < t2).toBe(true);
+                expect(aniOpt.repeat - 1 >= repeat).toBe(true);
+                expect(stop).toBe(1);
+
+            });
+
+        clip2
+            .on('start', function () {
+                ct0 = window.performance.now();
+                expect(ct0 > t2).toBe(true);
+            })
+            .on('complete', function () {
+                ct2 = window.performance.now();
+            });
+
+        ani
+            .on('update', function () {
+                at0 = window.performance.now();
+                if (!at00) {
+                    at00 = at0;
+                }
+            })
+            .on('afterUpdate', function () {
+                at1 = window.performance.now();
+                expect(at0 < at1).toBe(true);
+            })
+            .on('complete', function () {
+                at2 = window.performance.now();
+                expect(at2 > t11 && ct2 > t2).toBe(true);
+                expect(at00 < t11).toBe(true);
+                expect(ani.getClips().length).toBe(0);
+                done();
+            });
+
+        clip1.chain(clip2);
+        ani.addClip(clip1);
+        ani.start();
+
+        setTimeout(function () {
+            ani.stop();
+            setTimeout(function () {
+                ani.start();
+            }, 500)
+        }, 800)
+    });
 });

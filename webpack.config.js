@@ -3,7 +3,7 @@ var webpack = require('webpack');
 
 module.exports = {
     entry: {
-        'animater': './src/main'
+        'animater': './src/main',
     },
 
     output: {
@@ -24,9 +24,4 @@ module.exports = {
         ]
     },
 
-    plugins: [
-        new webpack.optimize.UglifyJsPlugin({
-            compress: true
-        }),
-    ]
 };

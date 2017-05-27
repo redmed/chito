@@ -23,19 +23,25 @@
 
 * clip `Clip=` 	`可选` 移除的`Clip`实例，默认移除全部。
 
-#### 3. start(startClip=false)
+#### 3. start()
 
-启动动画，startClip 控制是否启动内部的 `Clip`。如果已启动，则不会重复启动。
-
-##### 参数:
-
-* startClip `boolean=false` 是否启动全部 Clip，默认不启动，需要开发者调用 Clip.start()
+启动动画，startClip 控制是否启动内部的 `Clip`。  
+如果已启动，则不会重复启动。  
+如果已暂停，则恢复播放。
 
 #### 4. stop()
 
 停止动画
 
-#### 5. getClips()
+#### 5. pause()
+
+暂停动画
+
+#### 6. reset()
+
+重置动画  
+
+#### 7. getClips()
 
 获取正在进行的`Clip`
 
@@ -44,7 +50,7 @@
 `Array.<Clip>` 
 
 
-#### 6. destory()
+#### 7. destory()
 
 析构函数，清空内部状态。
 

@@ -78,6 +78,7 @@ class ShaderClip extends Clip {
     constructor(options, attr) {
 
         super(options, attr);
+
         let cs = options[ Attr.COLOR_SUPPORT ];
         cs = typeof cs == 'undefined' ? true : cs;
         this._tracks = transform(attr, cs);
@@ -120,21 +121,11 @@ class ShaderClip extends Clip {
     // }
 
     /**
-     * 更新动画, 触发 UPDATE 事件
-     * @param {number} time
-     * @returns {boolean} true: 还没结束. false: 运行结束
+     * 更新动画属性
+     * @param {number} percent
+     * @returns {Object}
      */
-    update(time) {
-
-        if (this._isPlaying && time && time < this._startTime) {
-            return true;
-        }
-
-        let elapsed = (time - this._startTime) / this._duration;
-        elapsed += this._startAt;
-        elapsed = Math.min(elapsed, 1);
-
-        let percent = this._easing(this._reversed ? 1 - elapsed : elapsed);
+    _updateAttr(percent) {
 
         let tracks = this._tracks;
         let keyframe = {};
@@ -161,34 +152,7 @@ class ShaderClip extends Clip {
             keyframe[ key ] = val;
         }
 
-        this.emit(Ev.UPDATE, percent, keyframe, this.getOpt());
-
-        // 一个周期结束
-        if (elapsed == 1) {
-            if (this._repeat > 1) {
-                if (isFinite(this._repeat)) {
-                    this._repeat--;
-                }
-
-                this._startTime = time + this._interval;
-                this._startAt = 0;
-
-                if (this._yoyo) {
-                    this._reversed = !this._reversed;
-                }
-
-                this.emit(Ev.REPEAT_COMPLETE, this._repeat, this.getOpt());
-
-                return true;
-            }
-            else {
-                this.emit(Ev.COMPLETE, this.getOpt());
-
-                return false;
-            }
-        }
-
-        return true;
+        return keyframe;
 
     }
 }

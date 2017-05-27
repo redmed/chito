@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>title</title>
+    <style>
+        .container {
+            width: 100%;
+            height: 600px;
+            position: relative;
+        }
+
+        .wrapper {
+            position: relative;
+            display: block;
+            height: 60px;
+        }
+        .point {
+            width: 50px;
+            height: 50px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            background-color: #22e1ee;
+        }
+    </style>
+</head>
+<body>
+<div class="container" id="demo1">
+    <div class="wrapper">
+        <div class="point" id="p1">
+            <h4 id="p1-num">P1</h4>
+        </div>
+    </div>
+
+    <div class="wrapper">
+        <div class="point" id="p2">
+            <h4 id="p2-num">P2</h4>
+        </div>
+    </div>
+
+    <div class="wrapper">
+        <div class="point" id="p3">
+            <h4 id="p3-num">P3</h4>
+        </div>
+    </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/16.3.5/Tween.min.js"></script>
+<!--<script src="./script/tweenjs.js"></script>-->
+<script src="./script/tween.js"></script>
+</body>
+</html>

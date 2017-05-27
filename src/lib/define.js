@@ -4,7 +4,9 @@ const Ev = {
     REPEAT_COMPLETE: 'repeatComplete',
     AFTER_UPDATE: 'afterUpdate',
     COMPLETE: 'complete',
-    STOP: 'stop'
+    PAUSE: 'pause',
+    STOP: 'stop',
+    RESET: 'reset'
 };
 
 const Attr = {
