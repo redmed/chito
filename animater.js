@@ -73,7 +73,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 10);
+/******/ 	return __webpack_require__(__webpack_require__.s = 11);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -86,57 +86,15 @@ return /******/ (function(modules) { // webpackBootstrap
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _eventemitter = __webpack_require__(1);
-
-var _eventemitter2 = _interopRequireDefault(_eventemitter);
-
-var _easing = __webpack_require__(8);
-
-var _easing2 = _interopRequireDefault(_easing);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-/**
- * @file 子动画片段, 由 Animation 统一调度, 只控制时间的变化量
- * @author redmed
- *
- */
-
-// Include a performance.now polyfill
-(function () {
-
-    if ('performance' in window === false) {
-        window.performance = {};
-    }
-
-    // IE 8
-    Date.now = Date.now || function () {
-        return new Date().getTime();
-    };
-
-    if ('now' in window.performance === false) {
-        var offset = window.performance.timing && window.performance.timing.navigationStart ? window.performance.timing.navigationStart : Date.now();
-
-        window.performance.now = function () {
-            return Date.now() - offset;
-        };
-    }
-})();
-
-var Event = {
+var Ev = {
     UPDATE: 'update',
     START: 'start',
+    REPEAT_COMPLETE: 'repeatComplete',
+    AFTER_UPDATE: 'afterUpdate',
     COMPLETE: 'complete',
-    STOP: 'stop'
+    PAUSE: 'pause',
+    STOP: 'stop',
+    RESET: 'reset'
 };
 
 var Attr = {
@@ -146,7 +104,8 @@ var Attr = {
     EASING: 'easing',
     INTERVAL: 'interval',
     YOYO: 'yoyo',
-    START: 'startAt'
+    START: 'startAt',
+    COLOR_SUPPORT: 'colorSupport'
 };
 
 var Easing = {
@@ -193,176 +152,343 @@ var Easing = {
     BOUNCE_IN_OUT: 'BounceInOut'
 };
 
+exports.Ev = Ev;
+exports.Attr = Attr;
+exports.Easing = Easing;
+
+/***/ }),
+/* 1 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _eventemitter = __webpack_require__(2);
+
+var _eventemitter2 = _interopRequireDefault(_eventemitter);
+
+var _easing = __webpack_require__(9);
+
+var _easing2 = _interopRequireDefault(_easing);
+
+var _define = __webpack_require__(0);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+/**
+ * @file 动画片段, 由 Animation 统一调度, 只控制时间的变化量
+ * @author redmed
+ */
+
+// Include a performance.now polyfill
+(function () {
+
+    if ('performance' in window === false) {
+        window.performance = {};
+    }
+
+    // IE 8
+    Date.now = Date.now || function () {
+        return new Date().getTime();
+    };
+
+    if ('now' in window.performance === false) {
+        var offset = window.performance.timing && window.performance.timing.navigationStart ? window.performance.timing.navigationStart : Date.now();
+
+        window.performance.now = function () {
+            return Date.now() - offset;
+        };
+    }
+})();
+
 var Clip = function (_EventEmitter) {
     _inherits(Clip, _EventEmitter);
 
     /**
      * 构造函数
      * @param {Object=} options 配置项
+     * @param {Object=} attr 变换属性
      */
 
 
     /**
-     * 起始时间
+     * @type {Animation}
+     * @protected
+     */
+
+
+    /**
+     * yoyo 翻转状态
+     * @type {boolean}
+     * @protected
+     */
+
+
+    /**
+     * 每次暂停动画起始时间
+     * @type {number}
+     * @protected
+     */
+
+
+    /**
+     * 暂停状态
+     * @type {boolean}
+     * @protected
      */
 
 
     /**
      * progress起始位置加成, 可以控制progress不从0开始启动
      * @type {number}
+     * @protected
      */
 
 
     /**
      * Ease 动画名
      * @type {Function}
+     * @protected
      */
 
 
     /**
-     * 每次动画间隔
-     * @type {number} ms
-     */
-
-
-    /**
-     * 运行时长
+     * 动画重复次数，用于reset重置使用
      * @type {number}
-     */
-    function Clip() {
-        var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-
-        _classCallCheck(this, Clip);
-
-        var _this = _possibleConstructorReturn(this, (Clip.__proto__ || Object.getPrototypeOf(Clip)).call(this));
-
-        _this._options = {};
-        _this._startAt = 0;
-        _this._isPlaying = false;
-        _this._reversed = false;
-        _this.Event = Event;
-
-        _this.initialize(options);
-
-        return _this;
-    }
-
-    /**
-     * 初始化函数
-     * @param {Object=} from 起始帧
-     * @param {Object=} to 结束帧
-     * @param {Object=} options 配置项
-     */
-
-
-    /**
-     * yoyo翻转状态
-     * @type {boolean}
-     */
-
-
-    /**
-     * 播放状态
-     * @type {boolean}
-     */
-
-
-    /**
-     * 是否按原轨迹返回(类似溜溜球)
-     * @type {boolean}
-     */
-
-
-    /**
-     * 重复数量
-     * @type {number}
+     * @protected
      */
 
 
     /**
      * 延迟运行
      * @type {number} ms
+     * @protected
+     */
+
+
+    /**
+     * 变换属性
+     * @type {Object}
+     * @protected
+     */
+    function Clip(options, attr) {
+        _classCallCheck(this, Clip);
+
+        var _this = _possibleConstructorReturn(this, (Clip.__proto__ || Object.getPrototypeOf(Clip)).call(this));
+
+        _this._options = {};
+        _this._attr = {};
+        _this._startAt = 0;
+        _this._stopped = true;
+        _this._paused = false;
+        _this._startTime = 0;
+        _this._pauseStart = 0;
+        _this._pauseTime = 0;
+        _this._reversed = false;
+        _this._chainClips = [];
+
+
+        _this._options = options || {};
+        _this._attr = attr;
+
+        _this._initOption(options);
+
+        return _this;
+    }
+
+    /**
+     * 初始配置项
+     * @param {Object=} options
+     * @options {number=} options.duration, 单位ms, 默认 1000ms
+     * @options {number=} options.delay
+     * @options {string=|Function=} options.ease
+     * @options {number=} options.repeat
+     * @private
+     */
+
+
+    /**
+     * 被当前 Clip 链式调用的 Clip
+     * @type {Array}
+     * @protected
+     */
+
+
+    /**
+     * 暂停时长
+     * @type {number}
+     * @protected
+     */
+
+
+    /**
+     * 动画起始时间
+     * @type {number}
+     * @protected
+     */
+
+
+    /**
+     * 停止状态
+     * @type {boolean}
+     * @protected
+     */
+
+
+    /**
+     * 是否按原轨迹返回(类似溜溜球)
+     * @type {boolean}
+     * @protected
+     */
+
+
+    /**
+     * 动画重复次数
+     * @type {number}
+     * @protected
+     */
+
+
+    /**
+     * 每次动画间隔
+     * @type {number} ms
+     * @protected
+     */
+
+
+    /**
+     * 运行时长
+     * @type {number}
+     * @protected
      */
 
 
     /**
      * 配置项
      * @type {Object}
+     * @protected
      */
 
 
     _createClass(Clip, [{
-        key: 'initialize',
-        value: function initialize() {
-            var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-            var attr = arguments[1];
-
-
-            this._options = this._initOption(options);
-        }
-
-        /**
-         * 初始配置项
-         * @param {Object=} options
-         * @options {number=} options.duration, 单位ms, 默认 1000ms
-         * @options {number=} options.delay
-         * @options {string=|Function=} options.ease
-         * @options {number=} options.repeat
-         * @private
-         */
-
-    }, {
         key: '_initOption',
         value: function _initOption(options) {
 
-            var easing = options[Attr.EASING] || Easing.LINEAR;
+            var easing = options[_define.Attr.EASING] || _define.Easing.LINEAR;
             this._easing = _easing2['default'][easing] ? _easing2['default'][easing] : easing;
-            this._delay = options[Attr.DELAY] || 0;
-            this._duration = options[Attr.DURATION] || 1000;
-            this._repeat = options[Attr.REPEAT] || 0;
-            this._interval = options[Attr.INTERVAL] || 0;
-            this._yoyo = options[Attr.YOYO] || false;
-            this._startAt = options[Attr.START] || 0;
+            this._delay = options[_define.Attr.DELAY] || 0;
+            var dur = options[_define.Attr.DURATION];
+            this._duration = typeof dur == 'undefined' ? 1000 : dur;
+            this._repeat_0 = this._repeat = options[_define.Attr.REPEAT] || 1;
+            this._interval = options[_define.Attr.INTERVAL] || 0;
+            this._yoyo = options[_define.Attr.YOYO] || false;
+            this._startAt = options[_define.Attr.START] || 0;
+        }
 
-            return options;
+        /**
+         * @protected
+         */
+
+    }, {
+        key: '_getOption',
+        value: function _getOption() {
+            return {
+                options: this._options,
+                attr: this._attr
+            };
         }
 
         /**
          * 启动动画
-         * @param {Boolean=} forceStart 强制重新计时
+         * @param {boolean=false} force 强制重新计时
+         * @returns {Clip}
          */
 
     }, {
         key: 'start',
-        value: function start(forceStart) {
+        value: function start(force) {
 
-            if (!forceStart && this._isPlaying) {
-                return;
+            if (this._paused) {
+                this._pauseTime += window.performance.now() - this._pauseStart;
+                this._paused = false;
+            } else {
+                if (!force && !this._stopped) {
+                    return this;
+                }
+
+                this._stopped = false;
+                this._startTime = window.performance.now() + this._delay;
             }
 
-            this._isPlaying = true;
-            this._startTime = window.performance.now() + this._delay;
-
-            this.emit(Event.START);
+            this.emit(_define.Ev.START, this._getOption());
 
             return this;
         }
 
         /**
          * 停止动画
+         * @param {boolean=false} reset 是否重置 repeat 次数
+         * @returns {Clip}
          */
 
     }, {
         key: 'stop',
-        value: function stop() {
+        value: function stop(reset) {
 
-            if (!this._isPlaying) {
-                return;
+            if (!this._stopped) {
+                this._stopped = true;
+                this._paused = false;
+                this._pauseTime = 0;
+                this._pauseStart = 0;
+
+                this.emit(_define.Ev.STOP, this._getOption());
+
+                this.stopChain();
             }
 
-            this._isPlaying = false;
+            if (reset) {
+                this._repeat = this._repeat_0;
+            }
 
-            this.emit(Event.STOP);
+            return this;
+        }
+    }, {
+        key: 'pause',
+        value: function pause() {
+
+            if (this._stopped || this._paused) {
+                return this;
+            }
+
+            this._paused = true;
+            this._pauseStart = window.performance.now();
+
+            return this;
+        }
+    }, {
+        key: 'stopChain',
+        value: function stopChain() {
+
+            var i = -1,
+                clips = this._chainClips,
+                len = clips.length;
+
+            while (++i < len) {
+                var clip = clips[i];
+                clip.stop();
+            }
 
             return this;
         }
@@ -370,29 +496,67 @@ var Clip = function (_EventEmitter) {
         /**
          * 更新动画, 触发 UPDATE 事件
          * @param {number} time
-         * @returns {Boolean} true: 还没结束. false: 运行结束
+         * @returns {boolean} true: 还没结束. false: 运行结束
          */
 
     }, {
         key: 'update',
         value: function update(time) {
 
-            if (this._isPlaying && time && time < this._startTime) {
+            if (this._stopped) {
                 return true;
             }
+
+            if (this._paused || time && time < this._startTime) {
+                return true;
+            }
+
+            var t = time - this._pauseTime;
+
+            var _getProgress2 = this._getProgress(t),
+                percent = _getProgress2.percent,
+                elapsed = _getProgress2.elapsed;
+
+            var attr = this._updateAttr(percent, elapsed);
+
+            this.emit(_define.Ev.UPDATE, percent, attr, this._getOption());
+
+            // 一个周期结束
+            return this._afterUpdate(t, elapsed);
+        }
+    }, {
+        key: '_getProgress',
+        value: function _getProgress(time) {
 
             var elapsed = (time - this._startTime) / this._duration;
             elapsed += this._startAt;
             elapsed = Math.min(elapsed, 1);
 
             var percent = this._easing(this._reversed ? 1 - elapsed : elapsed);
-            this.emit(Event.UPDATE, percent);
+
+            return {
+                percent: percent,
+                elapsed: elapsed
+            };
+        }
+    }, {
+        key: '_updateAttr',
+        value: function _updateAttr(percent, elapsed) {
+
+            return this._attr;
+        }
+    }, {
+        key: '_afterUpdate',
+        value: function _afterUpdate(time, elapsed) {
 
             // 一个周期结束
             if (elapsed == 1) {
-                if (this._repeat > 1) {
-                    if (isFinite(this._repeat)) {
-                        this._repeat--;
+
+                var rep = this._repeat;
+
+                if (rep > 1) {
+                    if (isFinite(rep)) {
+                        rep--;
                     }
 
                     this._startTime = time + this._interval;
@@ -402,15 +566,55 @@ var Clip = function (_EventEmitter) {
                         this._reversed = !this._reversed;
                     }
 
+                    this.emit(_define.Ev.REPEAT_COMPLETE, rep, this._getOption());
+
+                    this._repeat = rep;
+
                     return true;
                 } else {
-                    this.emit(Event.COMPLETE);
+
+                    this.emit(_define.Ev.COMPLETE, this._getOption());
+
+                    var i = -1,
+                        chains = this._chainClips,
+                        len = chains.length;
+                    while (++i < len) {
+                        var clip = chains[i];
+
+                        var ani = this._animation;
+                        ani && ani.addClip(clip);
+
+                        clip.start();
+                    }
+
+                    this._stopped = true;
+                    this._pauseTime = 0;
+                    this._pauseStart = 0;
+                    this._repeat = this._repeat_0;
 
                     return false;
                 }
             }
 
             return true;
+        }
+
+        /**
+         * 链接新 Clip
+         * @param {*} args
+         * @returns {Clip}
+         */
+
+    }, {
+        key: 'chain',
+        value: function chain() {
+            for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+                args[_key] = arguments[_key];
+            }
+
+            this._chainClips = args;
+
+            return this;
         }
 
         /**
@@ -421,7 +625,17 @@ var Clip = function (_EventEmitter) {
         key: 'destroy',
         value: function destroy() {
 
-            this._isPlaying = false;
+            this._stopped = true;
+            this._paused = false;
+            this._startTime = 0;
+            this._pauseTime = 0;
+            this._pauseStart = 0;
+            this._chainClips = [];
+
+            var ani = this._animation;
+            ani && ani.removeClip(this);
+            this._animation = null;
+
             this.off();
         }
     }]);
@@ -429,13 +643,13 @@ var Clip = function (_EventEmitter) {
     return Clip;
 }(_eventemitter2['default']);
 
-Clip.Event = Event;
-Clip.Attr = Attr;
-Clip.Easing = Easing;
+Clip.Event = _define.Ev;
+Clip.Attr = _define.Attr;
+Clip.Easing = _define.Easing;
 exports['default'] = Clip;
 
 /***/ }),
-/* 1 */
+/* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -452,7 +666,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 /**
  * @file 事件封装类
  * @author redmed
- * 
  */
 
 var EventEmitter = function () {
@@ -460,6 +673,7 @@ var EventEmitter = function () {
     /**
      * 构造函数
      */
+
 
     /**
      * 事件池
@@ -526,7 +740,7 @@ var EventEmitter = function () {
 
         /**
          * 事件解绑
-         * @param {string=} type
+         * @param {string|null=} type
          * @param {Function=} listener
          * @returns {EventEmitter}
          */
@@ -539,25 +753,31 @@ var EventEmitter = function () {
 
             var events = this.__events__;
 
-            if (type == null) {
+            if (!type) {
                 this.__events__ = {};
 
                 return this;
             }
 
-            if (listener == null) {
+            if (!listener) {
                 delete events[type];
 
                 return this;
             }
 
-            events[type].some(function (cb, index, listeners) {
-                if (cb === listener || cb === cb.listener) {
-                    listeners.splice(index, 1);
+            var listeners = events[type];
+            if (listeners) {
 
-                    return true;
+                var i = listeners.length - 1;
+                while (i >= 0) {
+                    var cb = listeners[i];
+                    if (cb === listener || cb == cb.listener) {
+                        listeners.splice(i, 1);
+                    }
+
+                    i--;
                 }
-            });
+            }
 
             return this;
         }
@@ -572,18 +792,20 @@ var EventEmitter = function () {
     }, {
         key: "emit",
         value: function emit(type) {
-            var _this2 = this;
-
-            for (var _len2 = arguments.length, args = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
-                args[_key2 - 1] = arguments[_key2];
-            }
-
             var listeners = this.__events__[type];
 
             if (listeners) {
-                listeners.forEach(function (cb) {
-                    cb.apply(_this2, args);
-                });
+                var i = 0,
+                    len = listeners.length;
+
+                for (var _len2 = arguments.length, args = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
+                    args[_key2 - 1] = arguments[_key2];
+                }
+
+                while (i < len) {
+                    var cb = listeners[i++];
+                    cb.apply(this, args);
+                }
             }
 
             return this;
@@ -607,7 +829,7 @@ var EventEmitter = function () {
 exports["default"] = EventEmitter;
 
 /***/ }),
-/* 2 */
+/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -619,15 +841,17 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _eventemitter = __webpack_require__(1);
+var _eventemitter = __webpack_require__(2);
 
 var _eventemitter2 = _interopRequireDefault(_eventemitter);
 
-var _util = __webpack_require__(9);
+var _util = __webpack_require__(10);
 
 var _util2 = _interopRequireDefault(_util);
 
-var _animationframe = __webpack_require__(5);
+var _animationframe = __webpack_require__(6);
+
+var _define = __webpack_require__(0);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -640,80 +864,36 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 * @author redmed
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 */
 
-var Event = {
-    UPDATE: 'frameUpdate',
-    UPDATE_AFTER: 'frameUpdateAfter',
-    COMPLETE: 'complete'
-};
-
 var Animation = function (_EventEmitter) {
     _inherits(Animation, _EventEmitter);
 
     /**
      * 构造函数
-     * @param {Object} options 配置项
+     * @param {Object=} options 配置项
      */
 
 
     /**
      * 动画进程标记
-     * @type {*}
+     * @type {number|null}
      * @private
      */
-
-
-    /**
-     * 未结束的子动画片段
-     * @type {Array.<Clip>}
-     * @private
-     */
-
-
-    /**
-     * 配置项
-     * @type {Object}
-     * @private
-     */
-    function Animation() {
-        var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-
+    function Animation(options) {
         _classCallCheck(this, Animation);
 
         var _this = _possibleConstructorReturn(this, (Animation.__proto__ || Object.getPrototypeOf(Animation)).call(this));
 
         _this._options = {};
+        _this._savedClips = [];
         _this._clips = [];
-        _this._aliveClips = [];
-        _this._status = -1;
-        _this.Event = Event;
 
-
-        _this._options = options;
-        _this.initialize();
-
-        _this._status = 0;
+        _this._options = options || {};
 
         return _this;
     }
 
     /**
-     * 初始化函数
-     */
-
-
-    /**
-     * 动画状态
-     * -1: unInit
-     * 0: init
-     * 1: start
-     * 2: stop
-     * @type {number}
-     */
-
-
-    /**
      * 主进程动画函数
-     * @type {Function}
      * @private
      */
 
@@ -725,43 +905,77 @@ var Animation = function (_EventEmitter) {
      */
 
 
+    /**
+     * 配置项
+     * @type {Object}
+     * @private
+     */
+
+
     _createClass(Animation, [{
-        key: 'initialize',
-        value: function initialize() {
+        key: '_startAni',
+        value: function _startAni() {
             var _this2 = this;
 
-            this._animation = function (timestamp) {
-
-                _this2._animationTimer = (0, _animationframe.requestAnimationFrame)(_this2._animation);
-                _this2.emit(Event.UPDATE, timestamp);
-
-                var aliveClips = _this2._aliveClips,
-                    alive = [];
-
-                var i = 0,
-                    len = aliveClips.length;
-
-                while (i < len) {
-                    var clip = aliveClips[i++];
-
-                    var finish = clip.update(timestamp);
-                    clip._finish = finish;
-
-                    // 未结束的动画保存下来, 以便下次继续执行
-                    if (finish) {
-                        alive.push(clip);
-                    }
-                }
-
-                _this2._aliveClips = alive;
-
-                _this2.emit(Event.UPDATE_AFTER, timestamp);
-
-                if (_this2._aliveClips.length === 0) {
-                    _this2.stop();
-                    _this2.emit(Event.COMPLETE);
-                }
+            var update = function update(timestamp) {
+                _this2._timer = (0, _animationframe.requestAnimationFrame)(update);
+                _this2._update(timestamp);
             };
+
+            this._timer = (0, _animationframe.requestAnimationFrame)(update);
+        }
+    }, {
+        key: '_stopAni',
+        value: function _stopAni() {
+
+            var timer = this._timer;
+
+            if (timer) {
+                (0, _animationframe.cancelAnimationFrame)(timer);
+                this._timer = null;
+
+                return true;
+            }
+
+            return false;
+        }
+
+        /**
+         * 更新动画
+         * @param {number} timestamp
+         * @private
+         */
+
+    }, {
+        key: '_update',
+        value: function _update(timestamp) {
+
+            var clips = this._clips;
+
+            this.emit(_define.Ev.UPDATE, clips);
+
+            var i = 0;
+            while (i < clips.length) {
+                var clip = clips[i];
+
+                var running = clip.update(timestamp);
+
+                if (!running) {
+                    clip._animation = null;
+                    clips.splice(i, 1);
+                } else {
+                    i++;
+                }
+            }
+
+            this._clips = clips;
+
+            this.emit(_define.Ev.AFTER_UPDATE, clips);
+
+            if (clips.length == 0) {
+                this._stopAni();
+                this.emit(_define.Ev.COMPLETE);
+            }
         }
 
         /**
@@ -772,17 +986,23 @@ var Animation = function (_EventEmitter) {
         key: 'start',
         value: function start() {
 
-            if (this._animationTimer || this._aliveClips.length === 0) {
-                return;
+            var clips = this._clips,
+                len = clips.length;
+
+            if (this._timer || len == 0) {
+                return this;
             }
 
-            // FIXME: 这里启动clip可能存在问题, 后面在衡量一下是否在使用Clip时调用，还是这里统一调用
-            // this._aliveClips.forEach(clip => {
-            //     clip.start();
-            // });
+            var i = -1;
+            while (++i < len) {
+                var clip = clips[i];
+                clip.start();
+            }
 
-            (0, _animationframe.requestAnimationFrame)(this._animation);
-            this._status = 1;
+            this.emit(_define.Ev.START);
+            this._startAni();
+
+            return this;
         }
 
         /**
@@ -793,50 +1013,91 @@ var Animation = function (_EventEmitter) {
         key: 'stop',
         value: function stop() {
 
-            if (this._animationTimer) {
-                (0, _animationframe.cancelAnimationFrame)(this._animationTimer);
-                this._animationTimer = null;
+            this._stop(false);
 
-                // FIXME: 这里停止clip可能存在问题, 考虑是否在使用Clip时调用
-                // this._aliveClips.forEach(clip => {
-                //     clip.stop();
-                // });
-
-                this._status = 2;
-            }
+            return this;
         }
 
         /**
-         * 重启动画进程, 重置所有 Clip._finish 状态
+         * 暂停动画进程
          */
 
     }, {
-        key: 'restart',
-        value: function restart() {
+        key: 'pause',
+        value: function pause() {
 
-            this._clips.forEach(function (clip, i) {
-                clip._finish = false;
-            });
-            this._aliveClips = this._clips;
+            this._stop(true);
 
-            this.stop();
-            this.start();
+            return this;
+        }
+
+        /**
+         * 重置动画
+         * 会重置内部 Clip 已经执行的的 repeat 次数
+         */
+
+    }, {
+        key: 'reset',
+        value: function reset() {
+
+            var i = -1,
+                saved = this._savedClips,
+                len = saved.length;
+
+            while (++i < len) {
+                var c = saved[i];
+                c.stop(true);
+            }
+
+            this._clips = saved.slice();
+
+            this.emit(_define.Ev.RESET);
+
+            return this;
+        }
+    }, {
+        key: '_stop',
+        value: function _stop(pause, reset) {
+
+            this._stopAni();
+
+            var clips = this._clips,
+                len = clips.length;
+
+            if (len) {
+                var i = -1;
+                while (++i < len) {
+                    var clip = clips[i];
+                    pause ? clip.pause() : clip.stop(reset);
+                }
+
+                this.emit(pause ? _define.Ev.PAUSE : _define.Ev.STOP);
+            }
         }
 
         /**
          * 添加子动画片段
-         * @param {Clip|Array.<Clip>} clip
+         * @param {Clip|Array.<Clip>} clips
          */
 
     }, {
         key: 'addClip',
-        value: function addClip(clip) {
+        value: function addClip(clips) {
 
-            if (!Array.isArray(clip)) {
-                clip = [clip];
+            if (!Array.isArray(clips)) {
+                clips = [clips];
             }
 
-            this._aliveClips = this._clips = this._clips.concat(clip);
+            var i = -1,
+                len = clips.length;
+
+            while (++i < len) {
+                var clip = clips[i];
+                clip._animation = this;
+
+                this._clips.push(clip);
+                this._savedClips.push(clip);
+            }
 
             return this;
         }
@@ -850,26 +1111,49 @@ var Animation = function (_EventEmitter) {
         key: 'removeClip',
         value: function removeClip(clip) {
 
-            // TODO: All in one loop
+            var clips = this._clips;
+            var saved = this._savedClips;
+
             if (clip) {
-                _util2['default'].remove(this._clips, function (c) {
+                // let idx = clips.indexOf(clip);
+                // if (idx != -1) {
+                //     clip._animation = null;
+                //     clips.splice(idx, 1);
+                // }
+                _util2['default'].remove(clips, function (c) {
+                    return c === clip;
+                });
+                _util2['default'].remove(saved, function (c) {
                     return c === clip;
                 });
 
-                _util2['default'].remove(this._aliveClips, function (c) {
-                    return c === clip;
-                });
+                clip._animation = null;
             } else {
+                var i = -1,
+                    len = saved.length;
+
+                while (++i < len) {
+                    var c = saved[i];
+                    c._animation = null;
+                }
+
                 this._clips = [];
-                this._aliveClips = [];
+                this._savedClips = [];
             }
 
             return this;
         }
+
+        /**
+         * 获得 Clips
+         * @returns {Array.<Clip>}
+         */
+
     }, {
         key: 'getClips',
         value: function getClips() {
-            return this._aliveClips;
+
+            return this._clips;
         }
 
         /**
@@ -880,13 +1164,8 @@ var Animation = function (_EventEmitter) {
         key: 'destroy',
         value: function destroy() {
 
-            this.stop();
-            this._clips.forEach(function (clip) {
-                clip.destroy();
-            });
-            this._clips = [];
-            this._aliveClips = [];
-            this._status = -1;
+            this._stopAni();
+            this.removeClip();
 
             this.off();
         }
@@ -895,11 +1174,11 @@ var Animation = function (_EventEmitter) {
     return Animation;
 }(_eventemitter2['default']);
 
-Animation.Event = Event;
+Animation.Event = _define.Ev;
 exports['default'] = Animation;
 
 /***/ }),
-/* 3 */
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -911,19 +1190,19 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
-
-var _clip = __webpack_require__(0);
+var _clip = __webpack_require__(1);
 
 var _clip2 = _interopRequireDefault(_clip);
 
-var _Interpolation = __webpack_require__(4);
+var _Interpolation = __webpack_require__(5);
 
 var _Interpolation2 = _interopRequireDefault(_Interpolation);
 
-var _colorhelper = __webpack_require__(6);
+var _colorhelper = __webpack_require__(7);
 
 var _colorhelper2 = _interopRequireDefault(_colorhelper);
+
+var _define = __webpack_require__(0);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -932,72 +1211,17 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /**
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * @file
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * @file ShaderClip 动画片段，由 Animation 统一调度, 提供数值和颜色的变化
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 * @author redmed
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * @date 2017/3/13
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 */
-
-var SUPPORT_COLORS = {
-    color: 1,
-    backgroundColor: 1,
-    borderColor: 1,
-    lineColor: 1,
-    shadowColor: 1
-};
-
-function isColorName(name) {
-    // TODO: 修改, 根据特性判断。自己构造内部使用的数据类型
-    return name in SUPPORT_COLORS;
-}
-
-/**
- * 计算属性在某个时间上的具体数值
- * @param {Object} keyframe 属性
- * @param {number} progress 进度
- * @param {Function} interpolation 插值算法
- * @returns {Object}
- */
-function loopKeyframe(keyframe, progress) {
-    var interpolation = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : _Interpolation2['default'].Linear;
-
-
-    var _keyframe = {};
-
-    for (var key in keyframe) {
-        if (keyframe.hasOwnProperty(key)) {
-
-            var val = keyframe[key];
-
-            if (typeof val != 'undefined') {
-                // if (_.isPlainObject(val)) {
-                //     val = loopKeyframe(val, progress, interpolation);
-                // }
-                // else {
-                if (Array.isArray(val)) {
-                    if (isColorName(key) && Array.isArray(val[0])) {
-                        // 颜色渐变
-                        val = _colorhelper2['default'].linearGradient(val, progress);
-                        val = _colorhelper2['default'].toRGBA(val);
-                    } else {
-                        val = interpolation(val, progress);
-                    }
-                }
-                // }
-
-                _keyframe[key] = val;
-            }
-        }
-    }
-
-    return _keyframe;
-}
 
 /**
  * 转换数据格式
  * @param {Object} attr
+ * @param {boolean} colorSupport
  * @returns {Object}
  */
-function transform(attr) {
+function transform(attr, colorSupport) {
 
     var _attr = {};
 
@@ -1007,14 +1231,30 @@ function transform(attr) {
             var val = attr[key];
 
             if (_colorhelper2['default'].isColor(val)) {
-                val = _colorhelper2['default'].toNormalArray(val);
+                if (colorSupport) {
+                    val = _colorhelper2['default'].toNormalArray(val);
+                    val.__color__ = 1;
+                } else {
+                    val.__color__ = 2;
+                }
             }
 
             _attr[key] = val;
         }
     }
 
-    return _attr;
+    // 转换成数组，可以提高 loop 速度
+    var _attrList = [];
+
+    for (var _key in _attr) {
+        var _val = _attr[_key];
+        _attrList.push({
+            key: _key,
+            val: _val
+        });
+    }
+
+    return _attrList;
 }
 
 /**
@@ -1025,22 +1265,73 @@ var ShaderClip = function (_Clip) {
     _inherits(ShaderClip, _Clip);
 
     /**
+     * 构造函数
+     * @param {Object=} options 配置项
+     * @param {Object=} attr 变换属性
+     */
+
+
+    /**
      * 存储属性
-     * @type {Object}
+     * @param {Array}
      * @private
      */
-    function ShaderClip() {
+    function ShaderClip(options, attr) {
         _classCallCheck(this, ShaderClip);
 
-        var _this = _possibleConstructorReturn(this, (ShaderClip.__proto__ || Object.getPrototypeOf(ShaderClip)).call(this));
+        var _this = _possibleConstructorReturn(this, (ShaderClip.__proto__ || Object.getPrototypeOf(ShaderClip)).call(this, options, attr));
 
-        _this._tracks = {};
         _this._interpolation = _Interpolation2['default'].Linear;
 
-        _this.initialize.apply(_this, arguments);
+
+        var cs = options[_define.Attr.COLOR_SUPPORT];
+        cs = typeof cs == 'undefined' ? true : cs;
+        _this._tracks = transform(attr, cs);
 
         return _this;
     }
+
+    /**
+     * 设置属性状态及时间控制点
+     * @param {Object} attr
+     * @param {number} time 单位ms
+     * @returns {ShaderClip}
+     */
+    // when(attr/*, time*/) {
+    //     // TODO: 如果需要支持指定time上的变化，需要实现关于时间的插值计算，比较复杂，后面再考虑实现
+    //     let tracks = this._tracks;
+    //     for (let key in attr) {
+    //         if (attr.hasOwnProperty(key)) {
+    //             let value = attr[ key ];
+    //
+    //             if (!tracks[ key ]) {
+    //                 tracks[ key ] = [];
+    //
+    //                 // if (time != 0) {
+    //                 //     tracks[ key ].push({
+    //                 //         value,
+    //                 //         time: 0
+    //                 //     });
+    //                 // }
+    //             }
+    //
+    //             // tracks[ key ].push({
+    //             //     value,
+    //             //     time
+    //             // });
+    //             tracks[ key ].push(value);
+    //         }
+    //     }
+    //
+    //     return this;
+    // }
+
+    /**
+     * 更新动画属性
+     * @param {number} percent
+     * @returns {Object}
+     */
+
 
     /**
      * 插值算法
@@ -1050,110 +1341,36 @@ var ShaderClip = function (_Clip) {
 
 
     _createClass(ShaderClip, [{
-        key: 'initialize',
-        value: function initialize(options, attr) {
-
-            _get(ShaderClip.prototype.__proto__ || Object.getPrototypeOf(ShaderClip.prototype), 'initialize', this).call(this, options);
-            this._tracks = transform(attr);
-        }
-
-        /**
-         * 设置属性状态及时间控制点
-         * @param {Object} attr
-         * @param {number} time 单位ms
-         * @returns {Shader}
-         */
-
-    }, {
-        key: 'when',
-        value: function when(attr /*, time*/) {
-            // TODO: 如果需要支持指定time上的变化，需要实现关于时间的插值计算，比较复杂，后面再考虑实现
-            var tracks = this._tracks;
-            for (var key in attr) {
-                if (attr.hasOwnProperty(key)) {
-                    var value = attr[key];
-
-                    if (!tracks[key]) {
-                        tracks[key] = [];
-
-                        // if (time != 0) {
-                        //     tracks[ key ].push({
-                        //         value,
-                        //         time: 0
-                        //     });
-                        // }
-                    }
-
-                    // tracks[ key ].push({
-                    //     value,
-                    //     time
-                    // });
-                    tracks[key].push(value);
-                }
-            }
-
-            return this;
-        }
-    }, {
-        key: 'update',
-        value: function update(time) {
-            if (this._isPlaying && time && time < this._startTime) {
-                return true;
-            }
-
-            var elapsed = (time - this._startTime) / this._duration;
-            elapsed += this._startAt;
-            elapsed = Math.min(elapsed, 1);
-
-            var percent = this._easing(this._reversed ? 1 - elapsed : elapsed);
+        key: '_updateAttr',
+        value: function _updateAttr(percent) {
 
             var tracks = this._tracks;
             var keyframe = {};
 
-            for (var key in tracks) {
-                if (tracks.hasOwnProperty(key)) {
+            var i = 0,
+                len = tracks.length;
 
-                    var val = tracks[key];
+            while (i < len) {
+                var item = tracks[i++];
+                var key = item.key,
+                    val = item.val;
 
-                    if (Array.isArray(val)) {
-                        if (isColorName(key) && Array.isArray(val[0])) {
-                            // 颜色渐变
-                            val = _colorhelper2['default'].linearGradient(val, percent);
-                            val = _colorhelper2['default'].toRGBA(val);
-                        } else {
-                            val = this._interpolation(val, percent);
-                        }
+
+                var color = val.__color__;
+                if (color) {
+                    if (color == 1) {
+                        // 颜色渐变
+                        val = _colorhelper2['default'].linearGradient(val, percent);
+                        val = _colorhelper2['default'].toRGBA(val);
                     }
-
-                    keyframe[key] = val;
-                }
-            }
-
-            this.emit(this.Event.UPDATE, percent, keyframe);
-
-            // 一个周期结束
-            if (elapsed == 1) {
-                if (this._repeat > 1) {
-                    if (isFinite(this._repeat)) {
-                        this._repeat--;
-                    }
-
-                    this._startTime = time + this._interval;
-                    this._startAt = 0;
-
-                    if (this._yoyo) {
-                        this._reversed = !this._reversed;
-                    }
-
-                    return true;
                 } else {
-                    this.emit(this.Event.COMPLETE);
-
-                    return false;
+                    val = this._interpolation(val, percent);
                 }
+
+                keyframe[key] = val;
             }
 
-            return true;
+            return keyframe;
         }
     }]);
 
@@ -1163,7 +1380,7 @@ var ShaderClip = function (_Clip) {
 exports['default'] = ShaderClip;
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1292,7 +1509,7 @@ var Interpolation = {
 exports["default"] = Interpolation;
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1317,7 +1534,7 @@ exports.requestAnimationFrame = requestAnimationFrame;
 exports.cancelAnimationFrame = cancelAnimationFrame;
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1333,7 +1550,7 @@ var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = [
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           * @date 16/8/17
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           */
 
-var _csscolorparser = __webpack_require__(7);
+var _csscolorparser = __webpack_require__(8);
 
 var _csscolorparser2 = _interopRequireDefault(_csscolorparser);
 
@@ -1561,7 +1778,7 @@ var ColorHelper = {
 exports['default'] = ColorHelper;
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1771,7 +1988,7 @@ function parseCSSColor(css_str) {
 exports["default"] = parseCSSColor;
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2063,7 +2280,7 @@ var Easing = {
 exports["default"] = Easing;
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2127,7 +2344,7 @@ exports['default'] = {
 };
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2138,23 +2355,28 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.ShaderClip = exports.Clip = exports.Animation = undefined;
 
-var _animation = __webpack_require__(2);
+var _animation = __webpack_require__(3);
 
 var _animation2 = _interopRequireDefault(_animation);
 
-var _clip = __webpack_require__(0);
+var _clip = __webpack_require__(1);
 
 var _clip2 = _interopRequireDefault(_clip);
 
-var _shader = __webpack_require__(3);
+var _shaderclip = __webpack_require__(4);
 
-var _shader2 = _interopRequireDefault(_shader);
+var _shaderclip2 = _interopRequireDefault(_shaderclip);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+exports['default'] = {
+    Animation: _animation2['default'],
+    Clip: _clip2['default'],
+    ShaderClip: _shaderclip2['default']
+};
 exports.Animation = _animation2['default'];
 exports.Clip = _clip2['default'];
-exports.ShaderClip = _shader2['default'];
+exports.ShaderClip = _shaderclip2['default'];
 
 /***/ })
 /******/ ]);

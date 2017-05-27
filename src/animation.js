@@ -5,13 +5,8 @@
 
 import EventEmitter from './lib/eventemitter.js';
 import utils from './lib/util.js';
-import { requestAnimationFrame, cancelAnimationFrame } from './lib/animationframe.js';
-
-let Event = {
-    UPDATE: 'frameUpdate',
-    UPDATE_AFTER: 'frameUpdateAfter',
-    COMPLETE: 'complete'
-};
+import { requestAnimationFrame as rAF, cancelAnimationFrame as cAF } from './lib/animationframe.js';
+import { Ev } from './lib/define.js';
 
 class Animation extends EventEmitter {
 
@@ -22,6 +17,8 @@ class Animation extends EventEmitter {
      */
     _options = {};
 
+    _savedClips = [];
+
     /**
      * 子动画片段
      * @type {Array.<Clip>}
@@ -30,92 +27,89 @@ class Animation extends EventEmitter {
     _clips = [];
 
     /**
-     * 未结束的子动画片段
-     * @type {Array.<Clip>}
-     * @private
-     */
-    _aliveClips = [];
-
-    /**
-     * 主进程动画函数
-     * @type {Function}
-     * @private
-     */
-    _animation;
-
-    /**
      * 动画进程标记
-     * @type {*}
+     * @type {number|null}
      * @private
      */
-    _animationTimer;
+    _timer;
 
-    /**
-     * 动画状态
-     * -1: unInit
-     * 0: init
-     * 1: start
-     * 2: stop
-     * @type {number}
-     */
-    _status = -1;
-
-    Event = Event;
-
-    static Event = Event;
+    static Event = Ev;
 
     /**
      * 构造函数
-     * @param {Object} options 配置项
+     * @param {Object=} options 配置项
      */
-    constructor(options = {}) {
+    constructor(options) {
 
         super();
-
-        this._options = options;
-        this.initialize();
-
-        this._status = 0;
+        this._options = options || {};
 
     }
 
     /**
-     * 初始化函数
+     * 主进程动画函数
+     * @private
      */
-    initialize() {
+    _startAni() {
 
-        this._animation = (timestamp) => {
-
-            this._animationTimer = requestAnimationFrame(this._animation);
-            this.emit(Event.UPDATE, timestamp);
-
-            let aliveClips = this._aliveClips,
-                alive = [];
-
-            let i = 0,
-                len = aliveClips.length;
-
-            while (i < len) {
-                let clip = aliveClips[ i++ ];
-
-                let finish = clip.update(timestamp);
-                clip._finish = finish;
-
-                // 未结束的动画保存下来, 以便下次继续执行
-                if (finish) {
-                    alive.push(clip);
-                }
-            }
-
-            this._aliveClips = alive;
-
-            this.emit(Event.UPDATE_AFTER, timestamp);
-
-            if (this._aliveClips.length === 0) {
-                this.stop();
-                this.emit(Event.COMPLETE);
-            }
+        let update = timestamp => {
+            this._timer = rAF(update);
+            this._update(timestamp);
         };
+
+        this._timer = rAF(update);
+
+    }
+
+    _stopAni() {
+
+        let timer = this._timer;
+
+        if (timer) {
+            cAF(timer);
+            this._timer = null;
+
+            return true;
+        }
+
+        return false;
+
+    }
+
+    /**
+     * 更新动画
+     * @param {number} timestamp
+     * @private
+     */
+    _update(timestamp) {
+
+        let clips = this._clips;
+
+        this.emit(Ev.UPDATE, clips);
+
+        let i = 0;
+        while (i < clips.length) {
+            let clip = clips[ i ];
+
+            let running = clip.update(timestamp);
+
+            if (!running) {
+                clip._animation = null;
+                clips.splice(i, 1);
+            }
+            else {
+                i++;
+            }
+        }
+
+        this._clips = clips;
+
+        this.emit(Ev.AFTER_UPDATE, clips);
+
+        if (clips.length == 0) {
+            this._stopAni();
+            this.emit(Ev.COMPLETE);
+        }
 
     }
 
@@ -124,17 +118,23 @@ class Animation extends EventEmitter {
      */
     start() {
 
-        if (this._animationTimer || this._aliveClips.length === 0) {
-            return;
+        let clips = this._clips,
+            len = clips.length;
+
+        if (this._timer || len == 0) {
+            return this;
         }
 
-        // FIXME: 这里启动clip可能存在问题, 后面在衡量一下是否在使用Clip时调用，还是这里统一调用
-        // this._aliveClips.forEach(clip => {
-        //     clip.start();
-        // });
+        let i = -1;
+        while (++i < len) {
+            let clip = clips[ i ];
+            clip.start();
+        }
 
-        requestAnimationFrame(this._animation);
-        this._status = 1;
+        this.emit(Ev.START);
+        this._startAni();
+
+        return this;
 
     }
 
@@ -143,46 +143,85 @@ class Animation extends EventEmitter {
      */
     stop() {
 
-        if (this._animationTimer) {
-            cancelAnimationFrame(this._animationTimer);
-            this._animationTimer = null;
+        this._stop(false);
 
-            // FIXME: 这里停止clip可能存在问题, 考虑是否在使用Clip时调用
-            // this._aliveClips.forEach(clip => {
-            //     clip.stop();
-            // });
-
-            this._status = 2;
-        }
+        return this;
 
     }
 
     /**
-     * 重启动画进程, 重置所有 Clip._finish 状态
+     * 暂停动画进程
      */
-    restart() {
+    pause() {
 
-        this._clips.forEach((clip, i) => {
-            clip._finish = false;
-        });
-        this._aliveClips = this._clips;
+        this._stop(true);
 
-        this.stop();
-        this.start();
+        return this;
+
+    }
+
+    /**
+     * 重置动画
+     * 会重置内部 Clip 已经执行的的 repeat 次数
+     */
+    reset() {
+
+        let i = -1,
+            saved = this._savedClips,
+            len = saved.length;
+
+        while (++i < len) {
+            let c = saved[ i ];
+            c.stop(true);
+        }
+
+        this._clips = saved.slice();
+
+        this.emit(Ev.RESET);
+
+        return this;
+
+    }
+
+    _stop(pause, reset) {
+
+        this._stopAni();
+
+        let clips = this._clips,
+            len = clips.length;
+
+        if (len) {
+            let i = -1;
+            while (++i < len) {
+                let clip = clips[ i ];
+                pause ? clip.pause() : clip.stop(reset);
+            }
+
+            this.emit(pause ? Ev.PAUSE : Ev.STOP);
+        }
 
     }
 
     /**
      * 添加子动画片段
-     * @param {Clip|Array.<Clip>} clip
+     * @param {Clip|Array.<Clip>} clips
      */
-    addClip(clip) {
+    addClip(clips) {
 
-        if (!Array.isArray(clip)) {
-            clip = [ clip ];
+        if (!Array.isArray(clips)) {
+            clips = [ clips ];
         }
 
-        this._aliveClips = this._clips = this._clips.concat(clip);
+        let i = -1,
+            len = clips.length;
+
+        while (++i < len) {
+            let clip = clips[ i ];
+            clip._animation = this;
+
+            this._clips.push(clip);
+            this._savedClips.push(clip);
+        }
 
         return this;
 
@@ -194,27 +233,49 @@ class Animation extends EventEmitter {
      */
     removeClip(clip) {
 
-        // TODO: All in one loop
+        let clips = this._clips;
+        let saved = this._savedClips;
+
         if (clip) {
-            utils.remove(this._clips, c => {
+            // let idx = clips.indexOf(clip);
+            // if (idx != -1) {
+            //     clip._animation = null;
+            //     clips.splice(idx, 1);
+            // }
+            utils.remove(clips, c => {
+                return c === clip;
+            });
+            utils.remove(saved, c => {
                 return c === clip;
             });
 
-            utils.remove(this._aliveClips, c => {
-                return c === clip;
-            });
+            clip._animation = null;
         }
         else {
+            let i = -1,
+                len = saved.length;
+
+            while (++i < len) {
+                let c = saved[ i ];
+                c._animation = null;
+            }
+
             this._clips = [];
-            this._aliveClips = [];
+            this._savedClips = [];
         }
 
         return this;
 
     }
 
+    /**
+     * 获得 Clips
+     * @returns {Array.<Clip>}
+     */
     getClips() {
-        return this._aliveClips;
+
+        return this._clips;
+
     }
 
     /**
@@ -222,13 +283,8 @@ class Animation extends EventEmitter {
      */
     destroy() {
 
-        this.stop();
-        this._clips.forEach((clip) => {
-            clip.destroy();
-        });
-        this._clips = [];
-        this._aliveClips = [];
-        this._status = -1;
+        this._stopAni();
+        this.removeClip();
 
         this.off();
 

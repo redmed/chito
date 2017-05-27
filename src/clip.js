@@ -1,7 +1,6 @@
 /**
- * @file 子动画片段, 由 Animation 统一调度, 只控制时间的变化量
+ * @file 动画片段, 由 Animation 统一调度, 只控制时间的变化量
  * @author redmed
- *
  */
 
 // Include a performance.now polyfill
@@ -29,138 +28,136 @@
 
 import EventEmitter from './lib/eventemitter.js';
 import EasingFunc from './lib/easing.js';
-
-const Event = {
-    UPDATE: 'update',
-    START: 'start',
-    COMPLETE: 'complete',
-    STOP: 'stop'
-};
-
-const Attr = {
-    DURATION: 'duration',
-    REPEAT: 'repeat',
-    DELAY: 'delay',
-    EASING: 'easing',
-    INTERVAL: 'interval',
-    YOYO: 'yoyo',
-    START: 'startAt'
-};
-
-const Easing = {
-    LINEAR: 'Linear',
-
-    QUADRATIC_IN: 'QuadraticIn',
-    QUADRATIC_OUT: 'QuadraticOut',
-    QUADRATIC_IN_OUT: 'QuadraticInOut',
-
-    CUBIC_IN: 'CubicIn',
-    CUBIC_OUT: 'CubicOut',
-    CUBIC_IN_OUT: 'CubicInOut',
-
-    QUARTIC_IN: 'QuarticIn',
-    QUARTIC_OUT: 'QuarticOut',
-    QUARTIC_IN_OUT: 'QuarticInOut',
-
-    QUINTIC_IN: 'QuinticIn',
-    QUINTIC_OUT: 'QuinticOut',
-    QUINTIC_IN_OUT: 'QuinticInOut',
-
-    SINUSOIDAL_IN: 'SinusoidalIn',
-    SINUSOIDAL_OUT: 'SinusoidalOut',
-    SINUSOIDAL_IN_OUT: 'SinusoidalInOut',
-
-    EXPONENTIAL_IN: 'ExponentialIn',
-    EXPONENTIAL_OUT: 'ExponentialOut',
-    EXPONENTIAL_IN_OUT: 'ExponentialInOut',
-
-    CIRCULAR_IN: 'CircularIn',
-    CIRCULAR_OUT: 'CircularOut',
-    CIRCULAR_IN_OUT: 'CircularInOut',
-
-    ELASTIC_IN: 'ElasticIn',
-    ELASTIC_OUT: 'ElasticOut',
-    ELASTIC_IN_OUT: 'ElasticInOut',
-
-    BACK_IN: 'BackIn',
-    BACK_OUT: 'BackOut',
-    BACK_IN_OUT: 'BackInOut',
-
-    BOUNCE_IN: 'BounceIn',
-    BOUNCE_OUT: 'BounceOut',
-    BOUNCE_IN_OUT: 'BounceInOut'
-};
+import { Ev, Attr, Easing } from './lib/define.js';
 
 class Clip extends EventEmitter {
 
     /**
      * 配置项
      * @type {Object}
+     * @protected
      */
     _options = {};
 
     /**
+     * 变换属性
+     * @type {Object}
+     * @protected
+     */
+    _attr = {};
+
+    /**
      * 运行时长
      * @type {number}
+     * @protected
      */
     _duration;
 
     /**
      * 延迟运行
      * @type {number} ms
+     * @protected
      */
     _delay;
 
     /**
      * 每次动画间隔
      * @type {number} ms
+     * @protected
      */
     _interval;
 
     /**
-     * 重复数量
+     * 动画重复次数，用于reset重置使用
      * @type {number}
+     * @protected
+     */
+    _repeat_0;
+
+    /**
+     * 动画重复次数
+     * @type {number}
+     * @protected
      */
     _repeat;
 
     /**
      * Ease 动画名
      * @type {Function}
+     * @protected
      */
     _easing;
 
     /**
      * 是否按原轨迹返回(类似溜溜球)
      * @type {boolean}
+     * @protected
      */
     _yoyo;
 
     /**
      * progress起始位置加成, 可以控制progress不从0开始启动
      * @type {number}
+     * @protected
      */
     _startAt = 0;
 
     /**
-     * 播放状态
+     * 停止状态
      * @type {boolean}
+     * @protected
      */
-    _isPlaying = false;
+    _stopped = true;
 
     /**
-     * 起始时间
+     * 暂停状态
+     * @type {boolean}
+     * @protected
      */
-    _startTime;
+    _paused = false;
 
     /**
-     * yoyo翻转状态
+     * 动画起始时间
+     * @type {number}
+     * @protected
+     */
+    _startTime = 0;
+
+    /**
+     * 每次暂停动画起始时间
+     * @type {number}
+     * @protected
+     */
+    _pauseStart = 0;
+
+    /**
+     * 暂停时长
+     * @type {number}
+     * @protected
+     */
+    _pauseTime = 0;
+
+    /**
+     * yoyo 翻转状态
      * @type {boolean}
+     * @protected
      */
     _reversed = false;
 
-    Event = Event;
+    /**
+     * 被当前 Clip 链式调用的 Clip
+     * @type {Array}
+     * @protected
+     */
+    _chainClips = [];
 
-    static Event = Event;
+    /**
+     * @type {Animation}
+     * @protected
+     */
+    _animation;
+
+    static Event = Ev;
 
     static Attr = Attr;
 
@@ -169,23 +166,16 @@ class Clip extends EventEmitter {
     /**
      * 构造函数
      * @param {Object=} options 配置项
+     * @param {Object=} attr 变换属性
      */
-    constructor(options = {}) {
+    constructor(options, attr) {
 
         super();
-        this.initialize(options);
 
-    }
+        this._options = options || {};
+        this._attr = attr;
 
-    /**
-     * 初始化函数
-     * @param {Object=} from 起始帧
-     * @param {Object=} to 结束帧
-     * @param {Object=} options 配置项
-     */
-    initialize(options = {}, attr) {
-
-        this._options = this._initOption(options);
+        this._initOption(options);
 
     }
 
@@ -203,30 +193,46 @@ class Clip extends EventEmitter {
         let easing = options[ Attr.EASING ] || Easing.LINEAR;
         this._easing = EasingFunc[ easing ] ? EasingFunc[ easing ] : easing;
         this._delay = options[ Attr.DELAY ] || 0;
-        this._duration = options[ Attr.DURATION ] || 1000;
-        this._repeat = options[ Attr.REPEAT ] || 0;
+        let dur = options[ Attr.DURATION ];
+        this._duration = typeof dur == 'undefined' ? 1000 : dur;
+        this._repeat_0 = this._repeat = options[ Attr.REPEAT ] || 1;
         this._interval = options[ Attr.INTERVAL ] || 0;
         this._yoyo = options[ Attr.YOYO ] || false;
         this._startAt = options[ Attr.START ] || 0;
 
-        return options;
+    }
 
+    /**
+     * @protected
+     */
+    _getOption() {
+        return {
+            options: this._options,
+            attr: this._attr
+        }
     }
 
     /**
      * 启动动画
-     * @param {Boolean=} forceStart 强制重新计时
+     * @param {boolean=false} force 强制重新计时
+     * @returns {Clip}
      */
-    start(forceStart) {
+    start(force) {
 
-        if (!forceStart && this._isPlaying) {
-            return;
+        if (this._paused) {
+            this._pauseTime += window.performance.now() - this._pauseStart;
+            this._paused = false;
+        }
+        else {
+            if (!force && !this._stopped) {
+                return this;
+            }
+
+            this._stopped = false;
+            this._startTime = window.performance.now() + this._delay;
         }
 
-        this._isPlaying = true;
-        this._startTime = window.performance.now() + this._delay;
-
-        this.emit(Event.START);
+        this.emit(Ev.START, this._getOption());
 
         return this;
 
@@ -234,16 +240,53 @@ class Clip extends EventEmitter {
 
     /**
      * 停止动画
+     * @param {boolean=false} reset 是否重置 repeat 次数
+     * @returns {Clip}
      */
-    stop() {
+    stop(reset) {
 
-        if (!this._isPlaying) {
-            return;
+        if (!this._stopped) {
+            this._stopped = true;
+            this._paused = false;
+            this._pauseTime = 0;
+            this._pauseStart = 0;
+
+            this.emit(Ev.STOP, this._getOption());
+
+            this.stopChain();
         }
 
-        this._isPlaying = false;
+        if (reset) {
+            this._repeat = this._repeat_0;
+        }
 
-        this.emit(Event.STOP);
+        return this;
+
+    }
+
+    pause() {
+
+        if (this._stopped || this._paused) {
+            return this;
+        }
+
+        this._paused = true;
+        this._pauseStart = window.performance.now();
+
+        return this;
+
+    }
+
+    stopChain() {
+
+        let i = -1,
+            clips = this._chainClips,
+            len = clips.length;
+
+        while (++i < len) {
+            let clip = clips[ i ];
+            clip.stop();
+        }
 
         return this;
 
@@ -252,26 +295,61 @@ class Clip extends EventEmitter {
     /**
      * 更新动画, 触发 UPDATE 事件
      * @param {number} time
-     * @returns {Boolean} true: 还没结束. false: 运行结束
+     * @returns {boolean} true: 还没结束. false: 运行结束
      */
     update(time) {
 
-        if (this._isPlaying && time && time < this._startTime) {
+        if (this._stopped) {
             return true;
         }
+
+        if (this._paused || time && time < this._startTime) {
+            return true;
+        }
+
+        let t = time - this._pauseTime;
+        let { percent, elapsed } = this._getProgress(t);
+
+        let attr = this._updateAttr(percent, elapsed);
+
+        this.emit(Ev.UPDATE, percent, attr, this._getOption());
+
+        // 一个周期结束
+        return this._afterUpdate(t, elapsed);
+
+    }
+
+    _getProgress(time) {
 
         let elapsed = (time - this._startTime) / this._duration;
         elapsed += this._startAt;
         elapsed = Math.min(elapsed, 1);
 
         let percent = this._easing(this._reversed ? 1 - elapsed : elapsed);
-        this.emit(Event.UPDATE, percent);
+
+        return {
+            percent,
+            elapsed
+        }
+
+    }
+
+    _updateAttr(percent, elapsed) {
+
+        return this._attr;
+
+    }
+
+    _afterUpdate(time, elapsed) {
 
         // 一个周期结束
         if (elapsed == 1) {
-            if (this._repeat > 1) {
-                if (isFinite(this._repeat)) {
-                    this._repeat--;
+
+            let rep = this._repeat;
+
+            if (rep > 1) {
+                if (isFinite(rep)) {
+                    rep--;
                 }
 
                 this._startTime = time + this._interval;
@@ -281,10 +359,32 @@ class Clip extends EventEmitter {
                     this._reversed = !this._reversed;
                 }
 
+                this.emit(Ev.REPEAT_COMPLETE, rep, this._getOption());
+
+                this._repeat = rep;
+
                 return true;
             }
             else {
-                this.emit(Event.COMPLETE);
+
+                this.emit(Ev.COMPLETE, this._getOption());
+
+                let i = -1,
+                    chains = this._chainClips,
+                    len = chains.length;
+                while (++i < len) {
+                    let clip = chains[ i ];
+
+                    let ani = this._animation;
+                    ani && ani.addClip(clip);
+
+                    clip.start();
+                }
+
+                this._stopped = true;
+                this._pauseTime = 0;
+                this._pauseStart = 0;
+                this._repeat = this._repeat_0;
 
                 return false;
             }
@@ -295,11 +395,34 @@ class Clip extends EventEmitter {
     }
 
     /**
+     * 链接新 Clip
+     * @param {*} args
+     * @returns {Clip}
+     */
+    chain(...args) {
+
+        this._chainClips = args;
+
+        return this;
+
+    }
+
+    /**
      * 析构函数
      */
     destroy() {
 
-        this._isPlaying = false;
+        this._stopped = true;
+        this._paused = false;
+        this._startTime = 0;
+        this._pauseTime = 0;
+        this._pauseStart = 0;
+        this._chainClips = [];
+
+        let ani = this._animation;
+        ani && ani.removeClip(this);
+        this._animation = null;
+
         this.off();
 
     }

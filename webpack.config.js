@@ -1,12 +1,17 @@
+var path = require('path');
+var webpack = require('webpack');
+
 module.exports = {
     entry: {
         'animater': './src/main',
-        'animater.spec': './spec/animater.spec'
     },
 
     output: {
         filename: '[name].js',
-        publicPath: '/dist'
+        path: path.resolve(__dirname, './'),
+        library: 'Animater',
+        libraryTarget: 'umd',
+        umdNamedDefine: true,
     },
 
     module: {
@@ -17,5 +22,6 @@ module.exports = {
                 loader: 'babel-loader'
             }
         ]
-    }
+    },
+
 };
