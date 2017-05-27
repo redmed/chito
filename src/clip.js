@@ -300,7 +300,7 @@ class Clip extends EventEmitter {
     update(time) {
 
         if (this._stopped) {
-            return false;
+            return true;
         }
 
         if (this._paused || time && time < this._startTime) {
@@ -308,10 +308,11 @@ class Clip extends EventEmitter {
         }
 
         let t = time - this._pauseTime;
-
         let { percent, elapsed } = this._getProgress(t);
 
-        this.emit(Ev.UPDATE, percent, this._getOption());
+        let attr = this._updateAttr(percent, elapsed);
+
+        this.emit(Ev.UPDATE, percent, attr, this._getOption());
 
         // 一个周期结束
         return this._afterUpdate(t, elapsed);
@@ -333,13 +334,22 @@ class Clip extends EventEmitter {
 
     }
 
+    _updateAttr(percent, elapsed) {
+
+        return this._attr;
+
+    }
+
     _afterUpdate(time, elapsed) {
 
         // 一个周期结束
         if (elapsed == 1) {
-            if (this._repeat > 1) {
-                if (isFinite(this._repeat)) {
-                    this._repeat--;
+
+            let rep = this._repeat;
+
+            if (rep > 1) {
+                if (isFinite(rep)) {
+                    rep--;
                 }
 
                 this._startTime = time + this._interval;
@@ -349,7 +359,9 @@ class Clip extends EventEmitter {
                     this._reversed = !this._reversed;
                 }
 
-                this.emit(Ev.REPEAT_COMPLETE, this._repeat, this._getOption());
+                this.emit(Ev.REPEAT_COMPLETE, rep, this._getOption());
+
+                this._repeat = rep;
 
                 return true;
             }
@@ -372,6 +384,7 @@ class Clip extends EventEmitter {
                 this._stopped = true;
                 this._pauseTime = 0;
                 this._pauseStart = 0;
+                this._repeat = this._repeat_0;
 
                 return false;
             }
@@ -391,6 +404,7 @@ class Clip extends EventEmitter {
         this._chainClips = args;
 
         return this;
+
     }
 
     /**

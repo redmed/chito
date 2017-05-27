@@ -78,6 +78,7 @@ class ShaderClip extends Clip {
     constructor(options, attr) {
 
         super(options, attr);
+
         let cs = options[ Attr.COLOR_SUPPORT ];
         cs = typeof cs == 'undefined' ? true : cs;
         this._tracks = transform(attr, cs);
@@ -120,23 +121,11 @@ class ShaderClip extends Clip {
     // }
 
     /**
-     * 更新动画, 触发 UPDATE 事件
-     * @param {number} time
-     * @returns {boolean} true: 还没结束. false: 运行结束
+     * 更新动画属性
+     * @param {number} percent
+     * @returns {Object}
      */
-    update(time) {
-
-        if (this._stopped) {
-            return false;
-        }
-
-        if (this._paused || time && time < this._startTime) {
-            return true;
-        }
-
-        let t = time - this._pauseTime;
-
-        let { percent, elapsed } = this._getProgress(t);
+    _updateAttr(percent) {
 
         let tracks = this._tracks;
         let keyframe = {};
@@ -163,10 +152,7 @@ class ShaderClip extends Clip {
             keyframe[ key ] = val;
         }
 
-        this.emit(Ev.UPDATE, percent, keyframe, this._getOption());
-
-        // 一个周期结束
-        return this._afterUpdate(t, elapsed);
+        return keyframe;
 
     }
 }
