@@ -21,6 +21,11 @@ body {
     margin: 10px 0;
 }
 
+.status-info .events {
+    width: 80%;
+    height: 200px;
+}
+
 .ani-wrapper {
     margin-top: 20px;
 }
@@ -28,7 +33,7 @@ body {
 .shape-wrapper {
     display: block;
     position: relative;
-    height: 320px;
+    height: 200px;
 }
 
 .shape-wrapper .point {

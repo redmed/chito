@@ -11,7 +11,7 @@ var Animation = Animater.Animation,
     ShaderClip = Animater.ShaderClip;
 
 var clip1 = new ShaderClip({
-    duration: 4000,
+    duration: 2000,
     repeat: 2
 }, {
     x: [ 0, 300 ],
@@ -28,7 +28,7 @@ clip1.on('update', function (progress, keyframe) {
 });
 
 var clip2 = new ShaderClip({
-    duration: 8000,
+    duration: 3000,
     repeat: 1
 }, {
     x: [ 0, 300 ],
@@ -60,7 +60,7 @@ clip3.on('update', function (progress, keyframe) {
 });
 
 clip1.chain(clip2);
-// clip2.chain(clip1);
+clip2.chain(clip1);
 
 var animation = new Animation();
 
@@ -90,7 +90,6 @@ let startStatus = true;
 var $startBtn = document.getElementById('start');
 var $stopBtn = document.getElementById('stop');
 var $pauseBtn = document.getElementById('pause');
-var $resumeBtn = document.getElementById('resume');
 var $resetBtn = document.getElementById('reset');
 
 $startBtn.onclick = function () {
@@ -103,11 +102,6 @@ $stopBtn.onclick = function () {
 
 $pauseBtn.onclick = function () {
     animation.pause();
-};
-
-$resumeBtn.onclick = function () {
-    // clip1.start()
-    // animation.start();
 };
 
 $resetBtn.onclick = function () {
