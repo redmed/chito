@@ -95,8 +95,6 @@ ani.stop()
 
 ### 5. 例子
 
-1. [Basic](./example/01.helloworld.html)
-
 ### 6. 代码修改及本地调试
 
 源码使用`ES6`语法开发，具体语法规则请参考[babelrc](./.babelrc)文件
