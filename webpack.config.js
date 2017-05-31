@@ -3,13 +3,13 @@ var webpack = require('webpack');
 
 module.exports = {
     entry: {
-        'animater': './src/main',
+        'chito': './src/main',
     },
 
     output: {
         filename: '[name].js',
         path: path.resolve(__dirname, './'),
-        library: 'Animater',
+        library: 'Chito',
         libraryTarget: 'umd',
         umdNamedDefine: true,
     },
