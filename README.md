@@ -1,40 +1,40 @@
-## Animater
+## Chito (原 Animater)
 
-[![](https://img.shields.io/npm/v/animater.svg)](https://www.npmjs.com/package/animater)
-[![](https://api.travis-ci.org/redmed/animater.svg?branch=develop)](https://www.travis-ci.org/redmed/animater)
+[![](https://img.shields.io/npm/v/chito.svg)](https://www.npmjs.com/package/chito)
+[![](https://api.travis-ci.org/redmed/chito.svg?branch=develop)](https://www.travis-ci.org/redmed/chito)
 
+`赤兔` 一个支持计算颜色变化的动画库。
 
-一个支持计算颜色变化的动画库。
 
 ### 1. 安装
 
 您可以通过`npm`安装
 
 ```sh
-npm i animater --save
+npm i chito --save
 ```
 
-或者直接[下载](./animater.js)库文件，通过`script`标签引用
+或者直接[下载](./chito.js)库文件，通过`script`标签引用
 
 ```html
-<script src="js/animater.js"></script>
+<script src="js/chito.js"></script>
 ```
 
 ### 2. 模块引入
 
-`Animater`采用 `UMD` 的模块引用方式，因此可以考虑以下方式引用。
+`Chito`采用 `UMD` 的模块引用方式，因此可以考虑以下方式引用。
 
 
 By AMD + ES6
 
 ```js
-import { Animation, ShaderClip } from 'animater';
+import { Animation, ShaderClip } from 'chito';
 ```
 
 By global
 
 ```js
-let { Animation, ShaderClip } = window.Animater;
+let { Animation, ShaderClip } = window.Chito;
 ```
 
 ### 3. 使用
@@ -67,7 +67,7 @@ clip.on('update', (progress, frame) => {
 	// frame 中包含了当前时刻下的数据
 	// 根据数据绘制 UI
 	let $el = document.getElementById('p1');
-	
+
 	$el.style.left = frame.x + 'px'
 	$el.style.top = frame.y + 'px'
 	$el.style.backgroundColor = frame.color
@@ -95,12 +95,12 @@ ani.stop()
 
 ### 5. 例子
 
-* [HelloWorld](https://redmed.github.io/animater/example/01.helloworld.html)
-* [Yoyo](https://redmed.github.io/animater/example/02.yoyo.html)
-* [Delay & Interval](https://redmed.github.io/animater/example/03.delay_interval.html)
-* [StartAt](https://redmed.github.io/animater/example/04.startat.html)
-* [Easing](https://redmed.github.io/animater/example/05.easing.html)
-* [Chain](https://redmed.github.io/animater/example/06.chain.html)
+* [HelloWorld](https://redmed.github.io/chito/example/01.helloworld.html)
+* [Yoyo](https://redmed.github.io/chito/example/02.yoyo.html)
+* [Delay & Interval](https://redmed.github.io/chito/example/03.delay_interval.html)
+* [StartAt](https://redmed.github.io/chito/example/04.startat.html)
+* [Easing](https://redmed.github.io/chito/example/05.easing.html)
+* [Chain](https://redmed.github.io/chito/example/06.chain.html)
 
 ### 6. 代码修改及本地调试
 
@@ -108,7 +108,7 @@ ani.stop()
 
 ```sh
 # 代码下载
-git clone https://github.com/redmed/animater
+git clone https://github.com/redmed/chito
 
 # 1. 安装依赖
 npm i
@@ -122,4 +122,4 @@ open http://localhost:8082
 ```
 
 ### 许可
-本软件 (Animater) 实施 BSD 许可协议
+本软件 (Chito) 实施 BSD 许可协议

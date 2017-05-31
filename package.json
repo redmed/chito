@@ -1,8 +1,8 @@
 {
-  "name": "animater",
-  "version": "0.1.8",
-  "description": "一个支持计算颜色变化的动画库。",
-  "main": "animater.js",
+  "name": "Chito",
+  "version": "0.1.9",
+  "description": "赤兔 一个支持计算颜色变化的动画库。",
+  "main": "chito.js",
   "scripts": {
   },
   "author": "redmed",
