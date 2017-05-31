@@ -1,4 +1,4 @@
-// import Animater from '../../src/main';
+// import Chito from '../../src/main';
 var $p2Num = document.getElementById('p2-num');
 var $p2 = document.getElementById('p2');
 var $p1Num = document.getElementById('p1-num');
@@ -9,8 +9,8 @@ function goBottom() {
     $st.scrollTop += 100;
 }
 
-var Animation = Animater.Animation,
-    ShaderClip = Animater.ShaderClip;
+var Animation = Chito.Animation,
+    ShaderClip = Chito.ShaderClip;
 
 var clip1 = new ShaderClip({
     duration: 4000,

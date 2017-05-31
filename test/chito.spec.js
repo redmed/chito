@@ -1,6 +1,6 @@
-var Animation = Animater.Animation,
-    Clip = Animater.Clip,
-    ShaderClip = Animater.ShaderClip;
+var Animation = Chito.Animation,
+    Clip = Chito.Clip,
+    ShaderClip = Chito.ShaderClip;
 
 var ConsoleReporter = jasmineRequire.ConsoleReporter();
 var options = {

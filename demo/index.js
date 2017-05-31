@@ -1,4 +1,4 @@
-import Animater from '../src/main';
+import Chito from '../src/main';
 
 var $p3Num = document.getElementById('p3-num');
 var $p3 = document.getElementById('p3');
@@ -7,8 +7,8 @@ var $p2 = document.getElementById('p2');
 var $p1Num = document.getElementById('p1-num');
 var $p1 = document.getElementById('p1');
 
-var Animation = Animater.Animation,
-    ShaderClip = Animater.ShaderClip;
+var Animation = Chito.Animation,
+    ShaderClip = Chito.ShaderClip;
 
 var clip1 = new ShaderClip({
     duration: 2000,
