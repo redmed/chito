@@ -91,9 +91,16 @@ ani.stop()
 
 ### 4. 文档
 
-[API](./doc/api.md)
+[API](./doc/api.md)文档
 
 ### 5. 例子
+
+* [HelloWorld](https://redmed.github.io/animater/example/01.helloworld.html)
+* [Yoyo](https://redmed.github.io/animater/example/02.yoyo.html)
+* [Delay & Interval](https://redmed.github.io/animater/example/03.delay_interval.html)
+* [StartAt](https://redmed.github.io/animater/example/04.startat.html)
+* [Easing](https://redmed.github.io/animater/example/05.easing.html)
+* [Chain](https://redmed.github.io/animater/example/06.chain.html)
 
 ### 6. 代码修改及本地调试
 
