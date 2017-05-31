@@ -6,7 +6,7 @@
 import Clip from './clip.js';
 import Interpolation from './lib/Interpolation.js';
 import ColorHelper from './lib/colorhelper.js';
-import { Ev, Attr } from './lib/define.js';
+import { Attr } from './lib/define.js';
 
 /**
  * 转换数据格式

@@ -61,6 +61,10 @@ class Animation extends EventEmitter {
 
     }
 
+    /**
+     * 停止主进程
+     * @private
+     */
     _stopAni() {
 
         let timer = this._timer;
@@ -183,6 +187,12 @@ class Animation extends EventEmitter {
 
     }
 
+    /**
+     * 停止/暂停/重置 动画
+     * @param {boolean} pause 是否暂停 默认不暂停
+     * @param {boolean} reset 是否重置 默认不重置
+     * @private
+     */
     _stop(pause, reset) {
 
         this._stopAni();

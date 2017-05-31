@@ -266,6 +266,10 @@ class Clip extends EventEmitter {
 
     }
 
+    /**
+     * 暂停动画
+     * @returns {Clip}
+     */
     pause() {
 
         if (this._stopped || this._paused) {
@@ -396,6 +400,10 @@ class Clip extends EventEmitter {
 
     }
 
+    /**
+     * 停止链式内的 Clip 调用
+     * @returns {Clip}
+     */
     stopChain() {
 
         let i = -1,

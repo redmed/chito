@@ -6,7 +6,7 @@ export default {
     Animation,
     Clip,
     ShaderClip
-}
+};
 
 export {
     Animation,
