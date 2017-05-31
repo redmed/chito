@@ -219,8 +219,10 @@ class Clip extends EventEmitter {
      */
     start(force) {
 
+        let now = window.performance.now();
+
         if (this._paused) {
-            this._pauseTime += window.performance.now() - this._pauseStart;
+            this._pauseTime += now - this._pauseStart;
             this._paused = false;
         }
         else {
@@ -229,7 +231,7 @@ class Clip extends EventEmitter {
             }
 
             this._stopped = false;
-            this._startTime = window.performance.now() + this._delay;
+            this._startTime = now + this._delay;
         }
 
         this.emit(Ev.START, this._getOption());
@@ -273,20 +275,7 @@ class Clip extends EventEmitter {
         this._paused = true;
         this._pauseStart = window.performance.now();
 
-        return this;
-
-    }
-
-    stopChain() {
-
-        let i = -1,
-            clips = this._chainClips,
-            len = clips.length;
-
-        while (++i < len) {
-            let clip = clips[ i ];
-            clip.stop();
-        }
+        this.emit(Ev.PAUSE, this._getOption());
 
         return this;
 
@@ -402,6 +391,21 @@ class Clip extends EventEmitter {
     chain(...args) {
 
         this._chainClips = args;
+
+        return this;
+
+    }
+
+    stopChain() {
+
+        let i = -1,
+            clips = this._chainClips,
+            len = clips.length;
+
+        while (++i < len) {
+            let clip = clips[ i ];
+            clip.stop();
+        }
 
         return this;
 
