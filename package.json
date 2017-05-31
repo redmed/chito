@@ -1,6 +1,6 @@
 {
   "name": "animater",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "一个支持计算颜色变化的动画库。",
   "main": "animater.js",
   "scripts": {
@@ -9,6 +9,7 @@
     "test": "phantomjs test/run.spec.js test/animater.spec.html"
   },
   "author": "redmed",
+  "email": "qiaogang2003@163.com",
   "license": "BSD",
   "devDependencies": {
     "astrobench": "^0.1.2",

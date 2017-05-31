@@ -39,7 +39,9 @@
 
 #### 6. reset()
 
-重置动画  
+重置动画
+
+重置全部的`Clip`状态，包括已完成和未完成的`Clip`
 
 #### 7. getClips()
 
@@ -61,7 +63,7 @@
 
 添加事件
 
-参数:
+##### 参数:
 
 * eventName: `string` 事件名称
 * handler: `function` 事件回调函数
@@ -70,6 +72,8 @@
 
 * `'start' | Animation.Event.START` Animation 启动
 * `'stop' | Animation.Event.STOP`  Animation 停止
+* `'pause' | Animation.Event.PAUSE` Animation 暂停
+* `'reset' | Animation.Event.RESET` Animation 重置
 * `'update' | Animation.Event.UPDATE`  Animation 每次更新调用时，此时未触发 Clip
 * `'afterUpdate' | Animation.Event.AFTER_UPDATE`  Animation 每次更新 Clip 后触发
 * `'complete' | Animation.Event.COMPLETE`  Animation 动画全部(Clip)结束触发
@@ -120,22 +124,22 @@ options = {
 }
 ```
 
-#### duration: `number` 
+#### duration: `number=1000` 
 
-每次动画播放总时长，单位毫秒
+每次动画播放总时长，单位毫秒(ms)
 
-#### repeat: `number=0`
+#### repeat: `number=1`
 
-动画重复次数，默认值 0
+动画重复次数，默认值 1
 
 #### delay: `number=0` (optional)
 
 动画首次运行延迟执行的时间(只有首次运行，重复播放的时间间隔不受影响)。  
-单位: 毫秒ms，可选，默认值 0
+单位: 毫秒(ms)，可选，默认值 0
 
 #### interval: `number=0` (optional)
 
-每次重复播放的间隔时间, 单位: 毫秒ms，可选，默认值 0。
+每次重复播放的间隔时间, 单位: 毫秒(ms)，可选，默认值 0。
 
 #### yoyo: `boolean=false` (optional)
 
@@ -200,6 +204,74 @@ keyframe = {
 其中数据格式支持 `number` 和 `CSS` 的 `color` 类型 - 颜色名称, #RRGGBB, #RGB, rgb(R,G,B), rgba(R,G,B,A)   
 其中，`Array` 的长度必须 >1，否则 `value` 不会变化。
 
+### ShaderClip 方法
+
+#### 1. chain(clip, ...clipN) 
+
+链接/清除 `Clip`，被连接的`Clip`在当前`Clip`执行结束后，会被自动调用。
+
+##### 参数: 
+
+* clipN `Clip|undefined` 被连接的 Clip
+
+例如，下面的 clipA 运行2次后，会自动调用 clipB，并执行1次。
+
+```js
+var ani = new Animation();
+
+var clipA = new ShaderClip({ 
+		duration: 1000,
+		repeat: 2
+	}, {
+		x: [ 0, 100 ]
+	});
+	
+var clipB = new ShaderClip({ 
+		duration: 2000,
+		repeat: 1
+	}, {
+		y: [ 100, 0 ]
+	});
+
+clipA.chain(clipB);
+
+ani.addClip(clipA);
+ani.start();
+
+```
+
+另外，使用`.chain()`可以进行循环调用。  
+例如，clipB 执行结束后，可以链接 clipA 继续运行。当然，这种情况下，`Clip`会一直执行下去。直到调用`Animation.stop()`
+
+```js
+
+var ani = new Animation();
+
+var clipA = new ShaderClip({ 
+        duration: 1000,
+        repeat: 2
+    }, {
+        x: [ 0, 100 ]
+    });
+    
+var clipB = new ShaderClip({ 
+        duration: 2000,
+        repeat: 1
+    }, {
+        y: [ 100, 0 ]
+    });
+
+clipA.chain(clipB);
+// 循环调用
+clipB.chain(clipA);
+
+ani.addClip(clipA);
+ani.start();
+
+```
+清除作用链使用`clip.chain()`(不传值)即可。
+
+
 ### ShaderClip 事件
 
 #### 1. on(eventName, handler)
@@ -215,13 +287,12 @@ keyframe = {
 
 * `'start' | ShaderClip.Event.START`  clip 启动
 * `'update' | ShaderClip.Event.UPDATE`  clip 每次更新动画帧
+* `'pause' | ShaderClip.Event.PAUSE`  clip 暂停
+* `'stop' | ShaderClip.Event.STOP`  clip 停止
 * `'complete' | ShaderClip.Event.COMPLETE`  clip  动画结束(repeat运行全部结束)
 * `'repeatComplete' | ShaderClip.Event.REPEAT_COMPLETE`  clip repeat结束后(单词repeat执行结束后)  
-* `'stop' | ShaderClip.Event.STOP`  clip 动画停止
 
-<!-- * `'repeatComplete' | ShaderClip.Event.REPEAT_COMPLETE`  clip 每个周期(repeat)结束后 -->
-
-`update` handler 提供两个参数:
+其中 `update` handler 提供两个参数:
 
 * progress: `number=[0, 1]` 缓动进度
 * keyframe: `Object` 关键帧在当前进度下的值
