@@ -1,7 +1,0 @@
-{
-    "presets": [ "es2015" ],
-    "plugins": [
-        "transform-class-properties",
-        "transform-es3-member-expression-literals"
-    ]
-}
