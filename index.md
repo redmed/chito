@@ -1,7 +1,7 @@
 ## Animater
 
-[![](https://img.shields.io/npm/v/animater.svg)](npm-url)
-[![](https://api.travis-ci.org/redmed/animater.svg?branch=develop)](travis-url)
+[![](https://img.shields.io/npm/v/animater.svg)](https://www.npmjs.com/package/animater)
+[![](https://api.travis-ci.org/redmed/animater.svg?branch=develop)](https://www.travis-ci.org/redmed/animater)
 
 
 一个支持计算颜色变化的动画库。
@@ -22,7 +22,7 @@ npm i animater --save
 
 ### 2. 模块引入
 
-`Animater`采用 `UMD` 的模块引用方式，因此可以考虑一下方式引用。
+`Animater`采用 `UMD` 的模块引用方式，因此可以考虑以下方式引用。
 
 
 By AMD + ES6
