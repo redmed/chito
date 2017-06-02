@@ -144,7 +144,7 @@ options = {
 #### yoyo: `boolean=false` (optional)
 
 溜溜球模式，开启后，第二次重复时，动画变化会按原路返回。  
-只有在 `repeat > 1`的时候生效。可选，默认关闭。
+只有在 `repeat > 1`的时候生效。可选，默认关闭。
 
 #### startAt: `number=[0, 1]` (optional)
 
@@ -158,7 +158,7 @@ options = {
 可选参数有: Linear, QuadraticIn, QuadraticOut, QuadraticInOut, CubicIn, CubicOut, CubicInOut, QuarticIn, QuarticOut, QuarticInOut, QuinticIn, QuinticOut, QuinticInOut, SinusoidalIn, SinusoidalOut, SinusoidalInOut, ExponentialIn, ExponentialOut, ExponentialInOut, CircularIn, CircularOut, CircularInOut, ElasticIn, ElasticOut, ElasticInOut, BackIn, 
 BackOut, BackInOut, BounceIn, BounceOut, BounceInOut.
 
-<!-- 缓动函数效果，请参考[DEMO]() -->
+缓动函数效果，请参考[Easing DEMO](http://redmed.github.com/chito/example/easing.html)
 
 * 也可以使用自定义缓动函数。
 
