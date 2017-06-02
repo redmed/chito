@@ -45,3 +45,42 @@ body {
     background-color: #22e1ee;
     opacity: 0.8;
 }
+
+table {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    vertical-align: baseline;
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+.easing-page {
+    margin: 0 40px;
+}
+
+.easing-list td {
+    margin: 10px;
+    padding: 20px;
+}
+
+.easing-list .ceil {
+    position: relative;
+}
+
+.easing-list .pointer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: block;
+    width: 20px;
+    height: 20px;
+    border: 1px solid #111;
+    background: #22e1ee;
+}
+
+.easing-list .ceil canvas {
+    cursor: pointer;
+    width: 200px;
+    height: 150px;
+}
