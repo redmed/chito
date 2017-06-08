@@ -14,9 +14,9 @@ function goBottom() {
 }
 
 var Animation = Chito.Animation,
-    ShaderClip = Chito.ShaderClip;
+    Clip = Chito.Clip;
 
-var clip1 = new ShaderClip({
+var clip1 = new Clip({
     duration: 3000,
     repeat: 6,
     interval: 1000
@@ -31,7 +31,7 @@ clip1.on('update', function (progress, keyframe) {
     $p1.style.backgroundColor = keyframe.fill;
 });
 
-var clip2 = new ShaderClip({
+var clip2 = new Clip({
     duration: 3000,
     repeat: 6,
     interval: 1000,
@@ -47,7 +47,7 @@ clip2.on('update', function (progress, keyframe) {
     $p2.style.backgroundColor = keyframe.fill;
 });
 
-var clip3 = new ShaderClip({
+var clip3 = new Clip({
     duration: 3000,
     repeat: 6,
     interval: 1000,
@@ -63,7 +63,7 @@ clip3.on('update', function (progress, keyframe) {
     $p3.style.backgroundColor = keyframe.fill;
 });
 
-var clip4 = new ShaderClip({
+var clip4 = new Clip({
     duration: 3000,
     repeat: 6,
     interval: 1000,

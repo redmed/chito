@@ -1,4 +1,4 @@
-import colorHelper from '../src/lib/colorhelper';
+import colorHelper from '../src/plugins/color/colorhelper';
 
 suite('toString() vs + ""', () => {
     bench('toString()', () => {
@@ -14,7 +14,7 @@ suite('toString() vs + ""', () => {
 
 });
 
-suite('', () => {
+suite('String concat', () => {
     bench('Array.join("")', () => {
         let s = [ 1, 2, 3, 4 ];
         let s1 = s.join('');
@@ -36,4 +36,39 @@ suite('ColorHelper', () => {
         let s = [ 121, 212, 23, 0.1 ];
         colorHelper.toRGBA(s);
     });
+});
+
+suite('Loop', function () {
+
+    var hash = {},
+        list = [];
+    var i = 0, m = 5000;
+
+    while (i++ < m) {
+        hash[ i ] = i;
+        list.push({
+            name: i,
+            value: i
+        });
+    }
+
+    bench('for...in loop', function () {
+        for (var key in hash) {
+            let v = hash[ key ];
+
+            // let x = v * v;
+        }
+    });
+
+    bench('while loop', function () {
+
+        let i = 0, len = list.length;
+
+        while (i < len) {
+            let v = list[ i++ ].name;
+
+            // let x = v * v;
+        }
+    });
+
 });

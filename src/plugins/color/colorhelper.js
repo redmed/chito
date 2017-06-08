@@ -4,7 +4,8 @@
  * @date 16/8/17
  */
 
-import cssColorParser from './csscolorparser.js';
+import cssColorParser from 'csscolorparser';
+const parseCSSColor = cssColorParser.parseCSSColor;
 
 function _clamp_css_byte(i) {  // Clamp to integer 0 .. 255.
     i = Math.round(i);  // Seems to be what Chrome does (vs truncation).
@@ -33,7 +34,7 @@ const ColorHelper = {
                 let c = color[ i++ ];
 
                 if (typeof c === 'string') {
-                    if (!cssColorParser(c)) {
+                    if (!parseCSSColor(c)) {
                         return false;
                     }
                 }
@@ -74,7 +75,7 @@ const ColorHelper = {
                 let c = color[ i++ ];
 
                 if (typeof c === 'string') {
-                    let cssColor = cssColorParser(c);
+                    let cssColor = parseCSSColor(c);
 
                     if (!cssColor) {
                         return null;
@@ -91,7 +92,7 @@ const ColorHelper = {
             return colorArr;
         }
         else if (typeof color === 'string') {
-            return cssColorParser(color);
+            return parseCSSColor(color);
         }
         else {
             return null;
@@ -107,7 +108,7 @@ const ColorHelper = {
                 let c = color[ i++ ];
 
                 if (typeof c === 'string') {
-                    let cssColor = cssColorParser(c);
+                    let cssColor = parseCSSColor(c);
 
                     if (!cssColor) {
                         return null;
@@ -124,7 +125,7 @@ const ColorHelper = {
             return colorArr;
         }
         else if (typeof color === 'string') {
-            return [ cssColorParser(color) ];
+            return [ parseCSSColor(color) ];
         }
         else {
             return null;
