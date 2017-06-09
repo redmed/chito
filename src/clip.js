@@ -1,34 +1,12 @@
 /**
- * @file 动画片段, 由 Animation 统一调度, 只控制时间的变化量
+ * @file 动画片段, 由 Animation 统一调度
  * @author redmed
  */
 
-// Include a performance.now polyfill
-(function () {
-
-    if ('performance' in window === false) {
-        window.performance = {};
-    }
-
-    // IE 8
-    Date.now = (Date.now || function () {
-        return new Date().getTime();
-    });
-
-    if ('now' in window.performance === false) {
-        var offset = window.performance.timing && window.performance.timing.navigationStart
-            ? window.performance.timing.navigationStart : Date.now();
-
-        window.performance.now = function () {
-            return Date.now() - offset;
-        };
-    }
-
-})();
-
-import EventEmitter from './lib/eventemitter.js';
-import EasingFunc from './lib/easing.js';
-import { Ev, Attr, Easing } from './lib/define.js';
+import EventEmitter from './lib/eventemitter';
+import EasingFunc from './lib/easing';
+import Interpolation from './lib/Interpolation';
+import { Ev, Attr, Easing } from './lib/define';
 
 class Clip extends EventEmitter {
 
@@ -152,16 +130,54 @@ class Clip extends EventEmitter {
     _chainClips = [];
 
     /**
+     * 存储属性
+     * @param {Array}
+     * @protected
+     */
+    _tracks = [];
+
+    /**
+     * 插值算法
+     * @type {Function}
+     * @private
+     */
+    _interpolation = Interpolation.Linear;
+
+    /**
      * @type {Animation}
      * @protected
      */
     _animation;
+
+    /**
+     * 插件
+     * @type {Object|null}
+     * @protected
+     */
+    static _plugins;
 
     static Event = Ev;
 
     static Attr = Attr;
 
     static Easing = Easing;
+
+    /**
+     * 注册插件
+     * @param {Object} plugin
+     */
+    static registerPlugin(plugin) {
+
+        let type = plugin.type;
+        let plugins = this._plugins;
+        let p = plugins && plugins[ type ];
+
+        if (!p) {
+            this._plugins = plugins || {};
+            this._plugins[ type ] = plugin;
+        }
+
+    }
 
     /**
      * 构造函数
@@ -176,6 +192,7 @@ class Clip extends EventEmitter {
         this._attr = attr;
 
         this._initOption(options);
+        this._tracks = this._transform(attr);
 
     }
 
@@ -199,6 +216,40 @@ class Clip extends EventEmitter {
         this._interval = options[ Attr.INTERVAL ] || 0;
         this._yoyo = options[ Attr.YOYO ] || false;
         this._startAt = options[ Attr.START ] || 0;
+
+    }
+
+    _transform(attr) {
+
+        let _plugins = this.constructor._plugins;
+        // 转换成数组，可以提高 loop 速度
+        let _attrList = [];
+
+        for (let key in attr) {
+            if (attr.hasOwnProperty(key)) {
+
+                let value = attr[ key ];
+
+                for (let type in _plugins) {
+
+                    let plugin = _plugins[ type ];
+
+                    if (plugin.test(value, key)) {
+                        value = plugin.parse(value, key);
+                        value.__type__ = plugin.type;
+
+                        break;
+                    }
+                }
+
+                _attrList.push({
+                    key,
+                    value
+                });
+            }
+        }
+
+        return _attrList;
 
     }
 
@@ -301,11 +352,11 @@ class Clip extends EventEmitter {
         }
 
         let t = time - this._pauseTime;
-        let { percent, elapsed } = this._getProgress(t);
+        let { progress, elapsed } = this._getProgress(t);
 
-        let attr = this._updateAttr(percent, elapsed);
+        let attr = this._updateAttr(progress, elapsed);
 
-        this.emit(Ev.UPDATE, percent, attr, this._getOption());
+        this.emit(Ev.UPDATE, progress, attr, this._getOption());
 
         // 一个周期结束
         return this._afterUpdate(t, elapsed);
@@ -318,18 +369,41 @@ class Clip extends EventEmitter {
         elapsed += this._startAt;
         elapsed = Math.min(elapsed, 1);
 
-        let percent = this._easing(this._reversed ? 1 - elapsed : elapsed);
+        let progress = this._easing(this._reversed ? 1 - elapsed : elapsed);
 
         return {
-            percent,
+            progress,
             elapsed
         }
 
     }
 
-    _updateAttr(percent, elapsed) {
+    _updateAttr(progress, elapsed) {
 
-        return this._attr;
+        let tracks = this._tracks;
+        let keyframe = {};
+
+        let i = 0,
+            len = tracks.length;
+
+        while (i < len) {
+            let item = tracks[ i++ ];
+            let { key, value } = item;
+
+            let type = value.__type__;
+
+            if (type) {
+                let plugin = this.constructor._plugins[ type ];
+                value = plugin.valueOf(value, progress, elapsed, key);
+            }
+            else {
+                value = this._interpolation(value, progress);
+            }
+
+            keyframe[ key ] = value;
+        }
+
+        return keyframe;
 
     }
 

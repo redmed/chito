@@ -1,6 +1,5 @@
 var Animation = Chito.Animation,
-    Clip = Chito.Clip,
-    ShaderClip = Chito.ShaderClip;
+    Clip = Chito.Clip;
 
 var ConsoleReporter = jasmineRequire.ConsoleReporter();
 var options = {
@@ -150,7 +149,7 @@ describe('Clip test', function () {
     });
 });
 
-describe('ShaderClip test', function () {
+describe('Clip attr test', function () {
     var animationOptions = {
         'duration': 1000,
         'repeat': 1,
@@ -165,15 +164,15 @@ describe('ShaderClip test', function () {
     };
 
     it('Static attributes test ...ok', function () {
-        expect(ShaderClip.Event.UPDATE).toBe('update');
-        expect(ShaderClip.Event.START).toBe('start');
-        expect(ShaderClip.Event.STOP).toBe('stop');
-        expect(ShaderClip.Event.COMPLETE).toBe('complete');
-        expect(ShaderClip.Event.REPEAT_COMPLETE).toBe('repeatComplete');
+        expect(Clip.Event.UPDATE).toBe('update');
+        expect(Clip.Event.START).toBe('start');
+        expect(Clip.Event.STOP).toBe('stop');
+        expect(Clip.Event.COMPLETE).toBe('complete');
+        expect(Clip.Event.REPEAT_COMPLETE).toBe('repeatComplete');
     });
 
     it('.update() test ...ok', function () {
-        var clip = new ShaderClip(animationOptions, attr);
+        var clip = new Clip(animationOptions, attr);
         clip.start();
 
         var res = clip.update(window.performance.now() + 500);
@@ -183,15 +182,15 @@ describe('ShaderClip test', function () {
     });
 
     it('.on(Event.UPDATE)/emit(Event.UPDATE) test ...ok', function (done) {
-        var clip = new ShaderClip(animationOptions, attr);
+        var clip = new Clip(animationOptions, attr);
 
-        clip.on(ShaderClip.Event.UPDATE, function (progress, keyframe, args) {
+        clip.on(Clip.Event.UPDATE, function (progress, keyframe, args) {
             expect(typeof progress == 'number' && progress <= 1).toBe(true);
             expect(typeof keyframe == 'object'
                 && typeof keyframe.x == 'number'
                 && keyframe.x < 100).toBe(true);
             expect(typeof args.options == 'object'
-                && args.options[ ShaderClip.Attr.DURATION ] === animationOptions[ ShaderClip.Attr.DURATION ]).toBe(true);
+                && args.options[ Clip.Attr.DURATION ] === animationOptions[ Clip.Attr.DURATION ]).toBe(true);
 
             done();
         });
@@ -329,8 +328,8 @@ describe('Running test', function () {
     };
 
     it('start -> update -> stop -> start -> update -> complete', function (done) {
-        var clip1 = new ShaderClip(aniOpt, attr);
-        var clip2 = new ShaderClip({ duration: 1000, repeat: 2 }, attr);
+        var clip1 = new Clip(aniOpt, attr);
+        var clip2 = new Clip({ duration: 1000, repeat: 2 }, attr);
         var ani = new Animation();
 
         var t0, t1, t2,

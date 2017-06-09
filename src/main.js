@@ -1,6 +1,10 @@
-import Animation from './animation.js';
-import Clip from './clip.js';
-import ShaderClip from './shaderclip.js';
+import Animation from './animation';
+import Clip from './clip';
+const ShaderClip = Clip;
+
+//import plugin
+import './plugins/color/';
+
 
 export default {
     Animation,
