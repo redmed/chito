@@ -28,13 +28,13 @@ npm i chito --save
 By AMD + ES6
 
 ```js
-import { Animation, ShaderClip } from 'chito';
+import { Animation, Clip } from 'chito';
 ```
 
 By global
 
 ```js
-let { Animation, ShaderClip } = window.Chito;
+let { Animation, Clip } = window.Chito;
 ```
 
 ### 3. 使用
@@ -52,8 +52,8 @@ Javascript
 // 创建 Animation 实例，控制动画主进程
 let ani = new Animation()
 
-// 创建 ShaderClip 实例，控制具体动画片段
-let clip = new ShaderClip({
+// 创建 Clip 实例，控制具体动画片段
+let clip = new Clip({
 	duration: 10000,
 	repeat: 10
 }, {

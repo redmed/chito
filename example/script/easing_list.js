@@ -417,7 +417,7 @@ function init() {
             var $next = $target.nextSibling;
 
             clip && clip.destroy();
-            clip = new Chito.ShaderClip({
+            clip = new Chito.Clip({
                 duration: 1000,
                 repeat: 1,
                 easing: easingName

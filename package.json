@@ -1,6 +1,6 @@
 {
   "name": "Chito",
-  "version": "0.1.9",
+  "version": "0.2.0-beta",
   "description": "赤兔 一个支持计算颜色变化的动画库。",
   "main": "chito.js",
   "scripts": {
