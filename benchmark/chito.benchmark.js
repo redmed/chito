@@ -1,6 +1,5 @@
 var Animation = Chito.Animation,
-    Clip = Chito.Clip,
-    ShaderClip = Chito.ShaderClip;
+    Clip = Chito.Clip;
 
 suite('Clip.update() benchmark test', function () {
     var clips = [],
@@ -20,7 +19,7 @@ suite('Clip.update() benchmark test', function () {
         clip.start();
 
         // Shader
-        var shader = new ShaderClip({
+        var shader = new Clip({
             duration: 9999999999,
             repeat: 9999999999
         }, {
@@ -32,14 +31,13 @@ suite('Clip.update() benchmark test', function () {
         shaders.push(shader);
         shader.start();
 
-        var shader2 = new ShaderClip({
+        var shader2 = new Clip({
             duration: 9999999999,
             repeat: 9999999999,
             colorSupport: false
         }, {
             x: [ 0, 100 ],
-            y: [ 100, 0 ],
-            // color: [ 'red', 'blue' ]
+            y: [ 100, 0 ]
         });
 
         shaders2.push(shader2);
@@ -70,7 +68,7 @@ suite('Clip.update() benchmark test', function () {
     //     }
     // });
 
-    bench('ShaderClip update (color not support) ', function () {
+    bench('Clip update (color not support) ', function () {
         var j = 0;
         while (j < m) {
             var shader = shaders2[ j++ ];
@@ -78,7 +76,7 @@ suite('Clip.update() benchmark test', function () {
         }
     });
 
-    bench('ShaderClip update (color support) ', function () {
+    bench('Clip update (color support) ', function () {
         var j = 0;
         while (j < m) {
             var shader = shaders[ j++ ];
@@ -94,11 +92,6 @@ suite('create Class', function () {
         repeat: 1
     };
 
-    var keyframe = {
-        x: [ 0, 100 ],
-        color: [ 'red', 'blue', '#0fe' ]
-    };
-
     bench('new Tween', function () {
         var from = { x: 0 };
         new TWEEN.Tween(from)
@@ -109,19 +102,23 @@ suite('create Class', function () {
     //     new Clip(opt);
     // });
 
-    bench('new ShaderClip (color not support) ', function () {
-        new ShaderClip({
+    bench('new Clip (color not support) ', function () {
+        new Clip({
             duration: 1000,
             repeat: 1,
-            colorSupport: false
-        }, keyframe);
+        }, {
+            x: [ 0, 100 ]
+        });
     });
 
-    bench('new ShaderClip (color support) ', function () {
-        new ShaderClip({
+    bench('new Clip (color support) ', function () {
+        new Clip({
             duration: 1000,
             repeat: 1,
-        }, keyframe);
+        }, {
+            x: [ 0, 100 ],
+            color: [ 'red', 'blue', '#0fe' ]
+        });
     });
 
 });
@@ -160,41 +157,6 @@ suite('Animation._update()', function () {
 
     bench('Animation._update()', function () {
         ani._update(Date.now());
-    });
-
-});
-
-suite('Animation._update()', function () {
-
-    var hash = {},
-        list = [];
-    var i = 0, m = 5000;
-
-    while (i++ < m) {
-        hash[ i ] = i;
-        list.push({
-            name: i,
-            value: i
-        });
-    }
-
-    bench('for...in loop', function () {
-        for (var key in hash) {
-            let v = hash[ key ];
-
-            // let x = v * v;
-        }
-    });
-
-    bench('while loop', function () {
-
-        let i = 0, len = list.length;
-
-        while (i < len) {
-            let v = list[ i++ ].name;
-
-            // let x = v * v;
-        }
     });
 
 });

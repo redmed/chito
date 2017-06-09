@@ -3,10 +3,10 @@
  * @author redmed
  */
 
-import EventEmitter from './lib/eventemitter.js';
-import utils from './lib/util.js';
-import { requestAnimationFrame as rAF, cancelAnimationFrame as cAF } from './lib/animationframe.js';
-import { Ev } from './lib/define.js';
+import EventEmitter from './lib/eventemitter';
+import utils from './lib/util';
+import { requestAnimationFrame as rAF, cancelAnimationFrame as cAF } from './lib/animationframe';
+import { Ev } from './lib/define';
 
 class Animation extends EventEmitter {
 
@@ -189,8 +189,8 @@ class Animation extends EventEmitter {
 
     /**
      * 停止/暂停/重置 动画
-     * @param {boolean} pause 是否暂停 默认不暂停
-     * @param {boolean} reset 是否重置 默认不重置
+     * @param {boolean=false} pause 是否暂停 默认不暂停
+     * @param {boolean=false} reset 是否重置 默认不重置
      * @private
      */
     _stop(pause, reset) {

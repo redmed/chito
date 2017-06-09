@@ -8,9 +8,9 @@ var $p1Num = document.getElementById('p1-num');
 var $p1 = document.getElementById('p1');
 
 var Animation = Chito.Animation,
-    ShaderClip = Chito.ShaderClip;
+    Clip = Chito.Clip;
 
-var clip1 = new ShaderClip({
+var clip1 = new Clip({
     duration: 2000,
     repeat: 2
 }, {
@@ -27,7 +27,7 @@ clip1.on('update', function (progress, keyframe) {
     $p1.style.backgroundColor = keyframe.fill;
 });
 
-var clip2 = new ShaderClip({
+var clip2 = new Clip({
     duration: 3000,
     repeat: 1
 }, {
@@ -42,7 +42,7 @@ clip2.on('update', function (progress, keyframe) {
     $p2.style.backgroundColor = keyframe.fill;
 });
 
-var clip3 = new ShaderClip({
+var clip3 = new Clip({
     duration: 3000,
     repeat: 2
 }, {
@@ -68,22 +68,22 @@ animation
     .on('start', function () {
         console.log('animation start')
     })
-    .on('stop', function() {
+    .on('stop', function () {
         console.log('animation stop')
     })
-    .on('pause', function() {
+    .on('pause', function () {
         console.log('animation pause')
     })
-    .on('update', function() {
+    .on('update', function () {
         console.log('animation update')
     })
-    .on('complete', function() {
+    .on('complete', function () {
         console.log('animation complete')
     });
 
-animation.addClip(clip1);
-animation.addClip(clip3);
-animation.start();
+// animation.addClip(clip1);
+// animation.addClip(clip3);
+// animation.start();
 
 let startStatus = true;
 

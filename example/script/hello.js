@@ -10,9 +10,9 @@ function goBottom() {
 }
 
 var Animation = Chito.Animation,
-    ShaderClip = Chito.ShaderClip;
+    Clip = Chito.Clip;
 
-var clip1 = new ShaderClip({
+var clip1 = new Clip({
     duration: 5000,
     repeat: 1
 }, {
@@ -32,7 +32,7 @@ clip1.on('update', function (progress, keyframe) {
     $p1.style.backgroundColor = keyframe.fill;
 });
 
-var clip2 = new ShaderClip({
+var clip2 = new Clip({
     duration: 5000,
     repeat: 1
 }, {

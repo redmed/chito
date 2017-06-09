@@ -16,8 +16,7 @@ const Attr = {
     EASING: 'easing',
     INTERVAL: 'interval',
     YOYO: 'yoyo',
-    START: 'startAt',
-    COLOR_SUPPORT: 'colorSupport'
+    START: 'startAt'
 };
 
 const Easing = {

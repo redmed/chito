@@ -1,4 +1,4 @@
-import ColorHelper from '../src/lib/colorhelper';
+import ColorHelper from '../src/plugins/color/colorhelper';
 
 let [I, J, K] = [ 10000, 100, 10 ];
 
