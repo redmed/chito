@@ -1,14 +1,14 @@
 var path = require('path');
-var webpack = require('webpack');
 
 module.exports = {
     entry: {
-        'chito': './src/main',
+        'chito': './index',
+        'chito.core': './index.core'
     },
 
     output: {
         filename: '[name].js',
-        path: path.resolve(__dirname, './'),
+        path: path.resolve(__dirname, './dist'),
         library: 'Chito',
         libraryTarget: 'umd',
         umdNamedDefine: true,
@@ -22,10 +22,5 @@ module.exports = {
                 loader: 'babel-loader'
             }
         ]
-    },
-
-    plugins: [
-
-    ]
-
+    }
 };

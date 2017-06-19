@@ -1,5 +1,34 @@
 ## API 文档
 
+### 模块引用
+
+`Chito`采用 `UMD` 的模块引用方式。
+
+```js
+// 方式一
+import { Animation, Clip } from 'chito';
+```
+
+```js
+// 方式二
+import Chito from 'chito';
+let { Animation, Clip } = Chito;
+```
+
+### 插件加载
+
+`Chito`动画库颜色变化的计算，是通过插件方式加载，而默认引入模块将加载全部插件。  
+当你不需要颜色变化的支持，可以使用以下方式加载核心库(或者仅加载部分你需要的插件)，以减少文件体积:
+
+```js
+// 加载核心库，仅支持数值变化
+import { Animation, Clip } from 'chito/lib/core';
+
+// 指定加载需要的插件
+// 加载颜色插件，以支持颜色变化
+import 'chito/lib/plugins/color';
+```
+
 ## Animation
 
 动画主控进程
@@ -94,13 +123,13 @@
 
 ---
 
-## ShaderClip
+## Clip
 
 动画执行片段，提供配置计算动画中各属性变换。
 
-### ShaderClip 构造函数
+### Clip 构造函数
 
-`new ShaderClip(options, keyframe)`
+`new Clip(options, keyframe)`
 
 ##### 参数: 
 
@@ -204,7 +233,7 @@ keyframe = {
 其中数据格式支持 `number` 和 `CSS` 的 `color` 类型 - 颜色名称, #RRGGBB, #RGB, rgb(R,G,B), rgba(R,G,B,A)   
 其中，`Array` 的长度必须 >1，否则 `value` 不会变化。
 
-### ShaderClip 方法
+### Clip 方法
 
 #### 1. chain(clip, ...clipN) 
 
@@ -219,14 +248,14 @@ keyframe = {
 ```js
 var ani = new Animation();
 
-var clipA = new ShaderClip({ 
+var clipA = new Clip({
 		duration: 1000,
 		repeat: 2
 	}, {
 		x: [ 0, 100 ]
 	});
 	
-var clipB = new ShaderClip({ 
+var clipB = new Clip({
 		duration: 2000,
 		repeat: 1
 	}, {
@@ -247,14 +276,14 @@ ani.start();
 
 var ani = new Animation();
 
-var clipA = new ShaderClip({ 
+var clipA = new Clip({
         duration: 1000,
         repeat: 2
     }, {
         x: [ 0, 100 ]
     });
     
-var clipB = new ShaderClip({ 
+var clipB = new Clip({
         duration: 2000,
         repeat: 1
     }, {
@@ -272,7 +301,7 @@ ani.start();
 清除作用链使用`clip.chain()`(不传值)即可。
 
 
-### ShaderClip 事件
+### Clip 事件
 
 #### 1. on(eventName, handler)
 
@@ -285,12 +314,12 @@ ani.start();
 
 其中`eventName`支持类型: 
 
-* `'start' | ShaderClip.Event.START`  clip 启动
-* `'update' | ShaderClip.Event.UPDATE`  clip 每次更新动画帧
-* `'pause' | ShaderClip.Event.PAUSE`  clip 暂停
-* `'stop' | ShaderClip.Event.STOP`  clip 停止
-* `'complete' | ShaderClip.Event.COMPLETE`  clip  动画结束(repeat运行全部结束)
-* `'repeatComplete' | ShaderClip.Event.REPEAT_COMPLETE`  clip repeat结束后(单词repeat执行结束后)  
+* `'start' | Clip.Event.START`  clip 启动
+* `'update' | Clip.Event.UPDATE`  clip 每次更新动画帧
+* `'pause' | Clip.Event.PAUSE`  clip 暂停
+* `'stop' | Clip.Event.STOP`  clip 停止
+* `'complete' | Clip.Event.COMPLETE`  clip  动画结束(repeat运行全部结束)
+* `'repeatComplete' | Clip.Event.REPEAT_COMPLETE`  clip repeat结束后(单词repeat执行结束后)
 
 其中 `update` handler 提供两个参数:
 
@@ -300,14 +329,14 @@ ani.start();
 例如: 
 
 ```js
-let clip = new ShaderClip({
+let clip = new Clip({
 	duration: 2000,
 	repeat: 10
 }, {
 	x: [0, 10]
 })
 
-clip.on(ShaderClip.Event.UPDATE, (progress, keyframe) => {
+clip.on(Clip.Event.UPDATE, (progress, keyframe) => {
 	console.log(progress) // output: 0 .. 0.5 .. 1 
 	console.log(keyframe) // output: {x: 0} .. {x: 5} .. {x: 10}
 })
