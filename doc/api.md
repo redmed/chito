@@ -1,5 +1,34 @@
 ## API 文档
 
+### 模块引用
+
+`Chito`采用 `UMD` 的模块引用方式。
+
+```js
+// 方式一
+import { Animation, Clip } from 'chito';
+```
+
+```js
+// 方式二
+import Chito from 'chito';
+let { Animation, Clip } = Chito;
+```
+
+### 插件加载
+
+`Chito`动画库颜色变化的计算，是通过插件方式加载，而默认引入模块将加载全部插件。
+当你不需要颜色变化的支持，可以使用以下方式加载核心库(或者仅加载部分你需要的插件)，以减少文件体积:
+
+```js
+// 加载核心库，仅支持数值变化
+import { Animation, Clip } from 'chito/lib/core';
+
+// 指定加载需要的插件
+// 加载颜色插件，以支持颜色变化
+import 'chito/lib/plugins/color';
+```
+
 ## Animation
 
 动画主控进程

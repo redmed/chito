@@ -1,7 +1,7 @@
 ## Chito (原 Animater)
 
 [![](https://img.shields.io/npm/v/chito.svg)](https://www.npmjs.com/package/chito)
-[![](https://api.travis-ci.org/redmed/chito.svg?branch=develop)](https://www.travis-ci.org/redmed/chito)
+[![](https://api.travis-ci.org/redmed/chito.svg?branch=master)](https://www.travis-ci.org/redmed/chito)
 
 `赤兔` 一个支持计算颜色变化的动画库。
 
@@ -91,7 +91,7 @@ ani.stop()
 
 ### 4. 文档
 
-[API](./doc/api.md)文档
+更详细的API参考: [API文档](./doc/api.md)
 
 ### 5. 例子
 

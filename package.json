@@ -1,8 +1,8 @@
 {
   "name": "Chito",
-  "version": "0.2.0-beta",
+  "version": "0.2.0",
   "description": "赤兔 一个支持计算颜色变化的动画库。",
-  "main": "chito.js",
+  "main": "dist/chito.js",
   "scripts": {
   },
   "author": "redmed",
