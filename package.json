@@ -1,12 +1,12 @@
 {
   "name": "chito",
-  "version": "0.2.0-beta",
-  "description": "赤兔 一个支持计算颜色变化的动画库。",
-  "main": "chito.js",
+  "version": "0.2.0",
+  "description": "赤兔, 一个支持计算颜色变化的Web动画库。",
   "scripts": {
     "release": "webpack -p --config webpack.config.js",
     "test": "phantomjs test/run.spec.js test/chito.spec.html"
   },
+  "main": "index.js",
   "author": "redmed",
   "email": "qiaogang2003@163.com",
   "license": "BSD",

@@ -91,7 +91,7 @@ ani.stop()
 
 ### 4. 文档
 
-[API](./doc/api.md)文档
+更详细的API参考: [API文档](./doc/api.md)
 
 ### 5. 例子
 
