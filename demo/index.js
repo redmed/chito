@@ -1,4 +1,5 @@
-import Chito from '../src/main';
+import Chito from '../lib/core';
+import '../lib/plugins/color';
 
 var $p3Num = document.getElementById('p3-num');
 var $p3 = document.getElementById('p3');
@@ -9,6 +10,7 @@ var $p1 = document.getElementById('p1');
 
 var Animation = Chito.Animation,
     Clip = Chito.Clip;
+console.log(Chito, Animation, Clip)
 
 var clip1 = new Clip({
     duration: 2000,
@@ -81,8 +83,8 @@ animation
         console.log('animation complete')
     });
 
-// animation.addClip(clip1);
-// animation.addClip(clip3);
+animation.addClip(clip1);
+animation.addClip(clip3);
 // animation.start();
 
 let startStatus = true;
