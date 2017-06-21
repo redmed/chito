@@ -1,7 +1,7 @@
 ## Chito (原 Animater)
 
 [![](https://img.shields.io/npm/v/chito.svg)](https://www.npmjs.com/package/chito)
-[![](https://api.travis-ci.org/redmed/chito.svg?branch=develop)](https://www.travis-ci.org/redmed/chito)
+[![](https://api.travis-ci.org/redmed/chito.svg?branch=master)](https://www.travis-ci.org/redmed/chito)
 
 `赤兔` 一个支持计算颜色变化的动画库。
 
@@ -14,7 +14,7 @@
 npm i chito --save
 ```
 
-或者直接[下载](./chito.js)库文件，通过`script`标签引用
+或者直接下载[完整版](./dist/chito.js)或[核心板(不含颜色变化插件)](./dist/chito.core.js)库文件，通过`script`标签引用
 
 ```html
 <script src="js/chito.js"></script>
