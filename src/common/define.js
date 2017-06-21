@@ -1,9 +1,4 @@
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-var Ev = {
+const Ev = {
     UPDATE: 'update',
     START: 'start',
     REPEAT_COMPLETE: 'repeatComplete',
@@ -14,7 +9,7 @@ var Ev = {
     RESET: 'reset'
 };
 
-var Attr = {
+const Attr = {
     DURATION: 'duration',
     REPEAT: 'repeat',
     DELAY: 'delay',
@@ -24,7 +19,7 @@ var Attr = {
     START: 'startAt'
 };
 
-var Easing = {
+const Easing = {
     LINEAR: 'Linear',
 
     QUADRATIC_IN: 'QuadraticIn',
@@ -68,6 +63,8 @@ var Easing = {
     BOUNCE_IN_OUT: 'BounceInOut'
 };
 
-exports.Ev = Ev;
-exports.Attr = Attr;
-exports.Easing = Easing;
+export {
+    Ev,
+    Attr,
+    Easing
+};

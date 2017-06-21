@@ -1,5 +1,9 @@
-import { Animation, Clip } from './lib/core';
-import './lib/plugins/color';
+var Chito = require('./lib/core');
+var Animation = Chito.Animation,
+    Clip = Chito.Clip;
 
-export default { Animation, Clip };
-export { Animation, Clip };
+require('./lib/plugins/color');
+
+module.exports[ 'default' ] = { Animation: Animation, Clip: Clip };
+module.exports.Animation = Animation;
+module.exports.Clip = Clip;

@@ -1,123 +1,136 @@
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
 /**
  * @file Easing 函数
  * @author redmed
  * @date 2017/3/9
  */
 
-var Easing = {
+const Easing = {
 
-    Linear: function Linear(k) {
+    Linear: function (k) {
 
         return k;
+
     },
 
-    QuadraticIn: function QuadraticIn(k) {
+    QuadraticIn: function (k) {
 
         return k * k;
+
     },
 
-    QuadraticOut: function QuadraticOut(k) {
+    QuadraticOut: function (k) {
 
         return k * (2 - k);
+
     },
 
-    QuadraticInOut: function QuadraticInOut(k) {
+    QuadraticInOut: function (k) {
 
         if ((k *= 2) < 1) {
             return 0.5 * k * k;
         }
 
         return -0.5 * (--k * (k - 2) - 1);
+
     },
 
-    CubicIn: function CubicIn(k) {
+    CubicIn: function (k) {
 
         return k * k * k;
+
     },
 
-    CubicOut: function CubicOut(k) {
+    CubicOut: function (k) {
 
         return --k * k * k + 1;
+
     },
 
-    CubicInOut: function CubicInOut(k) {
+    CubicInOut: function (k) {
 
         if ((k *= 2) < 1) {
             return 0.5 * k * k * k;
         }
 
         return 0.5 * ((k -= 2) * k * k + 2);
+
     },
 
-    QuarticIn: function QuarticIn(k) {
+    QuarticIn: function (k) {
 
         return k * k * k * k;
+
     },
 
-    QuarticOut: function QuarticOut(k) {
+    QuarticOut: function (k) {
 
-        return 1 - --k * k * k * k;
+        return 1 - (--k * k * k * k);
+
     },
 
-    QuarticInOut: function QuarticInOut(k) {
+    QuarticInOut: function (k) {
 
         if ((k *= 2) < 1) {
             return 0.5 * k * k * k * k;
         }
 
         return -0.5 * ((k -= 2) * k * k * k - 2);
+
     },
 
-    QuinticIn: function QuinticIn(k) {
+    QuinticIn: function (k) {
 
         return k * k * k * k * k;
+
     },
 
-    QuinticOut: function QuinticOut(k) {
+    QuinticOut: function (k) {
 
         return --k * k * k * k * k + 1;
+
     },
 
-    QuinticInOut: function QuinticInOut(k) {
+    QuinticInOut: function (k) {
 
         if ((k *= 2) < 1) {
             return 0.5 * k * k * k * k * k;
         }
 
         return 0.5 * ((k -= 2) * k * k * k * k + 2);
+
     },
 
-    SinusoidalIn: function SinusoidalIn(k) {
+    SinusoidalIn: function (k) {
 
         return 1 - Math.cos(k * Math.PI / 2);
+
     },
 
-    SinusoidalOut: function SinusoidalOut(k) {
+    SinusoidalOut: function (k) {
 
         return Math.sin(k * Math.PI / 2);
+
     },
 
-    SinusoidalInOut: function SinusoidalInOut(k) {
+    SinusoidalInOut: function (k) {
 
         return 0.5 * (1 - Math.cos(Math.PI * k));
+
     },
 
-    ExponentialIn: function ExponentialIn(k) {
+    ExponentialIn: function (k) {
 
         return k === 0 ? 0 : Math.pow(1024, k - 1);
+
     },
 
-    ExponentialOut: function ExponentialOut(k) {
+    ExponentialOut: function (k) {
 
         return k === 1 ? 1 : 1 - Math.pow(2, -10 * k);
+
     },
 
-    ExponentialInOut: function ExponentialInOut(k) {
+    ExponentialInOut: function (k) {
 
         if (k === 0) {
             return 0;
@@ -132,28 +145,32 @@ var Easing = {
         }
 
         return 0.5 * (-Math.pow(2, -10 * (k - 1)) + 2);
+
     },
 
-    CircularIn: function CircularIn(k) {
+    CircularIn: function (k) {
 
         return 1 - Math.sqrt(1 - k * k);
+
     },
 
-    CircularOut: function CircularOut(k) {
+    CircularOut: function (k) {
 
-        return Math.sqrt(1 - --k * k);
+        return Math.sqrt(1 - (--k * k));
+
     },
 
-    CircularInOut: function CircularInOut(k) {
+    CircularInOut: function (k) {
 
         if ((k *= 2) < 1) {
             return -0.5 * (Math.sqrt(1 - k * k) - 1);
         }
 
         return 0.5 * (Math.sqrt(1 - (k -= 2) * k) + 1);
+
     },
 
-    ElasticIn: function ElasticIn(k) {
+    ElasticIn: function (k) {
 
         var s;
         var a = 0.1;
@@ -170,14 +187,16 @@ var Easing = {
         if (!a || a < 1) {
             a = 1;
             s = p / 4;
-        } else {
+        }
+        else {
             s = p * Math.asin(1 / a) / (2 * Math.PI);
         }
 
         return -(a * Math.pow(2, 10 * (k -= 1)) * Math.sin((k - s) * (2 * Math.PI) / p));
+
     },
 
-    ElasticOut: function ElasticOut(k) {
+    ElasticOut: function (k) {
 
         var s;
         var a = 0.1;
@@ -194,14 +213,16 @@ var Easing = {
         if (!a || a < 1) {
             a = 1;
             s = p / 4;
-        } else {
+        }
+        else {
             s = p * Math.asin(1 / a) / (2 * Math.PI);
         }
 
-        return a * Math.pow(2, -10 * k) * Math.sin((k - s) * (2 * Math.PI) / p) + 1;
+        return (a * Math.pow(2, -10 * k) * Math.sin((k - s) * (2 * Math.PI) / p) + 1);
+
     },
 
-    ElasticInOut: function ElasticInOut(k) {
+    ElasticInOut: function (k) {
 
         var s;
         var a = 0.1;
@@ -218,7 +239,8 @@ var Easing = {
         if (!a || a < 1) {
             a = 1;
             s = p / 4;
-        } else {
+        }
+        else {
             s = p * Math.asin(1 / a) / (2 * Math.PI);
         }
 
@@ -227,23 +249,26 @@ var Easing = {
         }
 
         return a * Math.pow(2, -10 * (k -= 1)) * Math.sin((k - s) * (2 * Math.PI) / p) * 0.5 + 1;
+
     },
 
-    BackIn: function BackIn(k) {
+    BackIn: function (k) {
 
         var s = 1.70158;
 
         return k * k * ((s + 1) * k - s);
+
     },
 
-    BackOut: function BackOut(k) {
+    BackOut: function (k) {
 
         var s = 1.70158;
 
         return --k * k * ((s + 1) * k + s) + 1;
+
     },
 
-    BackInOut: function BackInOut(k) {
+    BackInOut: function (k) {
 
         var s = 1.70158 * 1.525;
 
@@ -252,35 +277,42 @@ var Easing = {
         }
 
         return 0.5 * ((k -= 2) * k * ((s + 1) * k + s) + 2);
+
     },
 
-    BounceIn: function BounceIn(k) {
+    BounceIn: function (k) {
 
         return 1 - Easing.BounceOut(1 - k);
+
     },
 
-    BounceOut: function BounceOut(k) {
+    BounceOut: function (k) {
 
-        if (k < 1 / 2.75) {
+        if (k < (1 / 2.75)) {
             return 7.5625 * k * k;
-        } else if (k < 2 / 2.75) {
-            return 7.5625 * (k -= 1.5 / 2.75) * k + 0.75;
-        } else if (k < 2.5 / 2.75) {
-            return 7.5625 * (k -= 2.25 / 2.75) * k + 0.9375;
-        } else {
-            return 7.5625 * (k -= 2.625 / 2.75) * k + 0.984375;
         }
+        else if (k < (2 / 2.75)) {
+            return 7.5625 * (k -= (1.5 / 2.75)) * k + 0.75;
+        }
+        else if (k < (2.5 / 2.75)) {
+            return 7.5625 * (k -= (2.25 / 2.75)) * k + 0.9375;
+        }
+        else {
+            return 7.5625 * (k -= (2.625 / 2.75)) * k + 0.984375;
+        }
+
     },
 
-    BounceInOut: function BounceInOut(k) {
+    BounceInOut: function (k) {
 
         if (k < 0.5) {
             return Easing.BounceIn(k * 2) * 0.5;
         }
 
         return Easing.BounceOut(k * 2 - 1) * 0.5 + 0.5;
+
     }
 
 };
 
-exports["default"] = Easing;
+export default Easing;

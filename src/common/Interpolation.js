@@ -1,17 +1,12 @@
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
 /**
  * @file 插值算法
  * @author redmed
  * @date 2017/3/13
  */
 
-var Interpolation = {
+const Interpolation = {
 
-    Linear: function Linear(v, k) {
+    Linear: function(v, k) {
 
         var m = v.length - 1;
         var f = m * k;
@@ -27,9 +22,10 @@ var Interpolation = {
         }
 
         return fn(v[i], v[i + 1 > m ? m : i + 1], f - i);
+
     },
 
-    Bezier: function Bezier(v, k) {
+    Bezier: function(v, k) {
 
         var b = 0;
         var n = v.length - 1;
@@ -41,9 +37,10 @@ var Interpolation = {
         }
 
         return b;
+
     },
 
-    CatmullRom: function CatmullRom(v, k) {
+    CatmullRom: function(v, k) {
 
         var m = v.length - 1;
         var f = m * k;
@@ -57,6 +54,7 @@ var Interpolation = {
             }
 
             return fn(v[(i - 1 + m) % m], v[i], v[(i + 1) % m], v[(i + 2) % m], f - i);
+
         } else {
 
             if (k < 0) {
@@ -68,28 +66,32 @@ var Interpolation = {
             }
 
             return fn(v[i ? i - 1 : 0], v[i], v[m < i + 1 ? m : i + 1], v[m < i + 2 ? m : i + 2], f - i);
+
         }
+
     },
 
     Utils: {
 
-        Linear: function Linear(p0, p1, t) {
+        Linear: function(p0, p1, t) {
 
             return (p1 - p0) * t + p0;
+
         },
 
-        Bernstein: function Bernstein(n, i) {
+        Bernstein: function(n, i) {
 
             var fc = Interpolation.Utils.Factorial;
 
             return fc(n) / fc(i) / fc(n - i);
+
         },
 
-        Factorial: function () {
+        Factorial: (function() {
 
             var a = [1];
 
-            return function (n) {
+            return function(n) {
 
                 var s = 1;
 
@@ -103,10 +105,12 @@ var Interpolation = {
 
                 a[n] = s;
                 return s;
-            };
-        }(),
 
-        CatmullRom: function CatmullRom(p0, p1, p2, p3, t) {
+            };
+
+        })(),
+
+        CatmullRom: function(p0, p1, p2, p3, t) {
 
             var v0 = (p2 - p0) * 0.5;
             var v1 = (p3 - p1) * 0.5;
@@ -114,10 +118,11 @@ var Interpolation = {
             var t3 = t * t2;
 
             return (2 * p1 - 2 * p2 + v0 + v1) * t3 + (-3 * p1 + 3 * p2 - 2 * v0 - v1) * t2 + v0 * t + p1;
+
         }
 
     }
 
 };
 
-exports["default"] = Interpolation;
+export default Interpolation;

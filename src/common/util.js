@@ -1,8 +1,3 @@
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
 /**
  * @file Utils
  * @author redmed
@@ -10,11 +5,11 @@ Object.defineProperty(exports, "__esModule", {
  */
 
 function pullAt(array, indexes) {
-    var length = array ? indexes.length : 0;
+    let length = array ? indexes.length : 0;
 
     if (length > 0) {
         while (length--) {
-            var index = indexes[length];
+            let index = indexes[ length ];
             Array.prototype.splice.call(array, index, 1);
         }
     }
@@ -23,19 +18,19 @@ function pullAt(array, indexes) {
 }
 
 function remove(array, predicate) {
-    var result = [];
+    let result = [];
 
     if (!(array && array.length)) {
         return result;
     }
 
     if (typeof predicate == 'function') {
-        var index = -1,
+        let index = -1,
             indexes = [],
             length = array.length;
 
         while (++index < length) {
-            var value = array[index];
+            let value = array[ index ];
             if (predicate(value, index, array)) {
                 result.push(value);
                 indexes.push(index);
@@ -52,7 +47,7 @@ function clone(obj) {
     return obj;
 }
 
-exports['default'] = {
-    remove: remove,
-    clone: clone
+export default {
+    remove,
+    clone
 };
