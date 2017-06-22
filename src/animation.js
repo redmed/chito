@@ -231,6 +231,12 @@ class Animation extends EventEmitter {
 
             this._clips.push(clip);
             this._savedClips.push(clip);
+
+            if (this._timer) {
+                // 如果主进程进行中，立即启动Clip进程
+                clip.start();
+            }
+
         }
 
         return this;
