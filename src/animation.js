@@ -215,8 +215,9 @@ class Animation extends EventEmitter {
     /**
      * 添加子动画片段
      * @param {Clip|Array.<Clip>} clips
+     * @param {Boolean} startClip
      */
-    addClip(clips) {
+    addClip(clips, startClip = true) {
 
         if (!Array.isArray(clips)) {
             clips = [ clips ];
@@ -231,6 +232,12 @@ class Animation extends EventEmitter {
 
             this._clips.push(clip);
             this._savedClips.push(clip);
+
+            if (this._timer && startClip) {
+                // 如果主进程进行中，立即启动Clip进程
+                clip.start();
+            }
+
         }
 
         return this;
