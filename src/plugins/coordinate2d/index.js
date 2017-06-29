@@ -15,17 +15,17 @@ import vector from './vector';
  * let path = [ [x, y], [x1, y1], [x2, y2] ];
  * parseMovingSteps(path) =>
  * [
- *  { distance: 10, segment: [ [x, y], [x1, y2] ] },
- *  { distance: 50, segment: [ [x, y], [x1, y2] ] },
+ *  { length: 10, segment: [ [x, y], [x1, y2] ] },
+ *  { length: 50, segment: [ [x, y], [x1, y2] ] },
  *  { ... }
  * ]
- * distance 距离起点的向量长度之和, segment 所在片段的起始+终止点, segmentLength 片段长度
+ * length 距离起点的向量长度之和, segment 所在片段的起始+终止点, segmentLength 片段长度
  */
 function parseMovingSteps(path) {
 
     let i = 0,
         len = path.length,
-        distance = 0,
+        length = 0,
         _path = [],
         steps = [],
         angle = 0;
@@ -33,7 +33,7 @@ function parseMovingSteps(path) {
     while (i < len - 1) {
         let p0 = path[ i ], p1 = path[ i + 1 ];
         let segmentLength = vector.distance(p0, p1);
-        distance += segmentLength;
+        length += segmentLength;
 
         angle = vector.getAngle(p1, p0);
 
@@ -46,7 +46,7 @@ function parseMovingSteps(path) {
         _path.push(p0);
 
         steps.push({
-            distance,
+            length,
             segmentLength,
             segment: [ p0.slice(), p1.slice() ], // 当前步长所在的片段
             path: _path.slice(), // 已走过的路径
@@ -57,7 +57,7 @@ function parseMovingSteps(path) {
     }
 
     // 记录一个总长度
-    steps[ 'sumDistance' ] = distance;
+    steps[ 'sum' ] = length;
 
     return steps;
 
@@ -69,7 +69,7 @@ let plugin = {
      * 插件类型
      * @type {string}
      */
-    type: '2D-Coordinate',
+    type: 'coordinate-2d',
 
     /**
      *
@@ -120,21 +120,57 @@ let plugin = {
             path.push([ x, y ]);
         }
 
-        console.log('Coordinate \n', path);
+        let res = parseMovingSteps(path);
+
+        return res;
 
     },
 
     /**
      * 获取实际值
-     * @param {*} parsedValue
+     * @param {*} steps
      * @param {number} progress 经过缓动函数变换后的进度
      * @param {number=} elapsed 缓动变换前的原进度
      * @param {string=} key
      * @returns {*}
      */
-    valueOf(parsedValue, progress, elapsed, key) {
+    valueOf(steps, progress, elapsed, key) {
 
-        return 2;
+        let { sum } = steps;
+        // TODO: 这里是按照行进距离寻找所在片段
+        // TODO: 也可以根据progress进度寻找所在分段
+        let current = sum * progress;
+
+        // 找到当前轨迹运行区间
+        let i = -1, len = steps.length;
+        let step = steps[ 0 ];
+        while (++i < len) {
+            let s = steps[ i ];
+            if (current <= s.length) {
+                step = s;
+                break;
+            }
+        }
+
+        let [ p0, p1 ] = step.segment, subLength = 0;
+        if (i == 0) {
+            subLength = current;
+        }
+        else {
+            subLength = current - steps[ i - 1 ].length;
+        }
+
+        // 根据每段已行驶的距离，计算 x, y 坐标
+        let scale = subLength / step.segmentLength;
+        let out = vector.create();
+        // 这就是这一时刻的坐标点所在，这里待计算
+        let position = vector.create();
+        vector.sub(out, p1, p0);
+        vector.scaleAndAdd(position, p0, out, scale);
+
+        position.step = step;
+
+        return position;
 
     }
 
