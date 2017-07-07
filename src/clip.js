@@ -444,7 +444,7 @@ class Clip extends EventEmitter {
                     let ani = this._animation;
                     ani && ani.addClip(clip);
 
-                    clip.on(Event.COMPLETE, () => {
+                    clip.on(Ev.COMPLETE, () => {
                         ani.removeClip(clip);
                     });
 
