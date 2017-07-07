@@ -98,7 +98,7 @@ class Animation extends EventEmitter {
             let running = clip.update(timestamp);
 
             if (!running) {
-                clip._animation = null;
+                // clip._animation = null;
                 clips.splice(i, 1);
             }
             else {

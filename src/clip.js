@@ -441,9 +441,12 @@ class Clip extends EventEmitter {
                     len = chains.length;
                 while (++i < len) {
                     let clip = chains[ i ];
-
                     let ani = this._animation;
                     ani && ani.addClip(clip);
+
+                    clip.on(Event.COMPLETE, () => {
+                        ani.removeClip(clip);
+                    });
 
                     clip.start();
                 }
