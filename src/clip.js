@@ -434,6 +434,8 @@ class Clip extends EventEmitter {
             }
             else {
 
+                this.emit(Ev.COMPLETE, this._getOption());
+
                 let i = -1,
                     chains = this._chainClips,
                     len = chains.length;
@@ -453,8 +455,6 @@ class Clip extends EventEmitter {
                 this._pauseTime = 0;
                 this._pauseStart = 0;
                 this._repeat = this._repeat_0;
-
-                this.emit(Ev.COMPLETE, this._getOption());
 
                 return false;
             }
