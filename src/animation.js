@@ -94,7 +94,6 @@ class Animation extends EventEmitter {
         let i = 0;
         while (i < clips.length) {
             let clip = clips[ i ];
-
             let running = clip.update(timestamp);
 
             if (!running) {
@@ -228,10 +227,9 @@ class Animation extends EventEmitter {
 
         while (++i < len) {
             let clip = clips[ i ];
-            clip._animation = this;
 
-            this._clips.push(clip);
-            this._savedClips.push(clip);
+            this._addLiveClip(clip);
+            this._addSavedClip(clip);
 
             if (this._timer && startClip) {
                 // 如果主进程进行中，立即启动Clip进程
@@ -244,13 +242,34 @@ class Animation extends EventEmitter {
 
     }
 
+    _addLiveClip(clip) {
+
+        let _c = this._clips;
+        // 防止重复添加
+        if (_c.indexOf(clip) == -1) {
+            _c.push(clip);
+            clip._animation = this;
+        }
+
+    }
+
+    _addSavedClip(clip) {
+
+        let _s = this._savedClips;
+        // 防止重复添加
+        if (_s.indexOf(clip) == -1) {
+            _s.push(clip);
+            clip._animation = this;
+        }
+
+    }
+
     /**
      * 移除子动画片段
      * @param {Clip=} clip
      */
     removeClip(clip) {
 
-        let clips = this._clips;
         let saved = this._savedClips;
 
         if (clip) {
@@ -259,12 +278,8 @@ class Animation extends EventEmitter {
             //     clip._animation = null;
             //     clips.splice(idx, 1);
             // }
-            utils.remove(clips, c => {
-                return c === clip;
-            });
-            utils.remove(saved, c => {
-                return c === clip;
-            });
+            this._removeLiveClip(clip);
+            this._removeSavedClip(clip);
 
             clip._animation = null;
         }
@@ -282,6 +297,22 @@ class Animation extends EventEmitter {
         }
 
         return this;
+
+    }
+
+    _removeLiveClip(clip) {
+
+        utils.remove(this._clips, c => {
+            return c === clip;
+        });
+
+    }
+
+    _removeSavedClip(clip) {
+
+        utils.remove(this._savedClips, c => {
+            return c === clip;
+        });
 
     }
 
