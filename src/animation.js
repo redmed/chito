@@ -169,6 +169,8 @@ class Animation extends EventEmitter {
      */
     reset() {
 
+        this._stop(false, true, false);
+
         let i = -1,
             saved = this._savedClips,
             len = saved.length;
@@ -190,9 +192,10 @@ class Animation extends EventEmitter {
      * 停止/暂停/重置 动画
      * @param {boolean=false} pause 是否暂停 默认不暂停
      * @param {boolean=false} reset 是否重置 默认不重置
+     * @param {boolean=true} emit 是否派发事件 默认派发
      * @private
      */
-    _stop(pause, reset) {
+    _stop(pause, reset, emit = true) {
 
         this._stopAni();
 
@@ -206,7 +209,7 @@ class Animation extends EventEmitter {
                 pause ? clip.pause() : clip.stop(reset);
             }
 
-            this.emit(pause ? Ev.PAUSE : Ev.STOP);
+            emit && this.emit(pause ? Ev.PAUSE : Ev.STOP);
         }
 
     }
