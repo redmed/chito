@@ -426,35 +426,31 @@ class Clip extends EventEmitter {
                     this._reversed = !this._reversed;
                 }
 
-                this.emit(Ev.REPEAT_COMPLETE, rep, this._getOption());
-
                 this._repeat = rep;
+
+                this.emit(Ev.REPEAT_COMPLETE, rep, this._getOption());
 
                 return true;
             }
             else {
+
+                this._stopped = true;
+                this._pauseTime = 0;
+                this._pauseStart = 0;
+                this._repeat = this._repeat_0;
 
                 this.emit(Ev.COMPLETE, this._getOption());
 
                 let i = -1,
                     chains = this._chainClips,
                     len = chains.length;
+                let ani = this._animation;
                 while (++i < len) {
                     let clip = chains[ i ];
-                    let ani = this._animation;
-                    ani && ani.addClip(clip);
-
-                    clip.on(Ev.COMPLETE, () => {
-                        ani.removeClip(clip);
-                    });
+                    ani && ani._addLiveClip(clip);
 
                     clip.start();
                 }
-
-                this._stopped = true;
-                this._pauseTime = 0;
-                this._pauseStart = 0;
-                this._repeat = this._repeat_0;
 
                 return false;
             }
