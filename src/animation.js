@@ -128,13 +128,14 @@ class Animation extends EventEmitter {
             return this;
         }
 
+        this.emit(Ev.START);
+
         let i = -1;
         while (++i < len) {
             let clip = clips[ i ];
             clip.start();
         }
 
-        this.emit(Ev.START);
         this._startAni();
 
         return this;

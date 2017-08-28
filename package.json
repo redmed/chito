@@ -1,10 +1,11 @@
 {
   "name": "chito",
-  "version": "0.2.6",
+  "version": "0.2.7-beta",
   "description": "赤兔, 一个支持计算颜色变化的Web动画库。",
   "scripts": {
     "release": "babel src --out-dir lib && webpack -p --config webpack.config.js",
-    "test": "phantomjs test/run.spec.js test/chito.spec.html"
+    "test": "phantomjs test/run.spec.js test/chito.spec.html",
+    "dev": "webpack-dev-server --config webpack.dev.config.js"
   },
   "main": "index.js",
   "author": "redmed",
