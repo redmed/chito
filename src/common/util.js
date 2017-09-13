@@ -9,7 +9,7 @@ function pullAt(array, indexes) {
 
     if (length > 0) {
         while (length--) {
-            let index = indexes[ length ];
+            let index = indexes[length];
             Array.prototype.splice.call(array, index, 1);
         }
     }
@@ -30,7 +30,7 @@ function remove(array, predicate) {
             length = array.length;
 
         while (++index < length) {
-            let value = array[ index ];
+            let value = array[index];
             if (predicate(value, index, array)) {
                 result.push(value);
                 indexes.push(index);
@@ -57,46 +57,52 @@ function normalize(arr, options = {}) {
         return arr;
     }
 
-    let { type = '', range = [ 0, 1 ] /*, base = 10*/ } = options;
+    let {
+        type = '',
+        range = [0, 1],
+        min = Math.min.apply(Math, arr),
+        max = Math.max.apply(Math, arr)
+        /*, base = 10*/
+    } = options;
+    type = type.toLowerCase();
 
     let normalizationArr = [];
-    let max = Math.max.apply(Math, arr),
-        min = Math.min.apply(Math, arr);
 
-    if (type != 'log') {
-        let diff = max - min;
+    let diff = max - min;
 
-        let i = -1, len = arr.length;
-        while (++i < len) {
-            let v = arr[ i ];
-            let v2 = (v - min) / diff;
-
-            normalizationArr.push(v2);
+    let i = -1, len = arr.length;
+    while (++i < len) {
+        let v = arr[i];
+        if (v > max) {
+            v = max;
         }
+
+        if (v < min) {
+            v = min;
+        }
+
+        let v2;
+        if (type !== 'log') {
+            v2 = (v - min) / diff;
+        } else {
+            v2 = Math.log10(v);
+        }
+
+        normalizationArr.push(v2);
     }
-    else {
-        let i = -1, len = arr.length;
-        while (++i < len) {
-            let v = arr[ i ];
-            let v2 = Math.log10(v);
-            // if (base != 10) {
-            //     v2 = v2 / Math.log10(base);
-            // }
 
-            normalizationArr.push(v2);
-        }
-
+    if (type === 'log') {
         normalizationArr = normalize(normalizationArr);
     }
 
     // 非标准归一
     let [ rMin, rMax ] = range;
-    if (rMin != 0 || rMax != 1) {
+    if (rMin !== 0 || rMax !== 1) {
         let i = -1, len = normalizationArr.length;
         let diff = rMax - rMin;
         let norArr = [];
         while (++i < len) {
-            let v = normalizationArr[ i ];
+            let v = normalizationArr[i];
             let v2 = diff * v + rMin;
 
             norArr.push(v2);
