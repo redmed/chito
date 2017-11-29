@@ -277,6 +277,10 @@ class Clip extends EventEmitter {
         }
 
         this.emit(Ev.START);
+        let repeat = this._repeat;
+        if (repeat > 1 && repeat === this._repeat_0) {
+            this.emit(Ev.REPEAT, 0);
+        }
 
         return this;
 
@@ -401,9 +405,10 @@ class Clip extends EventEmitter {
     _afterUpdate(time, elapsed) {
 
         // 一个周期结束
-        if (elapsed == 1) {
+        if (elapsed === 1) {
 
             let repeat = this._repeat;
+            let repeat_0 = this._repeat_0;
 
             if (repeat > 1) {
                 if (isFinite(repeat)) {
@@ -420,6 +425,7 @@ class Clip extends EventEmitter {
                 this._repeat = repeat;
 
                 this.emit(Ev.REPEAT_COMPLETE, repeat);
+                this.emit(Ev.REPEAT, repeat_0 - repeat);
 
                 return true;
             } else {
@@ -427,8 +433,11 @@ class Clip extends EventEmitter {
                 this._stopped = true;
                 this._pauseTime = 0;
                 this._pauseStart = 0;
-                this._repeat = this._repeat_0;
+                this._repeat = repeat_0;
 
+                if (repeat_0 > 1) {
+                    this.emit(Ev.REPEAT_COMPLETE, 0);
+                }
                 this.emit(Ev.COMPLETE);
 
                 let i = -1,
