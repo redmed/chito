@@ -3,6 +3,8 @@
  * @author redmed
  */
 
+let _uid = -1;
+
 class EventEmitter {
 
     /**
@@ -17,7 +19,7 @@ class EventEmitter {
      * @type {number}
      * @private
      */
-    __id__ = Math.random() * Date.now();
+    __id__ = ++_uid;
 
     /**
      * 构造函数

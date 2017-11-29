@@ -31,7 +31,7 @@ const ColorHelper = {
             let i = 0, len = color.length;
 
             while (i < len) {
-                let c = color[ i++ ];
+                let c = color[i++];
 
                 if (typeof c === 'string') {
                     if (!parseCSSColor(c)) {
@@ -49,16 +49,8 @@ const ColorHelper = {
         return false;
     },
 
-    isColorIncrease(inc) {
-        if (Array.isArray(color)) {
-            return color.length > 0;
-        }
-
-        return false;
-    },
-
     toColorIncrease(inc) {
-        return [ inc[ 0 ] || 0, inc[ 1 ] || 0, inc[ 2 ] || 0, inc[ 3 ] || 0 ];
+        return [inc[0] || 0, inc[1] || 0, inc[2] || 0, inc[3] || 0];
     },
 
     /**
@@ -72,7 +64,7 @@ const ColorHelper = {
             let i = 0, len = color.length;
 
             while (i < len) {
-                let c = color[ i++ ];
+                let c = color[i++];
 
                 if (typeof c === 'string') {
                     let cssColor = parseCSSColor(c);
@@ -105,7 +97,7 @@ const ColorHelper = {
             let i = 0, len = color.length;
 
             while (i < len) {
-                let c = color[ i++ ];
+                let c = color[i++];
 
                 if (typeof c === 'string') {
                     let cssColor = parseCSSColor(c);
@@ -125,7 +117,7 @@ const ColorHelper = {
             return colorArr;
         }
         else if (typeof color === 'string') {
-            return [ parseCSSColor(color) ];
+            return [parseCSSColor(color)];
         }
         else {
             return null;
@@ -161,8 +153,8 @@ const ColorHelper = {
             return rgba;
         };
 
-        let s0 = steps[ i ];
-        let s1 = steps[ i + 1 > m ? m : i + 1 ];
+        let s0 = steps[i];
+        let s1 = steps[i + 1 > m ? m : i + 1];
         let t = f - i;
 
         return fns(s0, s1, t);
@@ -178,13 +170,13 @@ const ColorHelper = {
         let c = this.toNormal(color);
         if (Array.isArray(increase) && c) {
             let [ r, g, b, a ] = [
-                _clamp_css_byte(c[ 0 ] + increase[ 0 ] || 0),
-                _clamp_css_byte(c[ 1 ] + increase[ 1 ] || 0),
-                _clamp_css_byte(c[ 2 ] + increase[ 2 ] || 0),
-                _clamp_css_float(c[ 3 ] + increase[ 3 ] || 0)
+                _clamp_css_byte(c[0] + increase[0] || 0),
+                _clamp_css_byte(c[1] + increase[1] || 0),
+                _clamp_css_byte(c[2] + increase[2] || 0),
+                _clamp_css_float(c[3] + increase[3] || 0)
             ];
 
-            let rgba = [ r, g, b, a ].join(',');
+            let rgba = [r, g, b, a].join(',');
 
             return 'rgba(' + rgba + ')';
         }
@@ -200,10 +192,10 @@ const ColorHelper = {
      */
     toRGBA(color) {
         if (color && color.length >= 3) {
-            let alpha = typeof color[ 3 ] === 'undefined' ? 1 : color[ 3 ];
-            let r = _clamp_css_byte(color[ 0 ]),
-                g = _clamp_css_byte(color[ 1 ]),
-                b = _clamp_css_byte(color[ 2 ]),
+            let alpha = typeof color[3] === 'undefined' ? 1 : color[3];
+            let r = _clamp_css_byte(color[0]),
+                g = _clamp_css_byte(color[1]),
+                b = _clamp_css_byte(color[2]),
                 a = _clamp_css_float(alpha);
 
             // Maybe slower..
