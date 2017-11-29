@@ -89,11 +89,11 @@ class Animation extends EventEmitter {
 
         let clips = this._clips;
 
-        this.emit(Ev.UPDATE, clips);
+        this.emit(Ev.UPDATE, timestamp);
 
         let i = 0;
         while (i < clips.length) {
-            let clip = clips[ i ];
+            let clip = clips[i];
             let running = clip.update(timestamp);
 
             if (!running) {
@@ -107,7 +107,7 @@ class Animation extends EventEmitter {
 
         this._clips = clips;
 
-        this.emit(Ev.AFTER_UPDATE, clips);
+        this.emit(Ev.AFTER_UPDATE);
 
         if (clips.length == 0) {
             this._stopAni();
@@ -132,7 +132,7 @@ class Animation extends EventEmitter {
 
         let i = -1;
         while (++i < len) {
-            let clip = clips[ i ];
+            let clip = clips[i];
             clip.start();
         }
 
@@ -177,7 +177,7 @@ class Animation extends EventEmitter {
             len = saved.length;
 
         while (++i < len) {
-            let c = saved[ i ];
+            let c = saved[i];
             c.stop(true);
         }
 
@@ -206,7 +206,7 @@ class Animation extends EventEmitter {
         if (len) {
             let i = -1;
             while (++i < len) {
-                let clip = clips[ i ];
+                let clip = clips[i];
                 pause ? clip.pause() : clip.stop(reset);
             }
 
@@ -223,14 +223,14 @@ class Animation extends EventEmitter {
     addClip(clips, startClip = true) {
 
         if (!Array.isArray(clips)) {
-            clips = [ clips ];
+            clips = [clips];
         }
 
         let i = -1,
             len = clips.length;
 
         while (++i < len) {
-            let clip = clips[ i ];
+            let clip = clips[i];
 
             this._addLiveClip(clip);
             this._addSavedClip(clip);
@@ -292,7 +292,7 @@ class Animation extends EventEmitter {
                 len = saved.length;
 
             while (++i < len) {
-                let c = saved[ i ];
+                let c = saved[i];
                 c._animation = null;
             }
 
@@ -335,10 +335,9 @@ class Animation extends EventEmitter {
      */
     destroy() {
 
+        this.off();
         this._stopAni();
         this.removeClip();
-
-        this.off();
 
     }
 }
