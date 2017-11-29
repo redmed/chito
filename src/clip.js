@@ -263,22 +263,23 @@ class Clip extends EventEmitter {
 
         let now = window.performance.now();
 
+        let onceRepeat = false;
         if (this._paused) {
             this._pauseTime += now - this._pauseStart;
             this._paused = false;
-        }
-        else {
+        } else {
             if (!force && !this._stopped) {
                 return this;
             }
 
+            onceRepeat = true;
             this._stopped = false;
             this._startTime = now + this._delay;
         }
 
         this.emit(Ev.START);
         let repeat = this._repeat;
-        if (repeat > 1 && repeat === this._repeat_0) {
+        if (repeat > 1 && repeat === this._repeat_0 && onceRepeat) {
             this.emit(Ev.REPEAT, 0);
         }
 

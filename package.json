@@ -13,15 +13,15 @@
   "license": "BSD",
   "devDependencies": {
     "astrobench": "^0.1.2",
-    "babel-core": "^6.24.1",
-    "babel-loader": "^7.0.0",
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
     "babel-plugin-transform-class-properties": "^6.24.1",
     "babel-plugin-transform-es3-member-expression-literals": "^6.22.0",
     "babel-preset-es2015": "^6.24.1",
-    "jasmine": "^2.6.0",
+    "jasmine": "^2.8.0",
     "phantomjs": "^2.1.7",
     "webpack": "^2.4.1",
-    "webpack-dev-server": "^2.4.4"
+    "webpack-dev-server": "^2.9.5"
   },
   "dependencies": {
     "csscolorparser": "git+https://github.com/redmed/css-color-parser-js.git"
