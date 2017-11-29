@@ -57,7 +57,7 @@ describe('Clip test', function () {
         clipA.chain(clipB);
 
         expect(clipA._chainClips.length).toBe(1);
-        expect(clipA._chainClips[ 0 ]).toBe(clipB);
+        expect(clipA._chainClips[0]).toBe(clipB);
     });
 
     it('.on(Event.START)/emit(Event.START) test ...ok', function (done) {
@@ -125,28 +125,28 @@ describe('Clip test', function () {
         clip.update(window.performance.now() + 1500);
     });
 
-    it('Clip COMPLETE Event arguments test ...ok', function (done) {
-        animationOptions = {
-            'durtaion': 1000,
-            'repeat': 1
-        };
-
-        var clip = new Clip(animationOptions);
-
-        clip.on(Clip.Event.COMPLETE, function (args) {
-            expect(typeof args.options == 'object'
-                && args.options[ Clip.Attr.DURATION ] === animationOptions[ Clip.Attr.DURATION ])
-                .toBe(true);
-            expect(typeof args.options == 'object'
-                && args.options[ Clip.Attr.REPEAT ] === animationOptions[ Clip.Attr.REPEAT ])
-                .toBe(true);
-
-            done();
-        });
-        clip.start();
-
-        clip.update(window.performance.now() + 1500);
-    });
+    // it('Clip COMPLETE Event arguments test ...ok', function (done) {
+    //     animationOptions = {
+    //         'durtaion': 1000,
+    //         'repeat': 1
+    //     };
+    //
+    //     var clip = new Clip(animationOptions);
+    //
+    //     clip.on(Clip.Event.COMPLETE, function (args) {
+    //         expect(typeof args.options == 'object'
+    //             && args.options[ Clip.Attr.DURATION ] === animationOptions[ Clip.Attr.DURATION ])
+    //             .toBe(true);
+    //         expect(typeof args.options == 'object'
+    //             && args.options[ Clip.Attr.REPEAT ] === animationOptions[ Clip.Attr.REPEAT ])
+    //             .toBe(true);
+    //
+    //         done();
+    //     });
+    //     clip.start();
+    //
+    //     clip.update(window.performance.now() + 1500);
+    // });
 });
 
 describe('Clip attr test', function () {
@@ -158,9 +158,9 @@ describe('Clip attr test', function () {
     };
 
     var attr = {
-        x: [ 0, 100 ],
-        y: [ 200, 400 ],
-        color: [ '#f00', '#00f' ]
+        x: [0, 100],
+        y: [200, 400],
+        color: ['#f00', '#00f']
     };
 
     it('Static attributes test ...ok', function () {
@@ -189,8 +189,8 @@ describe('Clip attr test', function () {
             expect(typeof keyframe == 'object'
                 && typeof keyframe.x == 'number'
                 && keyframe.x < 100).toBe(true);
-            expect(typeof args.options == 'object'
-                && args.options[ Clip.Attr.DURATION ] === animationOptions[ Clip.Attr.DURATION ]).toBe(true);
+            // expect(typeof args.options == 'object'
+            //     && args.options[ Clip.Attr.DURATION ] === animationOptions[ Clip.Attr.DURATION ]).toBe(true);
 
             done();
         });
@@ -238,7 +238,7 @@ describe('Animation test', function () {
         var ani = new Animation();
         ani.addClip(clip1);
 
-        expect(ani.getClips()[ 0 ]).toBe(clip1);
+        expect(ani.getClips()[0]).toBe(clip1);
     });
 
     it('.start()/on(Event.START) test ...ok', function (done) {
@@ -254,24 +254,24 @@ describe('Animation test', function () {
         ani.start();
     });
 
-    it('.start(true) test ...ok', function (done) {
-        var ani = new Animation();
-        ani.addClip(new Clip(clipOpt));
-
-        ani.on(Animation.Event.START, function () {
-
-            var clips = ani.getClips();
-            for (var i = 0, len = clips.length; i < len; i++) {
-                var c = clips[ i ];
-
-                expect(c._stopped).toBe(false);
-            }
-
-            done();
-        });
-
-        ani.start(true);
-    });
+    // it('.start(true) test ...ok', function (done) {
+    //     var ani = new Animation();
+    //     ani.addClip(new Clip(clipOpt));
+    //
+    //     ani.on(Animation.Event.START, function () {
+    //
+    //         var clips = ani.getClips();
+    //         for (var i = 0, len = clips.length; i < len; i++) {
+    //             var c = clips[ i ];
+    //
+    //             expect(c._stopped).toBe(false);
+    //         }
+    //
+    //         done();
+    //     });
+    //
+    //     ani.start(true);
+    // });
 
     it('.stop()/on(Event.STOP) test ...ok', function (done) {
         var clip1 = new Clip(clipOpt);
@@ -323,8 +323,8 @@ describe('Running test', function () {
     };
 
     var attr = {
-        x: [ 0, 10 ],
-        fill: [ '#fff', '#000' ]
+        x: [0, 10],
+        fill: ['#fff', '#000']
     };
 
     it('start -> update -> stop -> start -> update -> complete', function (done) {
@@ -334,7 +334,7 @@ describe('Running test', function () {
 
         var t0, t1, t2,
             ct0, ct1, ct2,
-            repeat = 0, stop = 0,
+            repeatEnd = 0, pause = 0, repeatStart = 0,
             at0, at1, at2,
             at00, t11;
 
@@ -354,18 +354,21 @@ describe('Running test', function () {
 
                 expect(t0 < t1).toBe(true);
             })
-            .on('stop', function () {
-                stop++;
+            .on('pause', function () {
+                pause++;
+            })
+            .on('repeat', function () {
+                repeatStart++;
             })
             .on('repeatComplete', function () {
-                repeat++;
+                repeatEnd++;
             })
             .on('complete', function () {
                 t2 = window.performance.now();
 
                 expect(t1 < t2).toBe(true);
-                expect(aniOpt.repeat - 1 >= repeat).toBe(true);
-                expect(stop).toBe(1);
+                expect(repeatEnd === repeatStart).toBe(true);
+                expect(pause).toBe(1);
 
             });
 
@@ -402,7 +405,7 @@ describe('Running test', function () {
         ani.start();
 
         setTimeout(function () {
-            ani.stop();
+            ani.pause();
             setTimeout(function () {
                 ani.start();
             }, 500)

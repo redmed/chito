@@ -170,11 +170,11 @@ class Clip extends EventEmitter {
 
         let type = plugin.type;
         let plugins = this._plugins;
-        let p = plugins && plugins[ type ];
+        let p = plugins && plugins[type];
 
         if (!p) {
             this._plugins = plugins || {};
-            this._plugins[ type ] = plugin;
+            this._plugins[type] = plugin;
         }
 
     }
@@ -207,15 +207,15 @@ class Clip extends EventEmitter {
      */
     _initOption(options) {
 
-        let easing = options[ Attr.EASING ] || Easing.LINEAR;
-        this._easing = EasingFunc[ easing ] ? EasingFunc[ easing ] : easing;
-        this._delay = options[ Attr.DELAY ] || 0;
-        let dur = options[ Attr.DURATION ];
+        let easing = options[Attr.EASING] || Easing.LINEAR;
+        this._easing = EasingFunc[easing] ? EasingFunc[easing] : easing;
+        this._delay = options[Attr.DELAY] || 0;
+        let dur = options[Attr.DURATION];
         this._duration = typeof dur == 'undefined' ? 1000 : dur;
-        this._repeat_0 = this._repeat = options[ Attr.REPEAT ] || 1;
-        this._interval = options[ Attr.INTERVAL ] || 0;
-        this._yoyo = options[ Attr.YOYO ] || false;
-        this._startAt = options[ Attr.START ] || 0;
+        this._repeat_0 = this._repeat = options[Attr.REPEAT] || 1;
+        this._interval = options[Attr.INTERVAL] || 0;
+        this._yoyo = options[Attr.YOYO] || false;
+        this._startAt = options[Attr.START] || 0;
 
     }
 
@@ -228,12 +228,12 @@ class Clip extends EventEmitter {
         for (let key in attr) {
             if (attr.hasOwnProperty(key)) {
 
-                let value = attr[ key ];
+                let value = attr[key];
 
                 for (let type in _plugins) {
 
                     // 插件先尝试解析
-                    let plugin = _plugins[ type ];
+                    let plugin = _plugins[type];
 
                     if (plugin.test(value, key)) {
                         value = plugin.parse(value, key);
@@ -255,20 +255,6 @@ class Clip extends EventEmitter {
     }
 
     /**
-     * @protected
-     */
-    _getEvent(obj) {
-
-        obj = obj || {};
-
-        obj.target = this;
-        obj.options = this._options;
-        obj.attr = this._attr;
-
-        return obj;
-    }
-
-    /**
      * 启动动画
      * @param {boolean=false} force 强制重新计时
      * @returns {Clip}
@@ -277,20 +263,25 @@ class Clip extends EventEmitter {
 
         let now = window.performance.now();
 
+        let onceRepeat = false;
         if (this._paused) {
             this._pauseTime += now - this._pauseStart;
             this._paused = false;
-        }
-        else {
+        } else {
             if (!force && !this._stopped) {
                 return this;
             }
 
+            onceRepeat = true;
             this._stopped = false;
             this._startTime = now + this._delay;
         }
 
-        this.emit(Ev.START, this._getEvent());
+        this.emit(Ev.START);
+        let repeat = this._repeat;
+        if (repeat > 1 && repeat === this._repeat_0 && onceRepeat) {
+            this.emit(Ev.REPEAT, 0);
+        }
 
         return this;
 
@@ -309,7 +300,7 @@ class Clip extends EventEmitter {
             this._pauseTime = 0;
             this._pauseStart = 0;
 
-            this.emit(Ev.STOP, this._getEvent());
+            this.emit(Ev.STOP);
 
             this.stopChain();
         }
@@ -335,7 +326,7 @@ class Clip extends EventEmitter {
         this._paused = true;
         this._pauseStart = window.performance.now();
 
-        this.emit(Ev.PAUSE, this._getEvent());
+        this.emit(Ev.PAUSE);
 
         return this;
 
@@ -361,11 +352,7 @@ class Clip extends EventEmitter {
 
         let attr = this._updateAttr(progress, elapsed);
 
-        this.emit(Ev.UPDATE, progress, attr, this._getEvent({
-            progress,
-            elapsed,
-            keyframe: attr,
-        }));
+        this.emit(Ev.UPDATE, progress, attr, elapsed);
 
         // 一个周期结束
         return this._afterUpdate(t, elapsed);
@@ -396,20 +383,20 @@ class Clip extends EventEmitter {
             len = tracks.length;
 
         while (i < len) {
-            let item = tracks[ i++ ];
+            let item = tracks[i++];
             let { key, value } = item;
 
             let type = value.__type__;
 
             if (type) {
-                let plugin = this.constructor._plugins[ type ];
+                let plugin = this.constructor._plugins[type];
                 value = plugin.valueOf(value, progress, elapsed, key);
             }
             else {
                 value = this._interpolation(value, progress);
             }
 
-            keyframe[ key ] = value;
+            keyframe[key] = value;
         }
 
         return keyframe;
@@ -419,9 +406,10 @@ class Clip extends EventEmitter {
     _afterUpdate(time, elapsed) {
 
         // 一个周期结束
-        if (elapsed == 1) {
+        if (elapsed === 1) {
 
             let repeat = this._repeat;
+            let repeat_0 = this._repeat_0;
 
             if (repeat > 1) {
                 if (isFinite(repeat)) {
@@ -437,27 +425,28 @@ class Clip extends EventEmitter {
 
                 this._repeat = repeat;
 
-                this.emit(Ev.REPEAT_COMPLETE, repeat, this._getEvent({
-                    repeat: repeat
-                }));
+                this.emit(Ev.REPEAT_COMPLETE, repeat);
+                this.emit(Ev.REPEAT, repeat_0 - repeat);
 
                 return true;
-            }
-            else {
+            } else {
 
                 this._stopped = true;
                 this._pauseTime = 0;
                 this._pauseStart = 0;
-                this._repeat = this._repeat_0;
+                this._repeat = repeat_0;
 
-                this.emit(Ev.COMPLETE, this._getEvent());
+                if (repeat_0 > 1) {
+                    this.emit(Ev.REPEAT_COMPLETE, 0);
+                }
+                this.emit(Ev.COMPLETE);
 
                 let i = -1,
                     chains = this._chainClips,
                     len = chains.length;
                 let ani = this._animation;
                 while (++i < len) {
-                    let clip = chains[ i ];
+                    let clip = chains[i];
                     ani && ani._addLiveClip(clip);
 
                     clip.start();
@@ -495,7 +484,7 @@ class Clip extends EventEmitter {
             len = clips.length;
 
         while (++i < len) {
-            let clip = clips[ i ];
+            let clip = clips[i];
             clip.stop();
         }
 
@@ -508,6 +497,7 @@ class Clip extends EventEmitter {
      */
     destroy() {
 
+        this.off();
         this._stopped = true;
         this._paused = false;
         this._startTime = 0;
@@ -518,8 +508,6 @@ class Clip extends EventEmitter {
         let ani = this._animation;
         ani && ani.removeClip(this);
         this._animation = null;
-
-        this.off();
 
     }
 }

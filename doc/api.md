@@ -319,7 +319,8 @@ ani.start();
 * `'pause' | Clip.Event.PAUSE`  clip 暂停
 * `'stop' | Clip.Event.STOP`  clip 停止
 * `'complete' | Clip.Event.COMPLETE`  clip  动画结束(repeat运行全部结束)
-* `'repeatComplete' | Clip.Event.REPEAT_COMPLETE`  clip repeat结束后(单词repeat执行结束后)
+* `'repeat' | Clip.Event.REPEAT`  clip repeat开始前(单次repeat执行前, repeat>1时触发)
+* `'repeatComplete' | Clip.Event.REPEAT_COMPLETE`  clip repeat结束后(单次repeat执行结束后, repeat>1时触发)
 
 其中 `update` handler 提供两个参数:
 
