@@ -3,37 +3,55 @@
  * @author redmed
  */
 
+let _uid = -1;
+
 class EventEmitter {
+
+    /**
+     * 构造函数
+     */
+    constructor() {
 
     /**
      * 事件池
      * @type {Object}
      * @private
      */
-    __events__ = {};
+        this.__events__ = {};
 
     /**
      *
      * @type {number}
      * @private
      */
-    __id__ = Math.random() * Date.now();
+        this.__id__ = ++_uid;
 
-    /**
-     * 构造函数
-     */
-    constructor() {}
+    }
 
     /**
      * 事件绑定, 不支持过滤重复添加
      * @param {string} type
      * @param {Function} listener
+     * @param {*=} context
      * @returns {EventEmitter}
      */
-    on(type, listener) {
+    on(type, listener, context) {
+
         let events = this.__events__;
-        events[ type ] = events[ type ] || [];
-        events[ type ].push(listener);
+        let listeners = events[type] = events[type] || [];
+        if (context === this) {
+            context = undefined;
+        }
+        let i = -1, len = listeners;
+        while (++i < len) {
+            let { fn, ctx } = listeners[i];
+            if (fn === listener && ctx === context) {
+                return this;
+            }
+        }
+
+        let newListener = { fn: listener, ctx: context };
+        listeners.push(newListener);
 
         return this;
     }
@@ -42,26 +60,28 @@ class EventEmitter {
      * 事件绑定, 只绑定一次, 用后即焚
      * @param {string} type
      * @param {Function} listener
+     * @param {*=} context
      * @returns {EventEmitter}
      */
-    once(type, listener) {
-        let onceCallback = (...args) => {
+    once(type, listener, context) {
+        function onceCallback(ev) {
             this.off(type, onceCallback);
-            listener.apply(this, args);
-        };
+            listener.call(this, ev);
+        }
 
         onceCallback.listener = listener;
 
-        return this.on(type, onceCallback);
+        return this.on(type, onceCallback, context);
     }
 
     /**
      * 事件解绑
      * @param {string|null=} type
      * @param {Function=} listener
+     * @param {*=} context
      * @returns {EventEmitter}
      */
-    off(type = null, listener = null) {
+    off(type, listener, context) {
         let events = this.__events__;
 
         if (!type) {
@@ -71,22 +91,22 @@ class EventEmitter {
         }
 
         if (!listener) {
-            delete events[ type ];
+            delete events[type];
 
             return this;
         }
 
-        let listeners = events[ type ];
+        let listeners = events[type];
         if (listeners) {
 
-            let i = listeners.length - 1;
-            while (i >= 0) {
-                let cb = listeners[ i ];
-                if (cb === listener || cb == cb.listener) {
+            let i = listeners.length;
+            while (--i >= 0) {
+                let { fn, ctx } = listeners[i];
+                if (ctx !== context) continue;
+                if (fn === listener || fn === fn.listener) {
                     listeners.splice(i, 1);
+                    fn = () => {};
                 }
-
-                i--;
             }
         }
 
@@ -96,19 +116,26 @@ class EventEmitter {
     /**
      * 事件触发
      * @param {string} type
-     * @param {*=} args
+     * @param {Object=} data
      * @returns {EventEmitter}
      */
     emit(type, ...args) {
-        let listeners = this.__events__[ type ];
+        let listeners = this.__events__[type];
 
         if (listeners) {
-            let i = 0,
-                len = listeners.length;
 
-            while (i < len) {
-                let cb = listeners[ i++ ];
-                cb.apply(this, args);
+            let event = {
+                target: this,
+                type,
+            };
+
+            args.push(event);
+
+            let i = -1,
+                len = listeners.length;
+            while (++i < len) {
+                let { fn, ctx } = listeners[i];
+                fn.apply(ctx || this, args);
             }
         }
 
@@ -121,6 +148,10 @@ class EventEmitter {
      */
     get events() {
         return this.__events__;
+    }
+
+    get id() {
+        return this.__id__;
     }
 }
 

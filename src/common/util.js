@@ -9,7 +9,7 @@ function pullAt(array, indexes) {
 
     if (length > 0) {
         while (length--) {
-            let index = indexes[ length ];
+            let index = indexes[length];
             Array.prototype.splice.call(array, index, 1);
         }
     }
@@ -30,7 +30,7 @@ function remove(array, predicate) {
             length = array.length;
 
         while (++index < length) {
-            let value = array[ index ];
+            let value = array[index];
             if (predicate(value, index, array)) {
                 result.push(value);
                 indexes.push(index);
@@ -43,11 +43,79 @@ function remove(array, predicate) {
     return result;
 }
 
-function clone(obj) {
-    return obj;
+/**
+ * 数据归一化
+ * 将数据归一到 [0, 1] 区间, 目前仅支持离差归一和log归一
+ * @param {Array} arr 待归一的数据
+ * @param {Object} options
+ * @options {string=} options.type 归一方法 默认 'minmax'离差归一 / 'log' log归一
+ * @options {Array.<number>=} options.range 归一范围 默认 [0, 1]
+ */
+function normalize(arr, options = {}) {
+
+    if (!Array.isArray(arr)) {
+        return arr;
+    }
+
+    let {
+        type = '',
+        range = [0, 1],
+        min = Math.min.apply(Math, arr),
+        max = Math.max.apply(Math, arr)
+        /*, base = 10*/
+    } = options;
+    type = type.toLowerCase();
+
+    let normalizationArr = [];
+
+    let diff = max - min;
+
+    let i = -1, len = arr.length;
+    while (++i < len) {
+        let v = arr[i];
+        if (v > max) {
+            v = max;
+        }
+
+        if (v < min) {
+            v = min;
+        }
+
+        let v2;
+        if (type !== 'log') {
+            v2 = (v - min) / diff;
+        } else {
+            v2 = Math.log10(v);
+        }
+
+        normalizationArr.push(v2);
+    }
+
+    if (type === 'log') {
+        normalizationArr = normalize(normalizationArr);
+    }
+
+    // 非标准归一
+    let [ rMin, rMax ] = range;
+    if (rMin !== 0 || rMax !== 1) {
+        let i = -1, len = normalizationArr.length;
+        let diff = rMax - rMin;
+        let norArr = [];
+        while (++i < len) {
+            let v = normalizationArr[i];
+            let v2 = diff * v + rMin;
+
+            norArr.push(v2);
+        }
+
+        normalizationArr = norArr;
+    }
+
+    return normalizationArr;
+
 }
 
 export default {
     remove,
-    clone
+    normalize,
 };
