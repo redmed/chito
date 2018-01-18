@@ -231,15 +231,15 @@ class Animation extends EventEmitter {
 
         while (++i < len) {
             let clip = clips[i];
+            if (!this.hasClip(clip)) {
+                this._addLiveClip(clip);
+                this._addSavedClip(clip);
 
-            this._addLiveClip(clip);
-            this._addSavedClip(clip);
-
-            if (this._timer && startClip) {
-                // 如果主进程进行中，立即启动Clip进程
-                clip.start();
+                if (this._timer && startClip) {
+                    // 如果主进程进行中，立即启动Clip进程
+                    clip.start();
+                }
             }
-
         }
 
         return this;
@@ -250,7 +250,7 @@ class Animation extends EventEmitter {
 
         let _c = this._clips;
         // 防止重复添加
-        if (_c.indexOf(clip) == -1) {
+        if (_c.indexOf(clip) === -1) {
             _c.push(clip);
             clip._animation = this;
         }
@@ -261,7 +261,7 @@ class Animation extends EventEmitter {
 
         let _s = this._savedClips;
         // 防止重复添加
-        if (_s.indexOf(clip) == -1) {
+        if (_s.indexOf(clip) === -1) {
             _s.push(clip);
             clip._animation = this;
         }
@@ -327,6 +327,18 @@ class Animation extends EventEmitter {
     getClips() {
 
         return this._clips;
+
+    }
+
+    /**
+     * 判断指定的Clip是否存在
+     * @param {Clip} clip
+     * @returns {boolean}
+     */
+    hasClip(clip) {
+
+        // TODO: 使用Key-Value判断是否存在。indexOf性能太差
+        return this._savedClips.indexOf(clip) !== -1;
 
     }
 

@@ -12,18 +12,18 @@ class EventEmitter {
      */
     constructor() {
 
-    /**
-     * 事件池
-     * @type {Object}
-     * @private
-     */
+        /**
+         * 事件池
+         * @type {Object}
+         * @private
+         */
         this.__events__ = {};
 
-    /**
-     *
-     * @type {number}
-     * @private
-     */
+        /**
+         *
+         * @type {number}
+         * @private
+         */
         this.__id__ = ++_uid;
 
     }
