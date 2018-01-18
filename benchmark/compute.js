@@ -72,3 +72,37 @@ suite('Loop', function () {
     });
 
 });
+
+suite('indexOf vs key-value', function() {
+
+    var i = -1, len = 1000;
+    var list = [];
+    var hashMap = {};
+    while(++i < len) {
+        let item = {
+            id: i,
+            value: i
+        };
+        list.push(item);
+        hashMap[i] = item;
+    }
+
+
+    bench('indexOf()', function() {
+
+        var pos = (Math.random() * 1000) >> 0;
+        var findIt = list[pos];
+
+        list.indexOf(findIt);
+
+    });
+
+    bench('key-value check', function() {
+
+        var pos = (Math.random() * 1000) >> 0;
+        var findIt = list[pos];
+
+        hashMap[findIt.id];
+
+    });
+});

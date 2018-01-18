@@ -4,7 +4,7 @@
  * @date 16/8/17
  */
 
-import cssColorParser from 'csscolorparser';
+import cssColorParser from './csscolorparser';
 const parseCSSColor = cssColorParser.parseCSSColor;
 
 function _clamp_css_byte(i) {  // Clamp to integer 0 .. 255.
@@ -140,8 +140,8 @@ const ColorHelper = {
         let fn = interpolation;
 
         let fns = (p0, p1, t) => {
-            let [ r0, g0, b0, a0 ] = p0;
-            let [ r1, g1, b1, a1 ] = p1;
+            let [r0, g0, b0, a0] = p0;
+            let [r1, g1, b1, a1] = p1;
 
             let rgba = [
                 fn(r0, r1, t) >> 0,
@@ -169,7 +169,7 @@ const ColorHelper = {
     mixColors(color, increase) {
         let c = this.toNormal(color);
         if (Array.isArray(increase) && c) {
-            let [ r, g, b, a ] = [
+            let [r, g, b, a] = [
                 _clamp_css_byte(c[0] + increase[0] || 0),
                 _clamp_css_byte(c[1] + increase[1] || 0),
                 _clamp_css_byte(c[2] + increase[2] || 0),
