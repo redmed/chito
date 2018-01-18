@@ -1,7 +1,7 @@
 /**
  * @file 二维向量
  * @author qiaogang
- * 
+ *
  */
 
 let ArrayCons = typeof Float32Array === 'undefined'
@@ -17,8 +17,8 @@ let vector = {
      */
     create(x = 0, y = 0) {
         let out = new ArrayCons(2);
-        out[ 0 ] = x;
-        out[ 1 ] = y;
+        out[0] = x;
+        out[1] = y;
 
         return out;
     },
@@ -30,8 +30,8 @@ let vector = {
      * @return {Vector}
      */
     copy(out, v) {
-        out[ 0 ] = v[ 0 ];
-        out[ 1 ] = v[ 1 ];
+        out[0] = v[0];
+        out[1] = v[1];
 
         return out;
     },
@@ -43,8 +43,8 @@ let vector = {
      */
     clone(v) {
         let out = new ArrayCons(2);
-        out[ 0 ] = v[ 0 ];
-        out[ 1 ] = v[ 1 ];
+        out[0] = v[0];
+        out[1] = v[1];
 
         return out;
     },
@@ -57,8 +57,8 @@ let vector = {
      * @return {Vector} 结果
      */
     set(out, x, y) {
-        out[ 0 ] = x;
-        out[ 1 ] = y;
+        out[0] = x;
+        out[1] = y;
 
         return out;
     },
@@ -70,8 +70,8 @@ let vector = {
      * @param {Vector} v2
      */
     add(out, v1, v2) {
-        out[ 0 ] = v1[ 0 ] + v2[ 0 ];
-        out[ 1 ] = v1[ 1 ] + v2[ 1 ];
+        out[0] = v1[0] + v2[0];
+        out[1] = v1[1] + v2[1];
 
         return out;
     },
@@ -84,8 +84,8 @@ let vector = {
      * @param {number} scale
      */
     scaleAndAdd(out, v1, v2, scale) {
-        out[ 0 ] = v1[ 0 ] + v2[ 0 ] * scale;
-        out[ 1 ] = v1[ 1 ] + v2[ 1 ] * scale;
+        out[0] = v1[0] + v2[0] * scale;
+        out[1] = v1[1] + v2[1] * scale;
 
         return out;
     },
@@ -97,8 +97,8 @@ let vector = {
      * @param {Vector} v2
      */
     sub(out, v1, v2) {
-        out[ 0 ] = v1[ 0 ] - v2[ 0 ];
-        out[ 1 ] = v1[ 1 ] - v2[ 1 ];
+        out[0] = v1[0] - v2[0];
+        out[1] = v1[1] - v2[1];
 
         return out;
     },
@@ -118,7 +118,7 @@ let vector = {
      * @return {number}
      */
     lengthSquare(v) {
-        return v[ 0 ] * v[ 0 ] + v[ 1 ] * v[ 1 ];
+        return v[0] * v[0] + v[1] * v[1];
     },
 
     /**
@@ -128,8 +128,8 @@ let vector = {
      * @param {Vector} v2
      */
     multiply(out, v1, v2) {
-        out[ 0 ] = v1[ 0 ] * v2[ 0 ];
-        out[ 1 ] = v1[ 1 ] * v2[ 1 ];
+        out[0] = v1[0] * v2[0];
+        out[1] = v1[1] * v2[1];
 
         return out;
     },
@@ -141,8 +141,8 @@ let vector = {
      * @param {Vector} v2
      */
     divide(out, v1, v2) {
-        out[ 0 ] = v1[ 0 ] / v2[ 0 ];
-        out[ 1 ] = v1[ 1 ] / v2[ 1 ];
+        out[0] = v1[0] / v2[0];
+        out[1] = v1[1] / v2[1];
 
         return out;
     },
@@ -154,7 +154,7 @@ let vector = {
      * @return {number}
      */
     dot(v1, v2) {
-        return v1[ 0 ] * v2[ 0 ] + v1[ 1 ] * v2[ 1 ];
+        return v1[0] * v2[0] + v1[1] * v2[1];
     },
 
     /**
@@ -164,8 +164,8 @@ let vector = {
      * @param {number} s
      */
     scale(out, v, s) {
-        out[ 0 ] = v[ 0 ] * s;
-        out[ 1 ] = v[ 1 ] * s;
+        out[0] = v[0] * s;
+        out[1] = v[1] * s;
 
         return out;
     },
@@ -179,12 +179,12 @@ let vector = {
         let d = this.len(v);
 
         if (d === 0) {
-            out[ 0 ] = 0;
-            out[ 1 ] = 0;
+            out[0] = 0;
+            out[1] = 0;
         }
         else {
-            out[ 0 ] = v[ 0 ] / d;
-            out[ 1 ] = v[ 1 ] / d;
+            out[0] = v[0] / d;
+            out[1] = v[1] / d;
         }
 
         return out;
@@ -207,8 +207,8 @@ let vector = {
      * @return {number}
      */
     distanceSquare(v1, v2) {
-        return (v1[ 0 ] - v2[ 0 ]) * (v1[ 0 ] - v2[ 0 ])
-            + (v1[ 1 ] - v2[ 1 ]) * (v1[ 1 ] - v2[ 1 ]);
+        return (v1[0] - v2[0]) * (v1[0] - v2[0])
+            + (v1[1] - v2[1]) * (v1[1] - v2[1]);
     },
 
     /**
@@ -217,8 +217,8 @@ let vector = {
      * @param {Vector} v
      */
     negate(out, v) {
-        out[ 0 ] = -v[ 0 ];
-        out[ 1 ] = -v[ 1 ];
+        out[0] = -v[0];
+        out[1] = -v[1];
 
         return out;
     },
@@ -231,8 +231,8 @@ let vector = {
      * @param {number} t
      */
     lerp(out, v1, v2, t) {
-        out[ 0 ] = v1[ 0 ] + t * (v2[ 0 ] - v1[ 0 ]);
-        out[ 1 ] = v1[ 1 ] + t * (v2[ 1 ] - v1[ 1 ]);
+        out[0] = v1[0] + t * (v2[0] - v1[0]);
+        out[1] = v1[1] + t * (v2[1] - v1[1]);
 
         return out;
     },
@@ -244,11 +244,11 @@ let vector = {
      * @param {Vector} m
      */
     applyTransform(out, v, m) {
-        let x = v[ 0 ];
-        let y = v[ 1 ];
+        let x = v[0];
+        let y = v[1];
 
-        out[ 0 ] = m[ 0 ] * x + m[ 2 ] * y + m[ 4 ];
-        out[ 1 ] = m[ 1 ] * x + m[ 3 ] * y + m[ 5 ];
+        out[0] = m[0] * x + m[2] * y + m[4];
+        out[1] = m[1] * x + m[3] * y + m[5];
 
         return out;
     },
@@ -260,8 +260,8 @@ let vector = {
      * @param  {Vector} v2
      */
     min(out, v1, v2) {
-        out[ 0 ] = Math.min(v1[ 0 ], v2[ 0 ]);
-        out[ 1 ] = Math.min(v1[ 1 ], v2[ 1 ]);
+        out[0] = Math.min(v1[0], v2[0]);
+        out[1] = Math.min(v1[1], v2[1]);
 
         return out;
     },
@@ -272,8 +272,8 @@ let vector = {
      * @param  {Vector} v2
      */
     max(out, v1, v2) {
-        out[ 0 ] = Math.max(v1[ 0 ], v2[ 0 ]);
-        out[ 1 ] = Math.max(v1[ 1 ], v2[ 1 ]);
+        out[0] = Math.max(v1[0], v2[0]);
+        out[1] = Math.max(v1[1], v2[1]);
 
         return out;
     },
@@ -286,10 +286,10 @@ let vector = {
      */
     getAngle(v1, v2) {
         let angle = 0;
-        let _dx = v1[ 0 ] - v2[ 0 ];
+        let _dx = v1[0] - v2[0];
         if (_dx != 0) {
             // TODO: 寻找更加高效的计算夹角的方法, 考虑夹角计算放进vector中
-            angle = Math.atan2((v1[ 1 ] - v2[ 1 ]), (v1[ 0 ] - v2[ 0 ]));
+            angle = Math.atan2((v1[1] - v2[1]), (v1[0] - v2[0]));
         }
 
         return angle;

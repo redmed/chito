@@ -1,6 +1,6 @@
 {
   "name": "chito",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "赤兔, 一个支持计算颜色变化的Web动画库。",
   "scripts": {
     "release": "babel src --out-dir lib && webpack -p --config webpack.config.js",
@@ -24,6 +24,5 @@
     "webpack-dev-server": "^2.9.5"
   },
   "dependencies": {
-    "csscolorparser": "git+https://github.com/redmed/css-color-parser-js.git"
   }
 }
