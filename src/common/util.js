@@ -24,7 +24,7 @@ function remove(array, predicate) {
         return result;
     }
 
-    if (typeof predicate == 'function') {
+    if (typeof predicate === 'function') {
         let index = -1,
             indexes = [],
             length = array.length;

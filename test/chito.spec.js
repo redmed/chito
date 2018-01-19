@@ -87,7 +87,8 @@ describe('Clip test', function () {
     it('.on(Event.UPDATE)/emit(Event.UPDATE) test ...ok', function (done) {
         var clip = new Clip(animationOptions);
 
-        clip.on(Clip.Event.UPDATE, function (progress) {
+        clip.on(Clip.Event.UPDATE, function (ev) {
+            var progress = ev.progress;
             expect(typeof progress == 'number' && progress <= 1).toBe(true);
             done();
         });
@@ -116,7 +117,8 @@ describe('Clip test', function () {
 
         var clip = new Clip(animationOptions);
 
-        clip.on(Clip.Event.REPEAT_COMPLETE, function (repeat) {
+        clip.on(Clip.Event.REPEAT_COMPLETE, function (ev) {
+            var repeat = ev.repeat;
             expect(typeof repeat == 'number' && repeat > 0).toBe(true);
             done();
         });
@@ -184,7 +186,9 @@ describe('Clip attr test', function () {
     it('.on(Event.UPDATE)/emit(Event.UPDATE) test ...ok', function (done) {
         var clip = new Clip(animationOptions, attr);
 
-        clip.on(Clip.Event.UPDATE, function (progress, keyframe, args) {
+        clip.on(Clip.Event.UPDATE, function (ev) {
+            var progress = ev.progress,
+                keyframe = ev.keyframe;
             expect(typeof progress == 'number' && progress <= 1).toBe(true);
             expect(typeof keyframe == 'object'
                 && typeof keyframe.x == 'number'
@@ -342,7 +346,9 @@ describe('Running test', function () {
             .on('start', function () {
                 t0 = window.performance.now();
             })
-            .on('update', function (p, k) {
+            .on('update', function (ev) {
+                let p = ev.progress,
+                    k = ev.keyframe;
                 t1 = window.performance.now();
                 if (!t11) {
                     t11 = t1;

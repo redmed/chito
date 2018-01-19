@@ -17,10 +17,15 @@ class Animation extends EventEmitter {
      */
     _options = {};
 
+    /**
+     * 执行后停止的Clip，用于reset时重置
+     * @type {Array.<Clip>}
+     * @private
+     */
     _savedClips = [];
 
     /**
-     * 子动画片段
+     * 执行中的子动画片段
      * @type {Array.<Clip>}
      * @private
      */
@@ -89,7 +94,7 @@ class Animation extends EventEmitter {
 
         let clips = this._clips;
 
-        this.emit(Ev.UPDATE, timestamp);
+        this.emit(Ev.UPDATE, { timestamp });
 
         let i = 0;
         while (i < clips.length) {
@@ -98,9 +103,10 @@ class Animation extends EventEmitter {
 
             if (!running) {
                 // clip._animation = null;
-                clips.splice(i, 1);
-            }
-            else {
+                if (this._hasLiveClip(clip)) {
+                    clips.splice(i, 1);
+                }
+            } else {
                 i++;
             }
         }
@@ -109,7 +115,7 @@ class Animation extends EventEmitter {
 
         this.emit(Ev.AFTER_UPDATE);
 
-        if (clips.length == 0) {
+        if (clips.length === 0) {
             this._stopAni();
             this.emit(Ev.COMPLETE);
         }
@@ -231,7 +237,7 @@ class Animation extends EventEmitter {
 
         while (++i < len) {
             let clip = clips[i];
-            if (!this.hasClip(clip)) {
+            if (!this._hasSavedClip(clip)) {
                 this._addLiveClip(clip);
                 this._addSavedClip(clip);
 
@@ -286,8 +292,7 @@ class Animation extends EventEmitter {
             this._removeSavedClip(clip);
 
             clip._animation = null;
-        }
-        else {
+        } else {
             let i = -1,
                 len = saved.length;
 
@@ -335,11 +340,15 @@ class Animation extends EventEmitter {
      * @param {Clip} clip
      * @returns {boolean}
      */
-    hasClip(clip) {
+    _hasSavedClip(clip) {
 
         // TODO: 使用Key-Value判断是否存在。indexOf性能太差
         return this._savedClips.indexOf(clip) !== -1;
 
+    }
+
+    _hasLiveClip(clip) {
+        return this._clips.indexOf(clip) !== -1;
     }
 
     /**

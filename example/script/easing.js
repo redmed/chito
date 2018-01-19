@@ -1,4 +1,3 @@
-// import Chito from '../../src/main';
 var $p1Num = document.getElementById('p1-num');
 var $p1 = document.getElementById('p1');
 var $p2 = document.getElementById('p2');
@@ -21,11 +20,12 @@ var clip1 = new Clip({
     repeat: 6,
     interval: 1000
 }, {
-    x: [ 0, 400 ],
-    fill: [ '#22e1ee', '#eb5e17' ]
+    x: [0, 400],
+    fill: ['#22e1ee', '#eb5e17']
 });
 
-clip1.on('update', function (progress, keyframe) {
+clip1.on('update', function (ev) {
+    var progress = ev.progress, keyframe = ev.keyframe;
     $p1Num.innerText = ((progress * 100) >> 0) + '%';
     $p1.style.left = keyframe.x + 'px';
     $p1.style.backgroundColor = keyframe.fill;
@@ -37,11 +37,12 @@ var clip2 = new Clip({
     interval: 1000,
     easing: 'ElasticInOut'
 }, {
-    x: [ 0, 400 ],
-    fill: [ '#22e1ee', '#eb5e17' ]
+    x: [0, 400],
+    fill: ['#22e1ee', '#eb5e17']
 });
 
-clip2.on('update', function (progress, keyframe) {
+clip2.on('update', function (ev) {
+    var progress = ev.progress, keyframe = ev.keyframe;
     $p2Num.innerText = ((progress * 100) >> 0) + '%';
     $p2.style.left = keyframe.x + 'px';
     $p2.style.backgroundColor = keyframe.fill;
@@ -53,11 +54,12 @@ var clip3 = new Clip({
     interval: 1000,
     easing: 'BounceInOut'
 }, {
-    x: [ 0, 400 ],
-    fill: [ '#22e1ee', '#eb5e17' ]
+    x: [0, 400],
+    fill: ['#22e1ee', '#eb5e17']
 });
 
-clip3.on('update', function (progress, keyframe) {
+clip3.on('update', function (ev) {
+    var progress = ev.progress, keyframe = ev.keyframe;
     $p3Num.innerText = ((progress * 100) >> 0) + '%';
     $p3.style.left = keyframe.x + 'px';
     $p3.style.backgroundColor = keyframe.fill;
@@ -71,11 +73,12 @@ var clip4 = new Clip({
         return Math.floor(progress * 10) / 10;
     }
 }, {
-    x: [ 0, 400 ],
-    fill: [ '#22e1ee', '#eb5e17' ]
+    x: [0, 400],
+    fill: ['#22e1ee', '#eb5e17']
 });
 
-clip4.on('update', function (progress, keyframe) {
+clip4.on('update', function (ev) {
+    var progress = ev.progress, keyframe = ev.keyframe;
     $p4Num.innerText = ((progress * 100) >> 0) + '%';
     $p4.style.left = keyframe.x + 'px';
     $p4.style.backgroundColor = keyframe.fill;
@@ -105,7 +108,7 @@ animation
         goBottom()
     });
 
-animation.addClip([ clip1, clip2, clip3, clip4 ]);
+animation.addClip([clip1, clip2, clip3, clip4]);
 animation.start();
 
 var $startBtn = document.getElementById('start');
