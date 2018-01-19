@@ -446,7 +446,7 @@ class Clip extends EventEmitter {
                 let ani = this._animation;
                 while (++i < len) {
                     let clip = chains[i];
-                    ani && ani._addLiveClip(clip);
+                    ani && ani._addClip(clip);
 
                     clip.start();
                 }

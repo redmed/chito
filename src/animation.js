@@ -7,6 +7,7 @@ import EventEmitter from './common/eventemitter';
 import utils from './common/util';
 import { requestAnimationFrame as rAF, cancelAnimationFrame as cAF } from './common/animationframe';
 import { Ev } from './common/define';
+const { remove, forInMap } = utils;
 
 class Animation extends EventEmitter {
 
@@ -19,10 +20,10 @@ class Animation extends EventEmitter {
 
     /**
      * 执行后停止的Clip，用于reset时重置
-     * @type {Array.<Clip>}
+     * @type {Object} id-Clip 值对保存
      * @private
      */
-    _savedClips = [];
+    _savedClipMap = {};
 
     /**
      * 执行中的子动画片段
@@ -30,6 +31,8 @@ class Animation extends EventEmitter {
      * @private
      */
     _clips = [];
+
+    _clipMap = {};
 
     /**
      * 动画进程标记
@@ -102,10 +105,7 @@ class Animation extends EventEmitter {
             let running = clip.update(timestamp);
 
             if (!running) {
-                // clip._animation = null;
-                if (this._hasLiveClip(clip)) {
-                    clips.splice(i, 1);
-                }
+                this._rmClip(clip);
             } else {
                 i++;
             }
@@ -130,7 +130,7 @@ class Animation extends EventEmitter {
         let clips = this._clips,
             len = clips.length;
 
-        if (this._timer || len == 0) {
+        if (this._timer || len === 0) {
             return this;
         }
 
@@ -178,16 +178,15 @@ class Animation extends EventEmitter {
 
         this._stop(false, true, false);
 
-        let i = -1,
-            saved = this._savedClips,
-            len = saved.length;
+        let savedMap = this._savedClipMap;
 
-        while (++i < len) {
-            let c = saved[i];
-            c.stop(true);
-        }
+        let list = [];
+        forInMap(savedMap, value => {
+            value.stop(true);
+            list.push(value);
+        });
 
-        this._clips = saved.slice();
+        this._clips = list;
 
         this.emit(Ev.RESET);
 
@@ -238,7 +237,7 @@ class Animation extends EventEmitter {
         while (++i < len) {
             let clip = clips[i];
             if (!this._hasSavedClip(clip)) {
-                this._addLiveClip(clip);
+                this._addClip(clip);
                 this._addSavedClip(clip);
 
                 if (this._timer && startClip) {
@@ -252,7 +251,7 @@ class Animation extends EventEmitter {
 
     }
 
-    _addLiveClip(clip) {
+    _addClip(clip) {
 
         let _c = this._clips;
         // 防止重复添加
@@ -265,10 +264,11 @@ class Animation extends EventEmitter {
 
     _addSavedClip(clip) {
 
-        let _s = this._savedClips;
+        let clipMap = this._savedClipMap;
+        let id = clip.id;
         // 防止重复添加
-        if (_s.indexOf(clip) === -1) {
-            _s.push(clip);
+        if (clipMap[id] !== clip) {
+            clipMap[id] = clip;
             clip._animation = this;
         }
 
@@ -280,48 +280,40 @@ class Animation extends EventEmitter {
      */
     removeClip(clip) {
 
-        let saved = this._savedClips;
+        let savedMap = this._savedClipMap;
 
         if (clip) {
-            // let idx = clips.indexOf(clip);
-            // if (idx != -1) {
-            //     clip._animation = null;
-            //     clips.splice(idx, 1);
-            // }
-            this._removeLiveClip(clip);
-            this._removeSavedClip(clip);
+            this._rmClip(clip);
+            this._rmSavedClip(clip);
 
             clip._animation = null;
         } else {
-            let i = -1,
-                len = saved.length;
-
-            while (++i < len) {
-                let c = saved[i];
-                c._animation = null;
-            }
+            // Rm all
+            forInMap(savedMap, value => {
+                value._animation = null;
+            });
 
             this._clips = [];
-            this._savedClips = [];
+            this._savedClipMap = {};
         }
 
         return this;
 
     }
 
-    _removeLiveClip(clip) {
+    _rmClip(clip) {
 
-        utils.remove(this._clips, c => {
+        remove(this._clips, c => {
             return c === clip;
         });
 
     }
 
-    _removeSavedClip(clip) {
+    _rmSavedClip(clip) {
 
-        utils.remove(this._savedClips, c => {
-            return c === clip;
-        });
+        if (this._hasSavedClip(clip)) {
+            delete this._savedClipMap[clip.id];
+        }
 
     }
 
@@ -342,12 +334,14 @@ class Animation extends EventEmitter {
      */
     _hasSavedClip(clip) {
 
-        // TODO: 使用Key-Value判断是否存在。indexOf性能太差
-        return this._savedClips.indexOf(clip) !== -1;
+        let id = clip.id;
+        let savedMap = this._savedClipMap;
+        let savedClip = savedMap[id];
+        return savedClip && savedClip === clip;
 
     }
 
-    _hasLiveClip(clip) {
+    _hasClip(clip) {
         return this._clips.indexOf(clip) !== -1;
     }
 

@@ -46,7 +46,7 @@ HTML
 </div>
 ```
 
-Javascript
+Javascript in ES6
 
 ```js
 // 创建 Animation 实例，控制动画主进程
@@ -63,14 +63,15 @@ let clip = new Clip({
 })
 
 // 增加 Clip 的 Update 事件
-clip.on('update', (progress, frame) => {
+clip.on('update', (event) => {
+    let { progress, keyframe } = event
 	// frame 中包含了当前时刻下的数据
 	// 根据数据绘制 UI
-	let $el = document.getElementById('p1');
+	let $el = document.getElementById('p1')
 
-	$el.style.left = frame.x + 'px'
-	$el.style.top = frame.y + 'px'
-	$el.style.backgroundColor = frame.color
+	$el.style.left = keyframe.x + 'px'
+	$el.style.top = keyframe.y + 'px'
+	$el.style.backgroundColor = keyframe.color
 })
 
 // 将 clip 添加至动画主进程
