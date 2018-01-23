@@ -63,34 +63,34 @@ var tw3 = new TWEEN.Tween(from3)
 // tw2.chain(tw3)
 // tw1.chain(tw2).start();
 
-var twLi = [ tw1, tw2, tw3, tw1 ];
+var twLi = [tw1, tw2, tw3, tw1];
 var i = -1, len = twLi.length;
 while (++i < len) {
-    var t = twLi[ i ];
-    var t1 = twLi[ i + 1 ];
+    var t = twLi[i];
+    var t1 = twLi[i + 1];
     if (t && t1) {
         t.chain(t1);
     }
 }
 
-twLi[ 0 ].start();
+twLi[0].start();
 
 var timer = null;
 
 function updateKeyframe(time) {
     var res = TWEEN.update();
     // if (res) {
-        timer = requestAnimationFrame(updateKeyframe);
+    timer = requestAnimationFrame(updateKeyframe);
     // }
 }
 
 timer = requestAnimationFrame(updateKeyframe)
 
-setTimeout(function() {
+setTimeout(function () {
     // cancelAnimationFrame(timer);
     // timer = null;
     tw1.stop()
-    setTimeout(function() {
+    setTimeout(function () {
         // timer = requestAnimationFrame(updateKeyframe)
         tw1.start();
     }, 2343)

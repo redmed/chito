@@ -5,6 +5,22 @@
 
 let _uid = -1;
 
+function assign(dest, ...args) {
+
+    let j = -1, len = args.length;
+    while (++j < len) {
+        let src = args[j];
+        for (let i in src) {
+            if (src.hasOwnProperty(i)) {
+                dest[i] = src[i];
+            }
+        }
+    }
+
+    return dest;
+
+}
+
 class EventEmitter {
 
     /**
@@ -119,23 +135,21 @@ class EventEmitter {
      * @param {Object=} data
      * @returns {EventEmitter}
      */
-    emit(type, ...args) {
+    emit(type, data) {
         let listeners = this.__events__[type];
 
         if (listeners) {
 
-            let event = {
+            let event = assign({}, data, {
                 target: this,
-                type,
-            };
-
-            args.push(event);
+                type
+            });
 
             let i = -1,
                 len = listeners.length;
             while (++i < len) {
                 let { fn, ctx } = listeners[i];
-                fn.apply(ctx || this, args);
+                fn.call(ctx || this, event);
             }
         }
 

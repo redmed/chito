@@ -1,4 +1,3 @@
-// import Chito from '../../src/main';
 var $p2Num = document.getElementById('p2-num');
 var $p2 = document.getElementById('p2');
 var $p1Num = document.getElementById('p1-num');
@@ -16,14 +15,15 @@ var clip1 = new Clip({
     duration: 5000,
     repeat: 1
 }, {
-    x: [ 0, 200 ],
-    y: [ 0, 200 ],
-    width: [ 50, 100, 50 ],
-    height: [ 50, 100, 50 ],
-    fill: [ '#22e1ee', '#eb5e17' ]
+    x: [0, 200],
+    y: [0, 200],
+    width: [50, 100, 50],
+    height: [50, 100, 50],
+    fill: ['#22e1ee', '#eb5e17']
 });
 
-clip1.on('update', function (progress, keyframe) {
+clip1.on('update', function (ev) {
+    var progress = ev.progress, keyframe = ev.keyframe;
     $p1Num.innerText = ((progress * 100) >> 0) + '%';
     $p1.style.left = keyframe.x + 'px';
     $p1.style.top = keyframe.y + 'px';
@@ -36,12 +36,13 @@ var clip2 = new Clip({
     duration: 5000,
     repeat: 1
 }, {
-    x: [ 0, 200, 200, 0, 0 ],
-    y: [ 0, 0, 200, 200, 0 ],
-    fill: [ '#22e1ee', '#eb5e17' ]
+    x: [0, 200, 200, 0, 0],
+    y: [0, 0, 200, 200, 0],
+    fill: ['#22e1ee', '#eb5e17']
 });
 
-clip2.on('update', function (progress, keyframe) {
+clip2.on('update', function (ev) {
+    var progress = ev.progress, keyframe = ev.keyframe;
     $p2Num.innerText = ((progress * 100) >> 0) + '%';
     $p2.style.left = keyframe.x + 'px';
     $p2.style.top = keyframe.y + 'px';
@@ -76,7 +77,7 @@ animation
         goBottom()
     });
 
-animation.addClip([ clip1, clip2 ]);
+animation.addClip([clip1, clip2]);
 animation.start();
 
 var $startBtn = document.getElementById('start');

@@ -280,7 +280,7 @@ class Clip extends EventEmitter {
         this.emit(Ev.START);
         let repeat = this._repeat;
         if (repeat > 1 && repeat === this._repeat_0 && onceRepeat) {
-            this.emit(Ev.REPEAT, 0);
+            this.emit(Ev.REPEAT, { remain: 0 });
         }
 
         return this;
@@ -350,9 +350,9 @@ class Clip extends EventEmitter {
         let t = time - this._pauseTime;
         let { progress, elapsed } = this._getProgress(t);
 
-        let attr = this._updateAttr(progress, elapsed);
+        let keyframe = this._updateAttr(progress, elapsed);
 
-        this.emit(Ev.UPDATE, progress, attr, elapsed);
+        this.emit(Ev.UPDATE, { progress, keyframe, elapsed });
 
         // 一个周期结束
         return this._afterUpdate(t, elapsed);
@@ -425,19 +425,18 @@ class Clip extends EventEmitter {
 
                 this._repeat = repeat;
 
-                this.emit(Ev.REPEAT_COMPLETE, repeat);
-                this.emit(Ev.REPEAT, repeat_0 - repeat);
+                this.emit(Ev.REPEAT_COMPLETE, { repeat });
+                this.emit(Ev.REPEAT, { remain: repeat_0 - repeat });
 
                 return true;
             } else {
-
                 this._stopped = true;
                 this._pauseTime = 0;
                 this._pauseStart = 0;
                 this._repeat = repeat_0;
 
                 if (repeat_0 > 1) {
-                    this.emit(Ev.REPEAT_COMPLETE, 0);
+                    this.emit(Ev.REPEAT_COMPLETE, { repeat: 0 });
                 }
                 this.emit(Ev.COMPLETE);
 
@@ -447,7 +446,7 @@ class Clip extends EventEmitter {
                 let ani = this._animation;
                 while (++i < len) {
                     let clip = chains[i];
-                    ani && ani._addLiveClip(clip);
+                    ani && ani._addClip(clip);
 
                     clip.start();
                 }

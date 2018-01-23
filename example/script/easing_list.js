@@ -329,7 +329,7 @@ function createCanvasTable() {
         tableArr.push('<tr>');
         let j = -1;
         while (++j < 3) {
-            var name = names[ i ];
+            var name = names[i];
 
             var str =
                 '<td data-type="' + name + '">' +
@@ -391,7 +391,7 @@ function easingShape(id, easing) {
     ctx.moveTo(0, dH - dH2);
     ctx.lineTo(WIDTH, dH - dH2);
     ctx.lineWidth = 0.4;
-    ctx.setLineDash([ 5, 5 ]);
+    ctx.setLineDash([5, 5]);
     ctx.stroke();
 }
 
@@ -400,8 +400,8 @@ function init() {
 
     var m = -1, len = names.length;
     while (++m < len) {
-        var key = names[ m ];
-        easingShape(key, Easing[ key ]);
+        var key = names[m];
+        easingShape(key, Easing[key]);
     }
 
     var clip,
@@ -422,10 +422,11 @@ function init() {
                 repeat: 1,
                 easing: easingName
             }, {
-                x: [ 0, 200 - 20 ]
+                x: [0, 200 - 20]
             });
 
-            clip.on('update', function (p, k) {
+            clip.on('update', function (ev) {
+                var p = ev.progress, k = ev.keyframe;
                 $next.style.left = k.x + 'px';
             });
 
