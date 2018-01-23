@@ -322,10 +322,10 @@ ani.start();
 * `'repeat' | Clip.Event.REPEAT`  clip repeat开始前(单次repeat执行前, repeat>1时触发)
 * `'repeatComplete' | Clip.Event.REPEAT_COMPLETE`  clip repeat结束后(单次repeat执行结束后, repeat>1时触发)
 
-其中 `update` handler 提供两个参数:
+其中 `update` handler 提供Event参数，其中包含属性如下:
 
-* progress: `number=[0, 1]` 缓动进度
-* keyframe: `Object` 关键帧在当前进度下的值
+* event.progress: `number=[0, 1]` 缓动进度
+* event.keyframe: `Object` 关键帧在当前进度下的值
 
 例如: 
 
@@ -337,7 +337,8 @@ let clip = new Clip({
 	x: [0, 10]
 })
 
-clip.on(Clip.Event.UPDATE, (progress, keyframe) => {
+clip.on(Clip.Event.UPDATE, (ev) => {
+    let { progress, keyframe } = ev;
 	console.log(progress) // output: 0 .. 0.5 .. 1 
 	console.log(keyframe) // output: {x: 0} .. {x: 5} .. {x: 10}
 })
