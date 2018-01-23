@@ -7,11 +7,15 @@
 function pullAt(array, indexes) {
     let length = array ? indexes.length : 0;
 
-    if (length > 0) {
-        while (length--) {
-            let index = indexes[length];
-            Array.prototype.splice.call(array, index, 1);
-        }
+    // if (length > 0) {
+    //     while (length--) {
+    //         let index = indexes[length];
+    //         Array.prototype.splice.call(array, index, 1);
+    //     }
+    // }
+    while(length-- > 0) {
+        let index = indexes[length];
+        array.splice(index, 1);
     }
 
     return array;
@@ -24,7 +28,7 @@ function remove(array, predicate) {
         return result;
     }
 
-    if (typeof predicate == 'function') {
+    if (typeof predicate === 'function') {
         let index = -1,
             indexes = [],
             length = array.length;
@@ -96,7 +100,7 @@ function normalize(arr, options = {}) {
     }
 
     // 非标准归一
-    let [ rMin, rMax ] = range;
+    let [rMin, rMax] = range;
     if (rMin !== 0 || rMax !== 1) {
         let i = -1, len = normalizationArr.length;
         let diff = rMax - rMin;
@@ -115,7 +119,17 @@ function normalize(arr, options = {}) {
 
 }
 
+function forInMap(obj, callback) {
+    for (let key in obj) {
+        if (obj.hasOwnProperty(key)) {
+            let value = obj[key];
+            callback(value, key, obj);
+        }
+    }
+}
+
 export default {
     remove,
     normalize,
+    forInMap,
 };
