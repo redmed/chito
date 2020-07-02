@@ -310,7 +310,10 @@ let Easing = {
 };
 
 var names = [];
-var WIDTH = 300, HEIGHT = 150, GAP = HEIGHT * 0.2;
+var C = 0.6;
+var CAV_WIDTH = 200, CAV_HEIGHT = 200 * (1 + C);
+var WIDTH = CAV_WIDTH;
+var INTERVAL = 1000, DURATION = 1500;
 
 function createCanvasTable() {
 
@@ -331,14 +334,16 @@ function createCanvasTable() {
         while (++j < 3) {
             var name = names[i];
 
-            var str =
-                '<td data-type="' + name + '">' +
-                '<p>' + name + '</p>' +
-                '<div class="ceil">' +
-                '<canvas id="' + name + '"></canvas>' +
-                '<span class="pointer"></span>' +
-                '</div>' +
-                '</td>';
+            var str = `
+                <td data-type="${name}">
+                    <p>${name}</p>
+                    <div class="ceil">
+                    <canvas id="${name}" width="${CAV_WIDTH}px" height="${CAV_HEIGHT}px" style="width:${CAV_WIDTH}px; height:${CAV_HEIGHT}px"></canvas>
+                    <span id="${name}_p" style="bottom: ${CAV_WIDTH * C / 2}px" class="pointer"></span>
+                    <span id="${name}_t" style="" class="time"></span>
+                    </div>
+                </td>
+            `
 
             tableArr.push(str);
             if (i++ == 0) {
@@ -363,8 +368,9 @@ function easingShape(id, easing) {
 
     var ctx = $cav.getContext('2d');
 
-    var dH = HEIGHT - GAP,
-        dH2 = HEIGHT * 0.6;
+    // 上下留出空间展示超出部分的曲线
+    var dH = WIDTH * (1 + C / 2),
+        dH2 = WIDTH;
 
     // Easing 曲线
     ctx.moveTo(0, dH);
@@ -377,21 +383,25 @@ function easingShape(id, easing) {
         var p = easing(k);
 
         var x = k * WIDTH;
-        var y = p * dH2;
+        var y = p * WIDTH;
 
         ctx.lineTo(x, dH - y);
     }
-
-    ctx.lineWidth = 0.5;
-    ctx.strokeStyle = '#222';
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = '#222222';
     ctx.stroke();
-    // 轴线
+    
+    // XY 轴
+    ctx.beginPath();
+    // x 轴
     ctx.moveTo(0, dH);
     ctx.lineTo(WIDTH, dH);
-    ctx.moveTo(0, dH - dH2);
-    ctx.lineTo(WIDTH, dH - dH2);
-    ctx.lineWidth = 0.4;
-    ctx.setLineDash([5, 5]);
+    // y 轴
+    ctx.moveTo(0.5, dH);
+    ctx.lineTo(0.5, dH - dH2);
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = '#222288';
+    ctx.setLineDash([4, 1]);
     ctx.stroke();
 }
 
@@ -414,20 +424,24 @@ function init() {
 
         if ($target.tagName == 'CANVAS' && easingName) {
 
-            var $next = $target.nextSibling;
+            var $next = document.getElementById($target.id + '_p');
+            var $time = document.getElementById($target.id + '_t');
 
             clip && clip.destroy();
             clip = new Chito.Clip({
-                duration: 1000,
-                repeat: 1,
+                duration: DURATION,
+                repeat: 99,
+                interval: INTERVAL,
                 easing: easingName
             }, {
-                x: [0, 200 - 20]
+                y: [0, WIDTH]
             });
 
             clip.on('update', function (ev) {
-                var p = ev.progress, k = ev.keyframe;
-                $next.style.left = k.x + 'px';
+                var p = ev.elapsed, k = ev.keyframe;
+                
+                $next.style.bottom = (k.y + WIDTH * C / 2) + 'px';
+                $time.style.left = (p * WIDTH - 2) + 'px';
             });
 
             ani.stop();

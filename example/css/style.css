@@ -70,17 +70,24 @@ table {
 
 .easing-list .pointer {
     position: absolute;
-    top: 0;
-    left: 0;
+    left: -26px;
     display: block;
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     border: 1px solid #111;
     background: #22e1ee;
 }
 
+.easing-list .time {
+    position: absolute;
+    bottom: 40px;
+    left: -1px;
+    display: block;
+    width: 3px;
+    height: 20px;
+    background: #ee2222;
+}
+
 .easing-list .ceil canvas {
     cursor: pointer;
-    width: 200px;
-    height: 150px;
 }
