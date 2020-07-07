@@ -1,11 +1,11 @@
 {
   "name": "chito",
   "version": "0.3.2",
-  "description": "赤兔, 一个支持计算颜色变化的Web动画库。",
+  "description": "赤兔, 一个支持计算数值、颜色、坐标变化的Web动画插值库。",
   "scripts": {
-    "release": "babel src --out-dir lib && webpack -p --config webpack.config.js",
+    "build-dist": "webpack --config build/webpack.config.js",
+    "release": "babel src --out-dir lib && webpack --config build/webpack.config.js",
     "test": "phantomjs test/run.spec.js test/chito.spec.html",
-    "dev": "webpack-dev-server --config webpack.dev.config.js",
     "serve": "webpack-dev-server"
   },
   "main": "index.js",
@@ -15,7 +15,10 @@
   "devDependencies": {
     "@babel/cli": "^7.5.5",
     "@babel/core": "^7.5.5",
+    "@babel/plugin-proposal-class-properties": "^7.10.4",
+    "@babel/preset-env": "^7.10.4",
     "astrobench": "^0.1.2",
+    "babel-loader": "^8.1.0",
     "jasmine": "^3.4.0",
     "phantomjs": "^2.1.7",
     "webpack": "^4.39.2",

@@ -4,10 +4,10 @@
  */
 
 import EventEmitter from './common/eventemitter';
-import utils from './common/util';
+import { remove, forInMap } from './common/util';
 import { requestAnimationFrame as rAF, cancelAnimationFrame as cAF } from './common/animationframe';
 import { Ev } from './common/define';
-const { remove, forInMap } = utils;
+// const { remove, forInMap } = utils;
 
 class Animation extends EventEmitter {
 

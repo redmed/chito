@@ -21,7 +21,7 @@ function pullAt(array, indexes) {
     return array;
 }
 
-function remove(array, predicate) {
+export function remove(array, predicate) {
     let result = [];
 
     if (!(array && array.length)) {
@@ -55,7 +55,7 @@ function remove(array, predicate) {
  * @options {string=} options.type 归一方法 默认 'minmax'离差归一 / 'log' log归一
  * @options {Array.<number>=} options.range 归一范围 默认 [0, 1]
  */
-function normalize(arr, options = {}) {
+export function normalize(arr, options = {}) {
 
     if (!Array.isArray(arr)) {
         return arr;
@@ -119,7 +119,7 @@ function normalize(arr, options = {}) {
 
 }
 
-function forInMap(obj, callback) {
+export function forInMap(obj, callback) {
     for (let key in obj) {
         if (obj.hasOwnProperty(key)) {
             let value = obj[key];
@@ -127,9 +127,3 @@ function forInMap(obj, callback) {
         }
     }
 }
-
-export default {
-    remove,
-    normalize,
-    forInMap,
-};
