@@ -27,6 +27,7 @@ import { Animation, Clip } from 'chito/lib/core';
 // 指定加载需要的插件
 // 加载颜色插件，以支持颜色变化
 import 'chito/lib/plugins/color';
+import 'chito/lib/plugins/coordinate';
 ```
 
 ## Animation
@@ -352,3 +353,80 @@ clip.on(Clip.Event.UPDATE, (ev) => {
 
 * eventName: `string=` 事件名称，默认移除全部函数
 * handler: `function=` 事件回调函数，默认移除`eventName`下的全部事件
+
+## plugins 插件
+
+插件的作用：
+
+#### 1. 根据业务场景选取插件，减少组件大小
+
+目前`Chito`除了基本数值插值外，还支持颜色插值、直角坐标插值计算。  
+默认引用导入的是全功能组件，但是也可以加载`core`模式，该模式下仅支持数值的线性插值计算。  
+其他插件通过`'chito/lib/plugins/'`加载。
+
+```js
+// 全功能
+import Chito from 'chito';
+
+// core 模式，仅支持数值线性插值
+
+import Chito from 'chito/lib/core';
+import 'chito/lib/plugins/color';
+import 'chito/lib/plugins/coordinate'; 
+```
+
+#### 2. 自定义扩展属性插值计算，满足特殊场景扩展 
+
+插件开发规则。
+
+插件目录：`/src/plugins/`
+
+
+插件规则示例，插件需要实现如下函数：
+
+```js
+const plugin = {
+  /**
+   * 定义插件类型
+   * @type {string}
+   */
+  type: 'color',
+
+  /**
+   * 判断数据是否使用该插件，如果返回 true，则在计算插值时，使用 parse 和 valueOf
+   * @param {*} value 待解析的数据
+   * @param {string=} key 解析数据名称
+   * @returns {boolean} 是否支持该类型
+   */
+  test(value, key) {
+    return ColorHelper.isColor(value);
+  },
+
+  /**
+   * 解析待解析的原始数据 
+   * @param {*} value 待解析的数据
+   * @param {string=} key 解析数据名称
+   * @returns {*} 解析中间过程的值
+   */
+  parse(value, key) {
+    return ColorHelper.toNormalArray(value);
+  },
+
+  /**
+   * 根据 progress 计算实际插值
+   * @param {*} parsedValue
+   * @param {number} progress 经过缓动函数变换后的进度
+   * @param {number=} elapsed 缓动变换前的原进度
+   * @param {string=} key
+   * @returns {*}
+   */
+  valueOf(parsedValue, progress, elapsed, key) {
+    let val = ColorHelper.linearGradient(parsedValue, progress);
+    val = ColorHelper.toRGBA(val);
+
+    return val;
+  }
+};
+
+Clip.registerPlugin(plugin);
+```
